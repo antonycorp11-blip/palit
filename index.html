@@ -3,11 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#1d2b53">
   <title>Palit</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=VT323&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#1d2b53">
+  <meta name="description" content="Incremental de construção vertical em pixel art: comece com um palito de fósforo e construa até atravessar o universo.">
+  <!-- PWA / iPhone (Adicionar à Tela de Início) -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Palit">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="preload" href="fonts/silkscreen-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/vt323-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -55,6 +65,7 @@
     <p>Uma caixa de fósforos.<br>Uma torre.<br>Um caminho absurdamente longo para cima.</p>
     <p class="c-l">Toque para colocar uma peça. Arraste para descer pela torre. Toque em ameaças para expulsá-las. Toque em peças danificadas para repará-las.</p>
     <button class="pxbtn gold">COMEÇAR</button>
+    <p id="ios-tip" class="c-y" hidden>Para jogar em tela cheia: toque em Compartilhar e depois em "Adicionar à Tela de Início".</p>
   </div>
 
   <script src="js/data/stats.js"></script>

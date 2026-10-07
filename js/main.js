@@ -79,6 +79,24 @@ var PALIT = window.PALIT = window.PALIT || {};
     document.body.appendChild(d);
   }
 
+  /* PWA: service worker (offline) + bloqueios de gestos do iOS */
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () { /* sem SW */ }); });
+  }
+  ['gesturestart', 'gesturechange', 'dblclick'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });
+  });
+  document.addEventListener('touchmove', function (e) {
+    if (!e.target.closest('#tree-detail, #modal .box')) e.preventDefault();
+  }, { passive: false });
+  var standalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  document.documentElement.classList.toggle('standalone', standalone);
+  document.addEventListener('DOMContentLoaded', function () {
+    var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var tip = document.getElementById('ios-tip');
+    if (tip && ios && !standalone) tip.hidden = false;
+  });
+
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 })();

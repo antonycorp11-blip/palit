@@ -3,7 +3,22 @@
 Jogo incremental de construção vertical em pixel art, **100% HTML + CSS + JS puro** (sem build, sem imagens).
 Toda a arte é CSS: sprites em `box-shadow` gerados a partir de ASCII, torre em projeção oblíqua (palitos gerados por material), cenário em blocos/degradês de corte seco, paleta PICO-8. Todos os sons são sintetizados em tempo real (Web Audio).
 
-Abra `index.html` (ou sirva a pasta: `python3 -m http.server`). Use `?debug` para o painel de testes.
+Sirva a pasta (`python3 -m http.server`) e abra no navegador. Use `?debug` para o painel de testes.
+
+## Publicar na Vercel e instalar no iPhone
+
+1. Na Vercel: **Add New → Project** e importe este repositório (ou arraste a pasta em *vercel.com/new*).
+   - Framework Preset: **Other** · Build Command: *(vazio)* · Output Directory: *(vazio / raiz)*.
+   - É um site estático: não há build. O `vercel.json` já configura os cabeçalhos do service worker e do manifesto.
+2. No iPhone, abra a URL no **Safari** → botão **Compartilhar** → **Adicionar à Tela de Início**.
+3. O app abre em tela cheia, sem barra do Safari, com ícone próprio, e funciona **offline** depois da primeira abertura.
+
+Notas:
+- O progresso fica salvo no próprio aparelho (o app instalado tem armazenamento separado do Safari).
+- O som do iPhone respeita a chave de silencioso; o áudio é liberado no primeiro toque.
+- Atualizações: ao publicar uma nova versão, o app baixa em segundo plano e mostra na abertura seguinte.
+  Para forçar, aumente `VERSION` em `sw.js`.
+- Ícones: `python3 tools/make_icons.py` regenera os PNGs em `icons/`.
 
 ## Arquitetura
 

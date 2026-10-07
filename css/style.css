@@ -31,7 +31,8 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
-  width: 100%; height: 100%; overflow: hidden;
+  width: 100%; height: 100%; overflow: hidden; position: fixed; inset: 0;
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
   background: var(--ink); color: var(--white);
   font-family: var(--font-txt); font-size: 20px; line-height: 1;
   -webkit-font-smoothing: none; font-smooth: never;
@@ -258,7 +259,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .chip { font-family: var(--font-px); font-size: 8px; padding: 3px 5px; background: var(--ink); color: var(--lgray); }
 .chip.bad { color: var(--red); } .chip.good { color: var(--lime); } .chip.warn { color: var(--yellow); }
 
-#alerts { position: absolute; left: 50%; transform: translateX(-50%); top: 196px; display: grid; justify-items: center; gap: calc(var(--u) * 3); pointer-events: none; width: calc(100% - 32px); }
+#alerts { position: absolute; left: 50%; transform: translateX(-50%); top: calc(196px + env(safe-area-inset-top)); display: grid; justify-items: center; gap: calc(var(--u) * 3); pointer-events: none; width: calc(100% - 32px); }
 .toast { pointer-events: none; font-family: var(--font-px); font-size: 10px; padding: calc(var(--u) * 2) calc(var(--u) * 3); background: var(--panel); color: var(--white); display: flex; align-items: center; gap: calc(var(--u) * 2); animation: toastin .2s steps(2), toastout .3s steps(2) forwards; animation-delay: 0s, var(--life, 2.4s); max-width: 100%; }
 .toast.small { font-size: 9px; padding: var(--u) calc(var(--u) * 2); }
 .toast.bad { color: var(--red); } .toast.good { color: var(--lime); } .toast.warn { color: var(--yellow); } .toast.info { color: var(--blue); }
@@ -267,11 +268,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @keyframes toastin { from { transform: translateY(calc(var(--u) * -3)); opacity: 0; } }
 @keyframes toastout { to { opacity: 0; transform: translateY(calc(var(--u) * -2)); } }
 
-#wind-ind { position: absolute; top: 150px; left: 16px; font-family: var(--font-px); font-size: 10px; padding: calc(var(--u) * 2); display: flex; gap: calc(var(--u) * 2); align-items: center; pointer-events: none; }
+#wind-ind { position: absolute; top: calc(150px + env(safe-area-inset-top)); left: 16px; font-family: var(--font-px); font-size: 10px; padding: calc(var(--u) * 2); display: flex; gap: calc(var(--u) * 2); align-items: center; pointer-events: none; }
 #wind-ind.now { color: var(--yellow); animation: blink .3s steps(2) infinite; }
-#ch-ind { position: absolute; top: 150px; right: 16px; font-family: var(--font-px); font-size: 10px; padding: calc(var(--u) * 2); color: var(--yellow); text-align: right; line-height: 1.6; pointer-events: none; }
+#ch-ind { position: absolute; top: calc(150px + env(safe-area-inset-top)); right: 16px; font-family: var(--font-px); font-size: 10px; padding: calc(var(--u) * 2); color: var(--yellow); text-align: right; line-height: 1.6; pointer-events: none; }
 
-#ruler { position: absolute; right: 16px; top: 34%; bottom: 25%; width: calc(var(--u) * 4); background: var(--ink); cursor: pointer; }
+#ruler { position: absolute; right: calc(16px + env(safe-area-inset-right)); top: calc(34% + env(safe-area-inset-top)); bottom: 25%; width: calc(var(--u) * 4); background: var(--ink); cursor: pointer; }
 #ruler::before { content: ''; position: absolute; inset: calc(var(--u) * -1); z-index: -1; background: var(--panel); }
 #ruler .fill { position: absolute; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, var(--lime) 0 calc(var(--u) * 1), #008751 var(--u) calc(var(--u) * 2)); }
 #ruler .limit { position: absolute; left: calc(var(--u) * -2); right: calc(var(--u) * -2); height: var(--u); background: var(--orange); }
@@ -326,7 +327,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .tn.root { width: 64px; height: 64px; margin: -32px 0 0 -32px; --bc: var(--orange); }
 .br-label { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-px); font-size: 9px; white-space: nowrap; padding: 3px 5px; background: var(--ink); color: var(--bc); pointer-events: none; }
 #tree-zoom { position: absolute; right: 16px; top: 16px; display: grid; gap: calc(var(--u) * 3); }
-#tree-detail { padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); background: var(--panel); box-shadow: 0 calc(var(--u) * -1) 0 0 var(--ink); display: grid; gap: calc(var(--u) * 2); min-height: 120px; max-height: 46vh; overflow-y: auto; touch-action: pan-y; z-index: 2; }
+#tree-detail { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); background: var(--panel); box-shadow: 0 calc(var(--u) * -1) 0 0 var(--ink); display: grid; gap: calc(var(--u) * 2); min-height: 120px; max-height: 46vh; overflow-y: auto; touch-action: pan-y; z-index: 2; }
 #tree-detail h3 { font-family: var(--font-px); font-size: 11px; font-weight: normal; line-height: 1.5; }
 #tree-detail .meta { font-family: var(--font-px); font-size: 9px; color: var(--lav); display: flex; gap: calc(var(--u) * 3); flex-wrap: wrap; line-height: 1.5; }
 #tree-detail p { font-size: 19px; color: var(--lgray); line-height: 1.05; }
@@ -343,8 +344,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* =========================================================
    MODAL
    ========================================================= */
-#modal { position: fixed; inset: 0; z-index: 80; background: rgba(18, 14, 28, .82); display: flex; align-items: center; justify-content: center; padding: 16px; }
-#modal .box { width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto; padding: calc(var(--u) * 5); display: grid; gap: calc(var(--u) * 3); touch-action: pan-y; }
+#modal { position: fixed; inset: 0; z-index: 80; background: rgba(18, 14, 28, .82); display: flex; align-items: center; justify-content: center; padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); }
+#modal .box { width: 100%; max-width: 440px; max-height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: calc(var(--u) * 5); display: grid; gap: calc(var(--u) * 3); touch-action: pan-y; }
 #modal h2 { font-family: var(--font-px); font-size: 14px; font-weight: normal; line-height: 1.5; color: var(--yellow); text-align: center; }
 #modal .body { font-size: 20px; line-height: 1.1; color: var(--lgray); display: grid; gap: calc(var(--u) * 2); }
 #modal .body .big { font-family: var(--font-px); font-size: 12px; color: var(--white); text-align: center; line-height: 1.6; }
@@ -482,3 +483,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 #b-tree.has::after { content: '!'; position: absolute; top: -12px; right: -8px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
   font-family: var(--font-px); font-size: 11px; color: var(--ink); background: var(--yellow); box-shadow: 0 0 0 2px var(--ink); animation: badge .6s steps(2) infinite; }
 @keyframes badge { 50% { transform: translateY(-3px); } }
+
+#ios-tip { font-family: var(--font-txt); font-size: 18px; max-width: 300px; line-height: 1.1; }
+input, button { -webkit-appearance: none; appearance: none; border-radius: 0; }

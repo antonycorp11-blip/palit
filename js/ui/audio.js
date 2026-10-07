@@ -14,7 +14,7 @@ PALIT.Audio = (function () {
   function midi(n) { return 440 * Math.pow(2, (n - 69) / 12); }
 
   function unlock() {
-    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    if (ctx) { if (ctx.state !== 'running') ctx.resume(); return; }
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     ctx = new AC();
@@ -25,6 +25,11 @@ PALIT.Audio = (function () {
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
     var d = noiseBuf.getChannelData(0);
     for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    // iOS: tocar um buffer mudo dentro do gesto destrava o áudio de vez
+    var b = ctx.createBufferSource();
+    b.buffer = ctx.createBuffer(1, 1, 22050);
+    b.connect(ctx.destination); b.start(0);
+    if (ctx.state !== 'running') ctx.resume();
   }
 
   function ok(key, gap) {
@@ -178,7 +183,9 @@ PALIT.Audio = (function () {
     if (master) master.gain.value = m ? 0 : 0.55;
   }
 
-  ['pointerdown', 'keydown', 'touchstart'].forEach(function (ev) { window.addEventListener(ev, unlock, { passive: true }); });
+  ['pointerdown', 'pointerup', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (ev) { window.addEventListener(ev, unlock, { passive: true }); });
+  // iOS suspende/interrompe o áudio ao sair do app; retoma ao voltar
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
 
   return { sfx: S, unlock: unlock, setMuted: setMuted, get muted() { return muted; } };
 })();
