@@ -272,11 +272,72 @@ PALIT.SPRITES = {
     frames: [['g...g', 'g.g.d', 'dgdgd']]
   },
 
+  /* ---------- cenário vivo ---------- */
+  birdlet: { pal: { k: '#29233a' }, fps: 5, frames: [
+    ['k...k', '.k.k.', '..k..'],
+    ['.....', 'kk.kk', '..k..']] },
+  plane: { pal: { w: '#fff1e8', g: '#c2c3c7', b: '#29adff', r: '#ff004d' }, frames: [[
+    'r...............',
+    'rr..............',
+    'rrwwwwwwwwwwww..',
+    '.gwbwbwbwbwwwwww',
+    '..gggggwwwgggg..',
+    '.......gg.......']] },
+  balloon: { pal: { r: '#ff004d', y: '#ffec27', o: '#ffa300', b: '#ab5236', k: '#5f574f' }, frames: [[
+    '...rryrr...',
+    '..rryyyrr..',
+    '.rryyryyrr.',
+    'rryyrrryyrr',
+    'rryyrrryyrr',
+    'rryyrrryyrr',
+    '.rryyryyrr.',
+    '..rryyyrr..',
+    '...rryrr...',
+    '....k.k....',
+    '....k.k....',
+    '....bbb....',
+    '....bbb....']] },
+  butterfly: { pal: { p: '#ff77a8', y: '#ffec27', k: '#1a1423' }, fps: 8, frames: [
+    ['pp.pp', 'pykyp', '.pkp.', '..k..'],
+    ['.....', '.pkp.', 'ppkpp', '..k..']] },
+  leaf: { pal: { o: '#ffa300', b: '#ab5236', g: '#00e436' }, fps: 4, frames: [
+    ['og.', '.ob'],
+    ['.o.', 'gob'],
+    ['.go', 'bo.'],
+    ['.b.', 'ogo']] },
+  moon: { pal: { w: '#fff1e8', g: '#c2c3c7' }, frames: [[
+    '..wwww..',
+    '.wwwwgw.',
+    'wwgwwwww',
+    'wwwwwwww',
+    'wwwwwgww',
+    'wgwwwwww',
+    '.wwwwww.',
+    '..wwww..']] },
+  ptree: { pal: { g: '#008751', l: '#00e436', d: '#1f5a3c', b: '#5f3a20' }, frames: [[
+    '...gggg...',
+    '..gglggg..',
+    '.ggllgggg.',
+    'gglgggggdg',
+    'gggggggddg',
+    '.ggggdddg.',
+    '..gdddgg..',
+    '....bb....',
+    '....bb....',
+    '...bbbb...']] },
+  flag: { pal: { r: '#ff004d', d: '#7e2553', w: '#fff1e8', k: '#5f574f' }, fps: 5, frames: [
+    ['krrrr.', 'krrrdd', 'krrd..', 'k.....', 'k.....', 'k.....', 'k.....'],
+    ['krrr..', 'krrrrd', 'krrdd.', 'k.....', 'k.....', 'k.....', 'k.....'],
+    ['krr...', 'krrrr.', 'krrrdd', 'k.....', 'k.....', 'k.....', 'k.....']] },
+
   /* ---------- ícones de HUD / ramos (7x7) ---------- */
   ico_match: { pal: { r: '#ff004d', d: '#7e2553', w: '#e8c27a', s: '#ab5236' }, frames: [[
     '.....rr', '....rdr', '...ws..', '..ws...', '.ws....', 'ws.....', 's......']] },
-  ico_coin: { pal: { y: '#ffec27', o: '#ffa300', k: '#ab5236' }, frames: [[
-    '.yyyyy.', 'yyoooyy', 'yoyyyky', 'yoyyyky', 'yoyyyky', 'yykkkyy', '.yyyyy.']] },
+  ico_coin: { pal: { y: '#ffec27', o: '#ffa300', k: '#ab5236', w: '#fff1e8' }, fps: 5, frames: [
+    ['.yyyyy.', 'yyoooyy', 'ywyyyky', 'ywyyyky', 'yoyyyky', 'yykkkyy', '.yyyyy.'],
+    ['..yyy..', '.yoooy.', '.wyyyk.', '.wyyyk.', '.oyyyk.', '.ykkky.', '..yyy..'],
+    ['...y...', '...o...', '...y...', '...w...', '...y...', '...k...', '...y...'],
+    ['..yyy..', '.yoooy.', '.kyyyw.', '.kyyyw.', '.kyyyo.', '.ykkky.', '..yyy..']] },
   ico_box: { pal: { b: '#ab5236', d: '#5f1f1f', y: '#ffec27', r: '#ff004d' }, frames: [[
     '.......', 'rrrrrrr', 'byyyyyb', 'byyyyyb', 'bbbbbbb', 'bdddddb', 'bbbbbbb']] },
   ico_tree: { pal: { g: '#00e436', d: '#008751', b: '#ab5236', y: '#ffec27' }, frames: [[

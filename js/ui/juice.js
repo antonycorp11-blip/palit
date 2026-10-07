@@ -155,6 +155,19 @@ PALIT.Juice = (function () {
     document.addEventListener('click', function (e) { if (e.target.closest('.pxbtn')) A.sfx.click(); }, true);
   }
 
+  /* renda de visitantes: um "+$" discreto a cada poucos segundos */
+  var passiveT = 4;
+  function tick(dt) {
+    passiveT -= dt;
+    if (passiveT > 0) return;
+    passiveT = 4;
+    var v = P.ECON.passive(G.mat, G.st, G.layersBuilt(), G.rt.integrity / 100) * 4;
+    if (v < 0.5) return;
+    var m = $('h-money'); if (!m) return;
+    var r = m.getBoundingClientRect();
+    popText(r.left + r.width / 2, r.bottom + 6, '+$' + P.fmtMoney(Math.max(1, v)), 'plus');
+  }
+
   /* dinheiro exibido "conta" até o valor real */
   function money() {
     var t = G.S.money, d = t - shownMoney;
@@ -163,5 +176,5 @@ PALIT.Juice = (function () {
     return shownMoney;
   }
 
-  return { init: init, bump: bump, coinFly: coinFly, popText: popText, banner: banner, confetti: confetti, money: money };
+  return { init: init, tick: tick, bump: bump, coinFly: coinFly, popText: popText, banner: banner, confetti: confetti, money: money };
 })();

@@ -226,7 +226,10 @@ PALIT.View = (function () {
       var cls = 'sp stk ' + r.cls + ' ' + (ghost ? 'ghost' : 's' + v);
       if (G.rt.repairing && G.rt.repairing.cell === c) cls += ' rep';
       var style = 'left:' + r.left + 'px;bottom:' + r.bottom + 'px';
-      if (v === C.PLACING && G.rt.placing) style += ';--pd:' + G.rt.placing.dur.toFixed(2) + 's';
+      if (v === C.PLACING && G.rt.placing) {
+        var fl = flyFrom(i, r);
+        style += ';--pd:' + G.rt.placing.dur.toFixed(2) + 's;--sx:' + fl.sx + 'px;--sy:' + fl.sy + 'px;--sr:' + fl.sr + 'deg';
+      }
       var inner = '';
       var mx = A ? Math.round(L / 2) * U : Math.round(D / 2) * U;
       var my = A ? U : Math.round(D / 2) * U;
@@ -237,6 +240,10 @@ PALIT.View = (function () {
         inner += '<b class="thr" style="left:' + 4 * U + 'px"></b><b class="thr" style="left:' + (L - 5) * U + 'px"></b>';
       }
       html += '<i class="' + cls + '" data-c="' + c + '" style="' + style + '">' + inner + '</i>';
+    }
+    // placa de marco a cada N camadas
+    if ((i + 1) % G.mat.milestoneEvery === 0 && G.layersBuilt() > i) {
+      html += '<b class="plaque" style="bottom:' + 2 * U + 'px">' + (i + 1) + '</b>';
     }
     // cola e amarração nos cruzamentos (camadas Z sobre camadas X)
     if (!A && (st.visGlue > 0 || st.visCorners > 0)) {
@@ -252,6 +259,20 @@ PALIT.View = (function () {
       }
     }
     Ly.el.innerHTML = html;
+  }
+
+  /* de onde o palito vem voando: da caixa do HUD (ou da borda, se for o braço mecânico) */
+  function flyFrom(i, r) {
+    var pl = G.rt.placing;
+    if (pl.fly) return pl.fly;
+    var tx = VW / 2 + X0 * U + r.left + r.w / 2 + layerX(i);
+    var ty = focal + cam.y - i * G.LHU * U - r.bottom - r.h / 2;
+    var bx, by;
+    var box = document.getElementById('h-box');
+    if (pl.auto || !box) { bx = VW + 40; by = ty - 120; }
+    else { var b = box.getBoundingClientRect(); bx = b.left + b.width / 2; by = b.top + b.height / 2; }
+    pl.fly = { sx: Math.round(bx - tx), sy: Math.round(by - ty), sr: (Math.random() < 0.5 ? -1 : 1) * (360 + Math.round(Math.random() * 4) * 45) };
+    return pl.fly;
   }
 
   function visibleRange() {
@@ -280,6 +301,17 @@ PALIT.View = (function () {
       if (Ly.x !== x) { Ly.x = x; Ly.el.style.transform = x ? 'translateX(' + x + 'px)' : ''; }
     }
     dirty = {}; allDirty = false;
+    // bandeirinha no topo da torre
+    var built = G.layersBuilt();
+    var f = el.flag;
+    if (!f) { f = el.flag = document.createElement('i'); f.className = 'sp sp-flag topflag'; el.fx.parentNode.appendChild(f); }
+    f.hidden = built < 2;
+    if (built >= 2) {
+      var fx = (X0 + L + Math.round(D / 2) - 2) * U + layerX(built - 1);
+      var fy = -(built * G.LHU + Math.round(D / 2) + 7) * U;
+      var key = fx + ',' + fy;
+      if (f._k !== key) { f._k = key; f.style.transform = 'translate(' + fx + 'px,' + fy + 'px)'; }
+    }
   }
 
   function layerX(i) { var Ly = layers[i]; return Ly ? Ly.x || 0 : 0; }
@@ -363,11 +395,10 @@ PALIT.View = (function () {
     var sc = P.sceneFor(G.globalHeight());
     if (sc !== sceneKey) {
       sceneKey = sc;
-      var n = sc.sky.length, stops = sc.sky.map(function (c, i) { return c + ' ' + (i * 100 / n).toFixed(1) + '% ' + ((i + 1) * 100 / n).toFixed(1) + '%'; });
-      el.sky.style.background = 'linear-gradient(180deg,' + stops.join(',') + ')';
       el.far.hidden = !sc.city; el.mid.hidden = !sc.hills; el.near.hidden = true;
-      el.clouds.hidden = !sc.clouds; el.sun.hidden = !sc.sun;
-      el.stars.style.opacity = Math.min(1, sc.stars || 0);
+      el.clouds.hidden = !sc.clouds;
+      $('mountains').hidden = !sc.hills; $('cloudbank').hidden = !sc.clouds;
+      $('trees').hidden = $('houses').hidden = !(sc.fence && G.S.matIndex === 0);
     }
     var base = cam.y - camMin();
     var key = Math.round(base);
@@ -377,7 +408,7 @@ PALIT.View = (function () {
     function par(e, f) { e.style.bottom = gy + 'px'; e.style.transform = 'translate3d(0,' + Math.round(base * f / U) * U + 'px,0)'; }
     par(el.far, 0.05); par(el.mid, 0.09); 
     el.clouds.style.transform = 'translate3d(0,' + Math.round(base * 0.15 / U) * U + 'px,0)';
-    el.sun.style.transform = 'translate3d(0,' + Math.round(base * 0.02 / U) * U + 'px,0) scale(2)';
+    P.Ambient.parallax(base, gy, U);
   }
 
   /* ---------------- ameaças ---------------- */

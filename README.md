@@ -29,6 +29,7 @@ js/ui/          apresentação
   treeview.js     árvore arrastável com zoom + efeitos de compra
   audio.js        sons 8-bit sintetizados (Web Audio)
   juice.js        efeitos de HUD e sons ligados aos eventos do jogo
+  ambient.js      cenário vivo: dia/noite, camadas de profundidade, vida ao fundo
 tools/
   validate.js     valida árvores (ids, pré-requisitos, sobreposição, limite estrutural)
   sim.js          simulação de balanceamento (`node tools/sim.js [fração ativa]`)

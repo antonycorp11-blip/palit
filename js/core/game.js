@@ -185,7 +185,7 @@ PALIT.Game = (function () {
     if (auto) dur = Math.max(dur, 0.6);
     var c = S.cursor++;
     S.cells[c] = PLACING;
-    rt.placing = { cell: c, t: 0, dur: dur };
+    rt.placing = { cell: c, t: 0, dur: dur, auto: !!auto };
     emit('placeStart', rt.placing);
     emit('cell', c);
     return true;

@@ -101,6 +101,7 @@ PALIT.HUD = (function () {
     ib.style.setProperty('--c', integ > 70 ? 'var(--lime)' : integ > 40 ? 'var(--yellow)' : 'var(--red)');
     $('h-int-t').textContent = Math.round(integ) + '%';
     $('b-tree-p').textContent = G.def ? Math.floor(G.progress() * 100) + '%' : '—';
+    $('b-tree').classList.toggle('has', canAffordAny());
 
     // chips de estado
     var chips = [];
@@ -160,6 +161,17 @@ PALIT.HUD = (function () {
     } else ci.hidden = true;
 
     updateRuler();
+  }
+
+  function canAffordAny() {
+    var def = G.def;
+    if (!def) return false;
+    var lv = G.levels(), money = G.S.money;
+    for (var i = 0; i < def.nodes.length; i++) {
+      var n = def.nodes[i], l = lv[n.id] || 0;
+      if (l < n.lv && P.Tree.reqsMet(def, n, lv) && money >= P.Tree.cost(def, G.mat, n, l)) return true;
+    }
+    return false;
   }
 
   /* ---------------- régua ---------------- */
