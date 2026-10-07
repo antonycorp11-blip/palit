@@ -1,12 +1,13 @@
 // Simulação grosseira de balanceamento: jogador ativo comprando o nó mais barato.
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const ctx = { console, Math, Object, Array, Number, JSON }; ctx.window = ctx; vm.createContext(ctx);
-['js/data/stats.js','js/data/materials.js','js/data/trees/fosforo.js','js/core/tree.js','js/core/econ.js']
+['js/data/stats.js','js/data/materials.js','js/data/trees/fosforo.js','js/data/trees/dente.js','js/core/tree.js','js/core/econ.js']
   .forEach(f => vm.runInContext(fs.readFileSync(path.join(__dirname, '..', f), 'utf8'), ctx));
 const P = ctx.PALIT, E = P.ECON;
-const mat = P.MATERIALS[0], def = P.Tree.prepare('fosforo');
+const TREE = process.argv[3] || 'fosforo';
+const mat = P.MATERIALS.find(m => m.tree === TREE), def = P.Tree.prepare(TREE);
 const activity = +(process.argv[2] || 1); // fração do tempo ativo
-let lv = {}, s = P.Tree.computeStats(mat, def, lv), money = 0, pieces = 10, layersPieces = 0, t = 0, prodP = 0, bought = 0;
+let lv = {}, s = P.Tree.computeStats(mat, def, lv), money = 0, pieces = mat.base.capacity, layersPieces = 0, t = 0, prodP = 0, bought = 0;
 const log = []; let nextLog = 0; let threatT = 50;
 while (t < 60 * 3600 * 4) {
   const dt = 1; t += dt;

@@ -544,3 +544,90 @@ html.desk .chip { font-size: 8px; }
 html.desk #topbar { gap: 12px; padding: 14px 16px; }
 html.desk .toast { font-size: 11px; }
 html.desk .toast.small { font-size: 9px; }
+
+/* =========================================================
+   HISTÓRIA — diálogo e balões
+   ========================================================= */
+#dialog { position: fixed; left: 16px; right: 16px; bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 60; display: flex; gap: 14px; align-items: flex-start;
+  padding: 14px 14px 18px; min-height: 120px; cursor: pointer; box-shadow: 0 -4px 0 0 var(--ink), 0 4px 0 0 var(--ink), -4px 0 0 0 var(--ink), 4px 0 0 0 var(--ink), inset 0 4px 0 0 var(--cc, var(--yellow)); }
+#dialog.in { animation: dlgin .25s steps(3); }
+@keyframes dlgin { from { transform: translateY(40px); opacity: 0; } }
+#dialog.mystery { background: #0a0614; }
+#dialog.mystery .dg-text { color: var(--yellow); letter-spacing: 1px; }
+.dg-por { flex: none; width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; background: var(--ink); box-shadow: inset 0 0 0 3px var(--cc, var(--yellow)); }
+.dg-por .sp { transform: scale(1.8); }
+.dg-main { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.dg-name { font-family: var(--font-px); font-size: 11px; font-weight: normal; }
+.dg-text { font-size: 22px; line-height: 1.08; color: var(--white); min-height: 48px; }
+.dg-next { position: absolute; right: 14px; bottom: 6px; font-size: 14px; color: var(--yellow); animation: blink .6s steps(2) infinite; }
+.dg-skip { position: absolute; right: 10px; top: -18px; font-size: 8px; padding: 4px 6px; }
+#bubble { position: absolute; left: 16px; right: 90px; bottom: calc(86px + env(safe-area-inset-bottom)); display: flex; gap: 10px; align-items: center; padding: 8px 10px; z-index: 5; pointer-events: auto; }
+#bubble.in { animation: dlgin .25s steps(3); }
+#bubble .sp { flex: none; transform: scale(1.1); margin: 0 6px; }
+#bubble b { display: block; font-family: var(--font-px); font-size: 9px; font-weight: normal; margin-bottom: 3px; }
+#bubble p { font-size: 18px; line-height: 1; color: var(--lgray); }
+html.desk #dialog { left: calc(16px + 340px + 24px); right: calc(16px + 350px + 24px); bottom: 96px; }
+html.desk #bubble { left: calc(16px + 340px + 24px); right: auto; max-width: 520px; bottom: 96px; }
+
+/* =========================================================
+   MISSÕES, ENCAIXE PERFEITO, MENU COM ABAS
+   ========================================================= */
+#mission-pill { position: absolute; left: 16px; top: calc(150px + env(safe-area-inset-top)); max-width: 62%; display: flex; gap: 8px; align-items: center; padding: 6px 8px; text-align: left; pointer-events: auto; }
+#mission-pill span { display: grid; gap: 4px; min-width: 0; }
+#mission-pill b { font-family: var(--font-px); font-size: 8px; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#mission-pill em { font-style: normal; font-family: var(--font-px); font-size: 7px; color: var(--lime); }
+#mission-pill .bar { height: 4px; width: 100%; display: block; }
+#mission-pill.ready { background: #4a3a10; animation: ready 0.8s steps(2) infinite; }
+#mission-pill.ready b { color: var(--yellow); }
+html.desk #mission-pill { display: none; }
+#wind-ind { left: auto; right: 16px; }
+#ch-ind { top: calc(196px + env(safe-area-inset-top)); }
+html.desk #wind-ind { right: auto; }
+html.desk #ch-ind { top: 16px; }
+
+.pwin { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px; box-shadow: 0 0 0 3px var(--yellow); animation: pwin .26s steps(4) forwards; }
+@keyframes pwin { from { transform: scale(.4); opacity: 1; } to { transform: scale(1.6); opacity: .2; } }
+.hud-pop.perf { color: var(--yellow); font-size: 14px; }
+.hud-pop.perf.hot { color: var(--orange); font-size: 18px; }
+.hud-pop.lost { color: var(--red); font-size: 10px; }
+.banner.ach b { color: var(--lime); }
+.banner.clue b { color: var(--yellow); text-shadow: 3px 3px 0 #000; }
+.banner.clue { background: #0a0614; }
+
+.mis { display: flex; gap: 10px; align-items: center; padding: 8px; background: #1c1628; margin-bottom: 6px; }
+.mis.done { background: #1d3a22; }
+.mis-t { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.mis-t b { font-family: var(--font-px); font-size: 9px; font-weight: normal; line-height: 1.4; }
+.mis-t span { font-size: 16px; color: var(--lgray); }
+.mis-t .bar { height: 6px; }
+.mis-r { font-family: var(--font-px); font-size: 8px; color: var(--yellow); white-space: nowrap; }
+.mis .pxbtn { font-size: 9px; padding: 6px 8px; flex: none; }
+
+#modal .box.wide { max-width: 560px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tab { font-family: var(--font-px); font-size: 8px; padding: 6px 7px; background: var(--ink); color: var(--lgray); }
+.tab.on { background: var(--yellow); color: var(--ink); }
+#tabbody { display: grid; gap: 8px; }
+.ach-grid, .best-grid { display: grid; gap: 6px; }
+.ach, .best, .clue { display: flex; gap: 10px; align-items: center; padding: 8px; background: #1c1628; }
+.ach .sp, .clue .sp { flex: none; transform: scale(1.4); margin: 0 6px; }
+.ach b, .best b, .clue b { display: block; font-family: var(--font-px); font-size: 9px; font-weight: normal; margin-bottom: 4px; line-height: 1.4; }
+.ach span, .best span, .clue span { font-size: 17px; color: var(--lgray); line-height: 1; }
+.ach:not(.ok) { opacity: .45; filter: grayscale(1); }
+.ach.ok { box-shadow: inset 4px 0 0 0 var(--yellow); }
+.ach.ok b { color: var(--yellow); }
+.best-sp { flex: none; width: 64px; display: flex; justify-content: center; }
+.best-sp .sp { transform: scale(1.3); }
+.best.unk .best-sp .sp { filter: brightness(0); opacity: .6; }
+.best em { display: block; font-style: normal; font-size: 15px; color: var(--lav); margin-top: 4px; }
+.clue.unk { opacity: .5; }
+.clue:not(.unk) b { color: var(--yellow); }
+.kv.opt { align-items: center; }
+.kv.opt .pxbtn { font-size: 8px; padding: 5px 8px; }
+.choice-head { display: flex; gap: 14px; align-items: center; }
+.choice-head .sp.big { flex: none; transform: scale(2.4); margin: 16px 22px; }
+.choice-head b { font-family: var(--font-px); font-size: 10px; font-weight: normal; display: block; margin-bottom: 6px; }
+.choice-head p { font-size: 20px; color: var(--white); line-height: 1.1; }
+#modal .btns { flex-direction: column; align-items: stretch; }
+#dp-mis .mis { margin-bottom: 0; }
+#deskpanel { gap: 10px; }

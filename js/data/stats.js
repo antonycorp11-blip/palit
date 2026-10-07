@@ -73,6 +73,7 @@ PALIT.STATS = {
   /* ---- qualidade do material ---- */
   visGlue:         { label: 'Nível da cola', fmt: 'int' },
   defectResist:    { label: 'Peças sem defeito', fmt: 'pct', max: 0.9 },
+  slipResist:      { label: 'Pontas não escorregam', fmt: 'pct', max: 0.95 },
   visHeadless:     { label: 'Cabeças aparadas', fmt: 'flag' },
   igniteResist:    { label: 'Resistência à ignição', fmt: 'pct', max: 0.95 },
   moistureResist:  { label: 'Resistência à umidade', fmt: 'pct', max: 0.95 },

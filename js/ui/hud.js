@@ -53,7 +53,7 @@ PALIT.HUD = (function () {
       '<button class="pxbtn red" id="b-dmg" hidden>' + spr('ico_down') + 'DANO</button>' +
       '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>';
     $('b-tree').addEventListener('click', function () { P.TreeView.open(); });
-    $('b-menu').addEventListener('click', openMenu);
+    $('b-menu').addEventListener('click', function () { P.Panels.open(); });
     $('b-snd').addEventListener('click', function () {
       P.Audio.unlock();
       P.Audio.setMuted(!P.Audio.muted);
@@ -256,7 +256,7 @@ PALIT.HUD = (function () {
     G.on('treeComplete', function () { toast('ÁRVORE 100% CONCLUÍDA', 'good', false, { big: true, life: 4 }); });
     G.on('challenge', function (s) {
       if (s === 'start') toast(G.mat.challenge.name + '!', 'bad', false, { big: true, life: 3 });
-      if (s === 'won') { toast('DESAFIO FINAL CONCLUÍDO!', 'good', false, { big: true, life: 4 }); setTimeout(masteryModal, 900); }
+      if (s === 'won') { toast('DESAFIO FINAL CONCLUÍDO!', 'good', false, { big: true, life: 4 }); setTimeout(function () { P.Story.whenIdle(masteryModal); }, 900); }
       if (s === 'lost') modal('DESAFIO FALHOU', '<div class="line c-r">A ESTRUTURA FICOU ABAIXO DE ' + G.mat.challenge.minIntegrity + '%.</div><p>Repare a torre e tente novamente. Nenhum progresso foi perdido.</p>', [['OK', null]]);
     });
     G.on('rebuild', function () { lastRuler = ''; });
@@ -276,7 +276,7 @@ PALIT.HUD = (function () {
       bx.appendChild(btn);
     });
   }
-  function close() { el.modal.hidden = true; el.modal.innerHTML = ''; }
+  function close() { el.modal.hidden = true; el.modal.innerHTML = ''; P.Pause.set('choice', false); }
 
   function confirmChallenge() {
     var c = G.mat.challenge;

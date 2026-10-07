@@ -32,5 +32,10 @@ PALIT.EVENTS = [
   { id: 'tip',        name: 'GORJETA DE VISITANTE', w: 6,  min: 10,  type: 'money', mult: 1, good: true },
   { id: 'photo',      name: 'FOTÓGRAFO AMADOR',     w: 3,  min: 150, type: 'money', mult: 3, good: true },
   { id: 'calm',       name: 'CALMARIA',             w: 4,  min: 0,   type: 'calm',  dur: 60, good: true },
+  { id: 'c_mercador', name: 'MERCADOR AMBULANTE',   w: 1.4, min: 40,  type: 'choice', choice: 'mercador' },
+  { id: 'c_cola',     name: 'COLA EXPERIMENTAL',    w: 1.1, min: 60,  type: 'choice', choice: 'cola' },
+  { id: 'c_luca',     name: 'LUQUINHAS PEDE UM PALITO', w: 1.1, min: 35, type: 'choice', choice: 'luquinhas' },
+  { id: 'c_insp',     name: 'FISCALIZAÇÃO SURPRESA', w: 1,  min: 90,  type: 'choice', choice: 'inspetor' },
+  { id: 'c_pombo',    name: 'GERVÁSIO NEGOCIA',     w: 1,   min: 120, type: 'choice', choice: 'pombo' },
   { id: 'lucky',      name: 'CAIXA PREMIADA',       w: 0.6, min: 0,  type: 'refill', good: true }
 ];

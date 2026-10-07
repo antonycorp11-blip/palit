@@ -87,6 +87,42 @@ PALIT.Juice = (function () {
     shownMoney = G.S.money;
 
     G.on('placeStart', function () { A.sfx.lift(); bump('h-pieces', 'dip'); });
+    var H = P.Haptics;
+    /* janela do encaixe perfeito: um anel aparece no instante do encaixe */
+    G.on('placeDone', function (c) {
+      H.buzz(8);
+      var p = V.cellScreen(c);
+      var r = document.createElement('i');
+      r.className = 'pwin';
+      r.style.left = p.x + 'px'; r.style.top = p.y + 'px';
+      fxLayer.appendChild(r);
+      setTimeout(function () { r.remove(); }, 300);
+    });
+    G.on('perfect', function (d) {
+      A.sfx.perfect(d.streak); H.buzz(15);
+      var p = V.cellScreen(Math.max(0, G.S.cursor - 1));
+      popText(p.x - 40, p.y - 46, d.streak >= 3 ? 'PERFEITO x' + d.streak : 'PERFEITO!', 'perf' + (d.streak >= 10 ? ' hot' : ''));
+      if (d.streak % 5 === 0) coinFly(p.x, p.y, 2, 0);
+      bump('h-money');
+    });
+    G.on('streakLost', function (n) { if (n >= 5) { A.sfx.streakLost(); var r = boxRect(); popText(window.innerWidth / 2, 240, 'SEQUÊNCIA PERDIDA (' + n + ')', 'lost'); } });
+    G.on('achievement', function (d) {
+      A.sfx.achievement(); H.buzz([20, 40, 20]);
+      banner('CONQUISTA!', d.a.name.toUpperCase() + ' · +$' + P.fmtMoney(d.money), 'ach');
+      confetti(24);
+    });
+    G.on('missionDone', function (m) { A.sfx.mission(); H.buzz([10, 30, 10]); P.HUD.toast('MISSÃO COMPLETA: ' + m.text.toUpperCase(), 'good', false, { icon: 'ico_star' }); });
+    G.on('missionClaim', function (m) {
+      var pill = $('mission-pill');
+      var r = pill && !pill.hidden ? pill.getBoundingClientRect() : { left: window.innerWidth - 200, top: 200, width: 100, height: 20 };
+      coinFly(r.left + r.width / 2, r.top + r.height / 2, 6, 0);
+      popText(r.left + r.width / 2, r.top + r.height + 10, '+$' + P.fmtMoney(m.money), 'plus');
+    });
+    G.on('clue', function (c) { if (!c) return; A.sfx.achievement(); banner('NOVA PISTA', c.title.toUpperCase(), 'clue'); });
+    G.on('bestiaryNew', function (k) { P.HUD.toast('NOVO NO BESTIÁRIO: ' + P.THREATS[k].name.toUpperCase(), 'info', true, { icon: 'ico_book' }); });
+    G.on('impact', function () { H.buzz(60); });
+    G.on('milestone', function () { H.buzz([30, 40, 30]); });
+    G.on('fall', function () { H.buzz(25); });
     G.on('placeDone', function () {
       A.sfx.place(G.rt.combo);
       var rt = G.rt;
@@ -158,6 +194,7 @@ PALIT.Juice = (function () {
   /* renda de visitantes: um "+$" discreto a cada poucos segundos */
   var passiveT = 4;
   function tick(dt) {
+    A.setMood(G.rt.ch ? 'tense' : (P.Ambient && P.Ambient.night > 0.5 ? 'night' : 'day'));
     passiveT -= dt;
     if (passiveT > 0) return;
     passiveT = 4;

@@ -13,24 +13,28 @@ var PALIT = window.PALIT = window.PALIT || {};
 
   function start() {
     G.init(P.State.load());
+    P.Progress.init();
     P.View.init();
     P.HUD.init();
     P.TreeView.init();
     P.Juice.init();
     P.Ambient.init();
     P.Desktop.init();
+    P.Story.init();
+    P.Panels.init();
     if (/[?&]debug/.test(location.search)) debugPanel();
 
     var last = performance.now(), hudT = 0, slowT = 0, saveT = 0;
     function loop(now) {
       var dt = Math.min(0.1, (now - last) / 1000);
       last = now;
-      G.update(dt);
+      if (!P.Pause.active()) { G.update(dt); P.Progress.tick(dt); }
+      P.Story.tick(dt);
       P.View.frame(dt);
       P.Ambient.tick(dt);
       P.Juice.tick(dt);
       hudT += dt; slowT += dt; saveT += dt;
-      if (hudT > 0.1) { hudT = 0; P.HUD.update(); P.TreeView.tick(); P.Desktop.update(); }
+      if (hudT > 0.1) { hudT = 0; P.HUD.update(); P.TreeView.tick(); P.Desktop.update(); P.Panels.update(); }
       if (slowT > 1) { slowT = 0; P.TreeView.slowTick(); }
       if (saveT > 5) { saveT = 0; P.save(); }
       requestAnimationFrame(loop);
@@ -48,9 +52,9 @@ var PALIT = window.PALIT = window.PALIT || {};
 
     var sp = document.getElementById('splash');
     var first = G.S.stats.placed === 0 && G.S.matIndex === 0;
-    if (!first) sp.remove();
+    if (!first) { sp.remove(); P.Story.start(); }
     else {
-      sp.querySelector('button').addEventListener('click', function () { sp.remove(); });
+      sp.querySelector('button').addEventListener('click', function () { sp.remove(); setTimeout(P.Story.start, 400); });
     }
   }
 

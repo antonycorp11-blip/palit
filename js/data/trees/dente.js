@@ -1,0 +1,181 @@
+/* =========================================================
+   ÁRVORE — ERA 02 — PALITO DE DENTE
+   126 nós · 10 ramos. Novidade da era: PONTAS (as pontas
+   escorregam e o palito encaixa torto). Sem fogo, sem cabeça.
+   ========================================================= */
+var PALIT = window.PALIT = window.PALIT || {};
+PALIT.TREES = PALIT.TREES || {};
+
+PALIT.TREES.dente = {
+  id: 'dente',
+  name: 'Árvore do Palito de Dente',
+  branches: [
+    { id: 'prod', name: 'FÁBRICA DE PALITOS', color: '#ffa300', icon: 'gear' },
+    { id: 'cap',  name: 'PALITEIRO',          color: '#ab5236', icon: 'box' },
+    { id: 'spd',  name: 'DESTREZA',           color: '#ffec27', icon: 'bolt' },
+    { id: 'con',  name: 'ARQUITETURA',        color: '#00e436', icon: 'layers' },
+    { id: 'res',  name: 'RIGIDEZ',            color: '#29adff', icon: 'shield' },
+    { id: 'rep',  name: 'MANUTENÇÃO',         color: '#ff77a8', icon: 'wrench' },
+    { id: 'def',  name: 'VIGILÂNCIA',         color: '#ff004d', icon: 'fist' },
+    { id: 'eff',  name: 'NEGÓCIOS',           color: '#83769c', icon: 'coin' },
+    { id: 'tip',  name: 'PONTAS',             color: '#fff1e8', icon: 'match' },
+    { id: 'auto', name: 'MECANIZAÇÃO',        color: '#c2c3c7', icon: 'robot' }
+  ],
+  nodes: [
+    { id: 'root', b: null, n: 'Paliteiro de Restaurante', d: 'Surrupiado da pizzaria da esquina. Por uma boa causa.', lv: 1, c: 5, e: { capacity: 2 }, r: [] },
+
+    /* ================= FÁBRICA DE PALITOS ================= */
+    { id: 'p1', b: 'prod', n: 'Descascar Mais Rápido', d: 'Tirar o plástico de cada palito sem morder o próprio dedo.', lv: 5, c: 8, e: { rechargeSec: -0.2 }, r: ['root'] },
+    { id: 'p2', b: 'prod', n: 'Caixa de 500 Unidades', d: 'O formato econômico. O caixa da mercearia te olha estranho.', lv: 5, c: 30, e: { rechargeSec: -0.12 }, r: ['p1:3'] },
+    { id: 'p3', b: 'prod', n: 'Linha de Desembalar', d: 'Uma pessoa desembala, a outra entrega. A outra pessoa é você também.', lv: 10, c: 25, g: 1.22, e: { prodMult: 0.02 }, r: ['p1'] },
+    { id: 'p4', b: 'prod', n: 'Bambu Pré-Cortado', d: 'Palitos de bambu, mais uniformes, saem mais rápido do pacote.', lv: 5, c: 90, e: { rechargeSec: -0.1 }, r: ['p2'] },
+    { id: 'p5', b: 'prod', n: 'Esteira de Bandeja', d: 'Uma bandeja de lanchonete virou esteira. Ninguém sentiu falta.', lv: 5, c: 120, e: { prodMult: 0.03 }, r: ['p3:5'] },
+    { id: 'p6', b: 'prod', n: 'Hora do Rush', d: 'Produzir como garçom em sexta-feira.', lv: 10, c: 220, g: 1.2, e: { prodMult: 0.02 }, r: ['p5'] },
+    { id: 'p7', b: 'prod', n: 'Pilha de Reserva', d: 'Sempre deixar um montinho pronto ao lado da caixa.', lv: 3, c: 60, e: { rechargeSec: -0.05 }, r: ['p3'] },
+    { id: 'p8', b: 'prod', n: 'Fornecedor da Pizzaria', d: 'O dono da pizzaria agora te manda caixas. Em troca, propaganda.', lv: 2, c: 250, e: { capacity: 3 }, r: ['p7'] },
+    { id: 'p9', b: 'prod', n: 'Contrato com Churrascaria', d: 'Os palitos que sobram do rodízio vêm para você.', lv: 1, c: 700, e: { doubleChance: 0.02 }, r: ['p8'] },
+    { id: 'p10', b: 'prod', n: 'Produção Sob Vigilância', d: 'Continuar produzindo mesmo com corvos olhando.', lv: 10, c: 110, g: 1.2, e: { attackProd: 0.05 }, r: ['p4'] },
+    { id: 'p11', b: 'prod', n: 'Mãos Ambidestras', d: 'Desembalar com as duas mãos ao mesmo tempo.', lv: 1, c: 800, e: { rechargeWhileRepair: 1 }, r: ['p10:5', 'p6:3'] },
+    { id: 'p12', b: 'prod', n: 'Mestre Palitólogo', d: 'Você reconhece a qualidade de um palito pelo som.', lv: 10, c: 400, g: 1.18, e: { rechargeSec: -0.05 }, r: ['p4', 'p6:5'] },
+    { id: 'p13', b: 'prod', n: 'Torno de Palitos', d: 'Um tornozinho elétrico que faz palitos a partir de varetas.', lv: 4, c: 1400, g: 1.35, e: { prodMult: 0.05 }, r: ['p12:5'] },
+    { id: 'p14', b: 'prod', n: 'Palito Gêmeo', d: 'Às vezes sai um palito duplo, colado de fábrica.', lv: 10, c: 320, g: 1.2, e: { doubleChance: 0.01 }, r: ['p12'] },
+    { id: 'p15', b: 'prod', n: 'INDÚSTRIA DO DENTE', d: 'Uma fábrica inteira no quintal. A Vó Zuleica vende os palitos tortos na feira.', lv: 1, c: 5000, sp: true, e: { prodMult: 0.1, doubleChance: 0.02 }, r: ['p13', 'p14', 'p9', 'p11'] },
+
+    /* ================= PALITEIRO ================= */
+    { id: 'c1', b: 'cap', n: 'Paliteiro de Vidro', d: 'Aquele de restaurante, com tampinha que nunca fecha direito.', lv: 5, c: 8, e: { capacity: [2, 2, 3, 3, 4] }, r: ['root'] },
+    { id: 'c2', b: 'cap', n: 'Paliteiro Giratório', d: 'Gira. Não tem motivo. Mas cabe mais.', lv: 10, c: 45, g: 1.2, e: { capacity: 1 }, r: ['c1:3'] },
+    { id: 'c3', b: 'cap', n: 'Bolso da Camisa', d: 'Palitos de reserva para emergências. E para palitar os dentes.', lv: 2, c: 40, e: { reserveCap: [2, 3] }, r: ['c1'] },
+    { id: 'c4', b: 'cap', n: 'Estojo de Escola', d: 'Emprestado do Luquinhas. Devolução prevista: nunca.', lv: 5, c: 90, e: { reserveCap: 1 }, r: ['c3'] },
+    { id: 'c5', b: 'cap', n: 'Paliteiro Duplo', d: 'Dois paliteiros grudados. Engenharia de ponta.', lv: 2, c: 230, e: { capacity: 5 }, r: ['c2:5'] },
+    { id: 'c6', b: 'cap', n: 'Gaveta de Talheres', d: 'Os talheres foram morar em outro lugar.', lv: 10, c: 300, g: 1.18, e: { capacity: 2 }, r: ['c5'] },
+    { id: 'c7', b: 'cap', n: 'Pote de Azeitona Vazio', d: 'Lavado. Quase sem cheiro.', lv: 2, c: 450, e: { reserveCap: 3 }, r: ['c4'] },
+    { id: 'c8', b: 'cap', n: 'Funil de Transbordo', d: 'O que sobra da caixa escorre para a reserva.', lv: 5, c: 120, e: { reserveFill: 0.15 }, r: ['c4:2'] },
+    { id: 'c9', b: 'cap', n: 'Caixa de Sapato', d: 'Tamanho 43. Cabe uma pequena fortuna em palitos.', lv: 5, c: 600, g: 1.25, e: { capacity: 3 }, r: ['c6:5'] },
+    { id: 'c10', b: 'cap', n: 'Baú de Palitos', d: 'Com fechadura e tudo. A chave está no pescoço do Gervásio.', lv: 5, c: 1000, g: 1.25, e: { capacity: 4 }, r: ['c9'] },
+    { id: 'c11', b: 'cap', n: 'Arrumação Japonesa', d: 'Cada palito dobrado... digo, alinhado com amor.', lv: 20, c: 450, g: 1.1, e: { capacity: 1 }, r: ['c10:3'] },
+    { id: 'c12', b: 'cap', n: 'Sacar do Bolso', d: 'Quando a caixa esvazia, a reserva também serve para construir.', lv: 1, c: 900, e: { reserveBuild: 1 }, r: ['c7', 'c8:3'] },
+    { id: 'c13', b: 'cap', n: 'DEPÓSITO DA CHURRASCARIA', d: 'Um galpão. Cheio de palitos. O cheiro de picanha é um bônus.', lv: 1, c: 4500, sp: true, e: { capacity: 10, reserveCap: 5 }, r: ['c11', 'c12'] },
+
+    /* ================= DESTREZA ================= */
+    { id: 's1', b: 'spd', n: 'Pegada de Pinça', d: 'Polegar e indicador. Como quem pega um palito. Porque é.', lv: 5, c: 10, e: { placeSpeed: 0.03 }, r: ['root'] },
+    { id: 's2', b: 'spd', n: 'Pinça de Sobrancelha', d: 'Emprestada da Vó Zuleica. Ela não sabe.', lv: 3, c: 60, e: { placeSpeed: 0.04 }, r: ['s1:3'] },
+    { id: 's3', b: 'spd', n: 'Olho de Joalheiro', d: 'Enxergar o milímetro exato do encaixe.', lv: 5, c: 45, e: { placeSpeed: 0.03 }, r: ['s1'] },
+    { id: 's4', b: 'spd', n: 'Batida de Tamborim', d: 'Toques em sequência aceleram a colocação.', lv: 5, c: 75, e: { comboStep: 0.01 }, r: ['s3:2'] },
+    { id: 's5', b: 'spd', n: 'Elevador Expresso', d: 'Voltar ao topo instantaneamente.', lv: 1, c: 60, e: { quickReturn: 1 }, r: ['s1'] },
+    { id: 's6', b: 'spd', n: 'Toque Antecipado', d: 'Um toque durante a colocação já prepara a próxima peça.', lv: 1, c: 220, e: { tapQueue: 1 }, r: ['s4:3'] },
+    { id: 's7', b: 'spd', n: 'Mão de Cirurgião', d: 'Firmeza absoluta. Nem o café de três xícaras abala.', lv: 10, c: 180, g: 1.2, e: { placeSpeed: 0.02 }, r: ['s3:5'] },
+    { id: 's8', b: 'spd', n: 'Dois de Uma Vez', d: 'Chance de posicionar dois palitos num único toque.', lv: 10, c: 380, g: 1.2, e: { doublePlace: 0.01 }, r: ['s7:5'] },
+    { id: 's9', b: 'spd', n: 'Cadeira Giratória', d: 'Girar para pegar palitos sem levantar.', lv: 5, c: 140, e: { placeSpeed: 0.03 }, r: ['s2'] },
+    { id: 's10', b: 'spd', n: 'Iluminação de Estúdio', d: 'Uma luminária de mesa apontada para a torre.', lv: 15, c: 270, g: 1.14, e: { placeSpeed: 0.01 }, r: ['s9', 's7:5'] },
+    { id: 's11', b: 'spd', n: 'Samba no Pé', d: 'O ritmo não quebra. A sequência rende mais.', lv: 5, c: 600, e: { comboStep: 0.01 }, r: ['s6'] },
+    { id: 's12', b: 'spd', n: 'MÃOS DE OURO', d: 'Dizem que você coloca palitos de olhos fechados. É verdade. Não recomendamos.', lv: 1, c: 4200, sp: true, e: { placeSpeed: 0.1, doublePlace: 0.03 }, r: ['s10', 's8', 's11'] },
+
+    /* ================= ARQUITETURA ================= */
+    { id: 'k1', b: 'con', n: 'Valor por Camada', d: 'Torre de palito de dente dá mais ibope que a de fósforo.', lv: 5, c: 10, e: { layerValue: [0.02, 0.03, 0.02, 0.03, 0.02] }, r: ['root'] },
+    { id: 'k2', b: 'con', n: 'Régua Escolar', d: 'Trinta centímetros de pura precisão.', lv: 3, c: 15, e: { limitLayers: 20 }, r: ['root'] },
+    { id: 'k3', b: 'con', n: 'Palitos Longos', d: 'Separar os mais compridos da caixa.', lv: 3, c: 60, e: { pieceSize: [0.02, 0.03, 0.04] }, r: ['k1:2'] },
+    { id: 'k4', b: 'con', n: 'Palito de Churrasco Mirim', d: 'Um pouco mais comprido. Um pouco de trapaça.', lv: 1, c: 300, e: { pieceSize: 0.05 }, r: ['k3:3'] },
+    { id: 'k5', b: 'con', n: 'Prumo de Linha', d: 'Fio dental com uma borracha amarrada na ponta.', lv: 2, c: 90, e: { limitLayers: 30 }, r: ['k2:3'] },
+    { id: 'k6', b: 'con', n: 'Fundação Reforçada', d: 'A plataforma do checkpoint foi nivelada com calço de papelão.', lv: 2, c: 220, e: { limitLayers: 40 }, r: ['k5'] },
+    { id: 'k7', b: 'con', n: 'Amarração de Fio Dental', d: 'A cada 10 camadas, uma volta de fio dental sabor menta.', lv: 1, c: 600, e: { limitLayers: 50, visBands: 1 }, r: ['k6'] },
+    { id: 'k8', b: 'con', n: 'Cruzamento Justo', d: 'Palito sobre palito, sem folga.', lv: 2, c: 450, e: { limitLayers: 25, looseResist: 0.02 }, r: ['k6'] },
+    { id: 'k9', b: 'con', n: 'Cantoneira de Clipe', d: 'Clipes de papel dobrados nos cantos.', lv: 1, c: 1000, e: { limitLayers: 50, visCorners: 1 }, r: ['k8', 'k7'] },
+    { id: 'k10', b: 'con', n: 'Treliça Invisível', d: 'Diagonais escondidas por dentro. A torre para de torcer.', lv: 1, c: 1800, e: { limitLayers: 60, sway: 0.05 }, r: ['k9', 'r5'] },
+    { id: 'k11', b: 'con', n: 'Acabamento Fino', d: 'Lixar cada ponta. Os visitantes notam.', lv: 10, c: 55, g: 1.2, e: { layerValue: 0.02 }, r: ['k1'] },
+    { id: 'k12', b: 'con', n: 'Inauguração com Fita', d: 'Cada marco ganha uma fitinha e mais dinheiro.', lv: 5, c: 180, e: { milestoneBonus: 0.1 }, r: ['k11:5'] },
+    { id: 'k13', b: 'con', n: 'Projeto Executivo', d: 'Planta baixa desenhada em guardanapo. Com escala.', lv: 5, c: 1300, g: 1.25, e: { limitLayers: 15 }, r: ['k10'] },
+    { id: 'k14', b: 'con', n: 'Arquitetura Dental', d: 'Uma escola de arquitetura inteira baseada em palitos de dente. Só você é aluno.', lv: 5, c: 1200, g: 1.3, e: { layerValue: 0.05 }, r: ['k12', 'k13:3'] },
+    { id: 'k15', b: 'con', n: 'CUMEEIRA', d: 'A última técnica: a torre alcança o limite absoluto do palito de dente.', lv: 1, c: 6000, sp: true, e: { limitLayers: 70 }, r: ['k14', 'k13', 'k4'] },
+
+    /* ================= RIGIDEZ ================= */
+    { id: 'r1', b: 'res', n: 'Madeira Mais Densa', d: 'Palito de dente é mais rígido. Aproveite.', lv: 3, c: 12, e: { windResist: [0.03, 0.04, 0.03] }, r: ['root'] },
+    { id: 'r2', b: 'res', n: 'Peso de Papel', d: 'Um peso de papel de vidro na base. Com uma bolha dentro.', lv: 5, c: 40, e: { sway: 0.02 }, r: ['r1'] },
+    { id: 'r3', b: 'res', n: 'Atrito Controlado', d: 'Menos chance de peça se soltar.', lv: 3, c: 30, e: { looseResist: [0.02, 0.02, 0.03] }, r: ['r1'] },
+    { id: 'r4', b: 'res', n: 'Perfil Aerodinâmico', d: 'Palito redondo corta o vento melhor que o chato.', lv: 10, c: 75, g: 1.2, e: { windResist: 0.02 }, r: ['r1:3'] },
+    { id: 'r5', b: 'res', n: 'Amortecedor de Borracha', d: 'Borrachinhas de cabelo nos cantos absorvem o balanço.', lv: 2, c: 120, e: { sway: [0.02, 0.03] }, r: ['r2:3'] },
+    { id: 'r6', b: 'res', n: 'Vento de Raspão', d: 'Chance de uma rajada passar sem soltar nada.', lv: 5, c: 180, e: { windImmune: 0.02 }, r: ['r4:3'] },
+    { id: 'r7', b: 'res', n: 'Fio Dental Estrutural', d: 'Fio dental passado por dentro das camadas. Mentolado.', lv: 3, c: 150, e: { limitLayers: 25, looseResist: 0.01 }, r: ['r3'] },
+    { id: 'r8', b: 'res', n: 'Lastro de Moedas', d: 'Moedas de 5 centavos coladas na base. Finalmente uma utilidade.', lv: 5, c: 300, e: { sway: 0.03 }, r: ['r5'] },
+    { id: 'r9', b: 'res', n: 'Fadiga Retardada', d: 'Peças danificadas demoram mais para afetar as vizinhas.', lv: 5, c: 220, e: { spreadResist: 0.05 }, r: ['r7:2'] },
+    { id: 'r10', b: 'res', n: 'Biombo de Cardápio', d: 'Cardápios plastificados viram anteparo contra o vento.', lv: 3, c: 750, e: { windResist: 0.05 }, r: ['r8', 'r6'] },
+    { id: 'r11', b: 'res', n: 'Estrutura Curada', d: 'Os palitos de baixo endureceram com o tempo.', lv: 1, c: 1200, e: { limitLayers: 65 }, r: ['r7', 'r9'] },
+    { id: 'r12', b: 'res', n: 'Esqueleto de Aço... de Madeira', d: 'Cada camada trava a próxima um pouco melhor.', lv: 15, c: 300, g: 1.15, e: { looseResist: 0.01 }, r: ['r11'] },
+    { id: 'r13', b: 'res', n: 'Indiferença ao Vento', d: 'A torre ouve o vento e responde: "e daí?".', lv: 10, c: 450, g: 1.18, e: { windImmune: 0.01 }, r: ['r10'] },
+    { id: 'r14', b: 'res', n: 'RIGIDEZ ABSOLUTA', d: 'Nem a Vó Zuleica consegue entortar. E ela tentou.', lv: 1, c: 6000, sp: true, e: { windResist: 0.1, sway: 0.1 }, r: ['r12', 'r13'] },
+
+    /* ================= MANUTENÇÃO ================= */
+    { id: 'e1', b: 'rep', n: 'Mão Leve', d: 'Reparar sem derrubar as vizinhas.', lv: 3, c: 12, e: { repairSpeed: [0.05, 0.05, 0.07] }, r: ['root'] },
+    { id: 'e2', b: 'rep', n: 'Cola de Isopor', d: 'Mais barata. Funciona. Não pergunte como.', lv: 2, c: 25, e: { repairFee: [0.02, 0.03] }, r: ['e1'] },
+    { id: 'e3', b: 'rep', n: 'Catador de Palitos', d: 'Recolher os palitos que caem no quintal.', lv: 3, c: 45, e: { recoverChance: [0.05, 0.02, 0.03] }, r: ['e1'] },
+    { id: 'e4', b: 'rep', n: 'Pinça Cirúrgica', d: 'Agora sim, uma pinça de verdade.', lv: 5, c: 90, e: { repairSpeed: 0.04 }, r: ['e1:3'] },
+    { id: 'e5', b: 'rep', n: 'Binóculo do Inspetor', d: 'Emprestado. Enxerga danos bem mais abaixo.', lv: 5, c: 60, e: { detectRange: 10 }, r: ['e2'] },
+    { id: 'e6', b: 'rep', n: 'Mapa de Rachaduras', d: 'Danos detectados aparecem marcados na régua.', lv: 1, c: 220, e: { rulerMarkers: 1 }, r: ['e5:2'] },
+    { id: 'e7', b: 'rep', n: 'Escorregador de Emergência', d: 'Um botão que desce direto até a próxima peça danificada.', lv: 1, c: 450, e: { jumpToDamage: 1 }, r: ['e6'] },
+    { id: 'e8', b: 'rep', n: 'Seguro Contra Ventania', d: 'O primeiro reparo após cada tempestade é gratuito.', lv: 1, c: 380, e: { freeStormRepair: 1 }, r: ['e2:2'] },
+    { id: 'e9', b: 'rep', n: 'Reaproveitar Palito Torto', d: 'Reparo manual consome 1 peça a menos a cada X reparos.', lv: 4, c: 300, g: 1.4, e: { freeRepairLv: 1 }, r: ['e8'] },
+    { id: 'e10', b: 'rep', n: 'Cola Quente', d: 'A pistola de cola quente chegou. Seus dedos sabem.', lv: 5, c: 220, e: { repairFee: 0.03 }, r: ['e9:2'] },
+    { id: 'e11', b: 'rep', n: 'Peneira de Quintal', d: 'Peneirar a terra em busca de palitos caídos.', lv: 10, c: 180, g: 1.2, e: { recoverChance: 0.01 }, r: ['e3:3'] },
+    { id: 'e12', b: 'rep', n: 'Tala de Palito', d: 'Peças reparadas recebem uma talinha. Ficam mais firmes.', lv: 5, c: 380, e: { spreadResist: 0.03 }, r: ['e4:5', 'e11:3'] },
+    { id: 'e13', b: 'rep', n: 'Maleta de Manutenção', d: 'Com divisórias. Você etiquetou tudo.', lv: 10, c: 450, g: 1.16, e: { repairSpeed: 0.03 }, r: ['e12', 'e10'] },
+    { id: 'e14', b: 'rep', n: 'OFICINA COMPLETA', d: 'Uma bancada inteira no quintal. O Seu Ademir pede emprestada toda semana.', lv: 1, c: 5200, sp: true, e: { repairSpeed: 0.15, repairFee: 0.1 }, r: ['e13', 'e11', 'e7'] },
+
+    /* ================= VIGILÂNCIA ================= */
+    { id: 'd1', b: 'def', n: 'Dedo Indicador Treinado', d: 'Cada toque em uma ameaça causa mais dano.', lv: 5, c: 12, e: { threatPower: 0.2 }, r: ['root'] },
+    { id: 'd2', b: 'def', n: 'Recompensa do Bairro', d: 'A associação de moradores paga por cada bicho espantado.', lv: 5, c: 25, e: { threatReward: 0.05 }, r: ['d1'] },
+    { id: 'd3', b: 'def', n: 'Biruta de Saco Plástico', d: 'Ver o vento chegar antes dele chegar.', lv: 2, c: 60, e: { windWarn: 1 }, r: ['d1'] },
+    { id: 'd4', b: 'def', n: 'CD Pendurado', d: 'Reflexos de CD espantam pássaros. E acordam vizinhos.', lv: 5, c: 75, e: { birdRepel: 0.03 }, r: ['d1:2'] },
+    { id: 'd5', b: 'def', n: 'Spray de Citronela', d: 'Insetos ficam mais lentos. A torre cheira a vela de jardim.', lv: 5, c: 75, e: { insectSlow: 0.04 }, r: ['d2'] },
+    { id: 'd6', b: 'def', n: 'Periscópio de Papelão', d: 'Setas indicam ameaças fora da tela.', lv: 1, c: 300, e: { threatWarn: 1 }, r: ['d3'] },
+    { id: 'd7', b: 'def', n: 'Peteleco Profissional', d: 'Golpes mais firmes. Com técnica.', lv: 10, c: 120, g: 1.2, e: { threatPower: 0.2 }, r: ['d1:5', 'd2:2'] },
+    { id: 'd8', b: 'def', n: 'Cerca de Palitos', d: 'Palitos espetados em volta: ameaças demoram mais a atacar.', lv: 5, c: 220, e: { threatDelay: 0.05 }, r: ['d5'] },
+    { id: 'd9', b: 'def', n: 'Guarda-Chuva Invertido', d: 'Protege a torre do granizo. E coleta água para as plantas.', lv: 5, c: 270, e: { hailResist: 0.05 }, r: ['d6'] },
+    { id: 'd10', b: 'def', n: 'Caça-Prêmios', d: 'Toda ameaça expulsa vira lucro.', lv: 10, c: 220, g: 1.18, e: { threatReward: 0.03 }, r: ['d7:5'] },
+    { id: 'd11', b: 'def', n: 'Acordo com Bartolomeu', d: 'Sachê de atum todo dia. Ameaças do chão aparecem menos.', lv: 5, c: 380, e: { groundResist: 0.04 }, r: ['d8'] },
+    { id: 'd12', b: 'def', n: 'Anemômetro de Copinho', d: 'Mais um segundo de aviso antes das rajadas.', lv: 1, c: 600, e: { windWarn: 1 }, r: ['d9'] },
+    { id: 'd13', b: 'def', n: 'SENTINELA DO BAIRRO', d: 'Até os corvos te cumprimentam. De longe.', lv: 1, c: 4500, sp: true, e: { threatPower: 1, threatDelay: 0.1 }, r: ['d10', 'd11', 'd12'] },
+
+    /* ================= NEGÓCIOS ================= */
+    { id: 'f1', b: 'eff', n: 'Palito Reaproveitado', d: 'Chance de um posicionamento não gastar palito.', lv: 2, c: 18, e: { saveChance: [0.01, 0.02] }, r: ['root'] },
+    { id: 'f2', b: 'eff', n: 'Excursão Escolar', d: 'A turma do Luquinhas veio visitar a torre. Pagaram meia.', lv: 5, c: 15, e: { passiveMult: 0.05 }, r: ['root'] },
+    { id: 'f3', b: 'eff', n: 'Palito de Festa', d: 'Com bandeirinha. Eventos bons aparecem com mais frequência.', lv: 5, c: 60, e: { eventLuck: 0.03 }, r: ['f2:2'] },
+    { id: 'f4', b: 'eff', n: 'Zero Desperdício', d: 'Nenhum palito vai para o lixo. Nem os mastigados. (Eca.)', lv: 10, c: 90, g: 1.2, e: { saveChance: 0.005 }, r: ['f1'] },
+    { id: 'f5', b: 'eff', n: 'Cartão-Postal', d: 'A torre virou cartão-postal do bairro.', lv: 10, c: 75, g: 1.2, e: { passiveMult: 0.04 }, r: ['f2:5'] },
+    { id: 'f6', b: 'eff', n: 'Caderninho de Fiado', d: 'Anotar tudo. Cada camada rende um pouco mais.', lv: 10, c: 120, g: 1.2, e: { layerValue: 0.01 }, r: ['f4:3'] },
+    { id: 'f7', b: 'eff', n: 'Alvará Provisório', d: 'O INPALI não tem regra para palito de dente. Você se adiantou.', lv: 2, c: 600, e: { limitLayers: 30 }, r: ['f6:5'] },
+    { id: 'f8', b: 'eff', n: 'Caixa Sem Defeito', d: 'Caixas de qualidade não emperram.', lv: 5, c: 150, e: { jamResist: 0.1 }, r: ['f3'] },
+    { id: 'f9', b: 'eff', n: 'Patrocínio da Pizzaria', d: '"PIZZARIA DO TUCA — PALITOS OFICIAIS DA TORRE".', lv: 2, c: 900, e: { passiveMult: 0.15 }, r: ['f5'] },
+    { id: 'f10', b: 'eff', n: 'Reciclagem Questionável', d: 'Palitos usados, lavados e reutilizados. A Vigilância Sanitária não precisa saber.', lv: 5, c: 750, g: 1.25, e: { saveChance: 0.01 }, r: ['f7', 'f4'] },
+    { id: 'f11', b: 'eff', n: 'Bilhete Premiado', d: 'Coisas boas acontecem com quem insiste.', lv: 10, c: 220, g: 1.18, e: { eventLuck: 0.02 }, r: ['f8'] },
+    { id: 'f12', b: 'eff', n: 'Rádio Torre FM Oficial', d: 'Boletins diários sobre cada marco. Mais bônus por marco.', lv: 5, c: 450, e: { milestoneBonus: 0.1 }, r: ['f9'] },
+    { id: 'f13', b: 'eff', n: 'IMPÉRIO DO PALITO', d: 'Você agora tem um logotipo. É um palito. Sorrindo.', lv: 1, c: 5200, sp: true, e: { passiveMult: 0.25, layerValue: 0.1 }, r: ['f10', 'f11', 'f12'] },
+
+    /* ================= PONTAS (mecânica da era) ================= */
+    { id: 't1', b: 'tip', n: 'Pontas Lixadas', d: 'Uma lixa de unha deixa as pontas menos escorregadias.', lv: 3, c: 15, e: { slipResist: [0.08, 0.08, 0.09] }, r: ['root'] },
+    { id: 't2', b: 'tip', n: 'Ponta Rombuda', d: 'Cortar a ponta afiada. Encaixa melhor, espeta menos.', lv: 1, c: 60, e: { slipResist: 0.1, limitLayers: 25 }, r: ['t1'] },
+    { id: 't3', b: 'tip', n: 'Encaixe em V', d: 'Um entalhe minúsculo onde os palitos se cruzam.', lv: 5, c: 90, e: { slipResist: 0.03 }, r: ['t1:2'] },
+    { id: 't4', b: 'tip', n: 'Palito Selecionado', d: 'Descartar palitos tortos. Menos peças defeituosas.', lv: 5, c: 50, e: { defectResist: 0.05 }, r: ['t1'] },
+    { id: 't5', b: 'tip', n: 'Ponta com Cola', d: 'Uma gotinha de cola em cada ponta antes de encaixar.', lv: 1, c: 250, e: { slipResist: 0.06, visGlue: 1, looseResist: 0.03 }, r: ['t3:3'] },
+    { id: 't6', b: 'tip', n: 'Ponta Dupla', d: 'Palitos com as duas pontas iguais: qualquer lado serve.', lv: 1, c: 400, e: { limitLayers: 35, placeSpeed: 0.03 }, r: ['t2'] },
+    { id: 't7', b: 'tip', n: 'Textura Antiderrapante', d: 'Riscos finos ao longo do palito.', lv: 10, c: 160, g: 1.2, e: { slipResist: 0.015 }, r: ['t5'] },
+    { id: 't8', b: 'tip', n: 'Madeira de Bétula', d: 'Palitos de bétula: mais firmes e mais caros.', lv: 10, c: 140, g: 1.2, e: { looseResist: 0.01 }, r: ['t4'] },
+    { id: 't9', b: 'tip', n: 'Cola de Pontas Premium', d: 'Cola que gruda ponta com ponta. Nem o vento separa.', lv: 1, c: 900, e: { visGlue: 1, slipResist: 0.04, limitLayers: 30 }, r: ['t7:5'] },
+    { id: 't10', b: 'tip', n: 'Envernizado', d: 'Uma camada de verniz: protege da umidade e brilha no sol.', lv: 10, c: 300, g: 1.18, e: { moistureResist: 0.05 }, r: ['t9'] },
+    { id: 't11', b: 'tip', n: 'Encaixe Macho-Fêmea', d: 'Um palito encaixa dentro do outro. Engenharia de dente.', lv: 1, c: 1500, e: { limitLayers: 70 }, r: ['t8:5', 't6'] },
+    { id: 't12', b: 'tip', n: 'Palito Extra-Longo', d: 'Tamanho "família". Para dentes muito afastados.', lv: 3, c: 1300, g: 1.4, e: { pieceSize: 0.03 }, r: ['t11'] },
+    { id: 't13', b: 'tip', n: 'PONTA PERFEITA', d: 'A ponta ideal: nunca escorrega, nunca espeta, nunca decepciona.', lv: 1, c: 6000, sp: true, e: { slipResist: 0.1, looseResist: 0.05, defectResist: 0.25 }, r: ['t12', 't10'] },
+
+    /* ================= MECANIZAÇÃO ================= */
+    { id: 'a1', b: 'auto', n: 'Câmera de Segurança', d: 'Uma webcam velha vigia a torre. Detecta danos em qualquer altura.', lv: 1, c: 220, e: { autoDetect: 1 }, r: ['root'] },
+    { id: 'a2', b: 'auto', n: 'Robô Aspirador Adaptado', d: 'Repara peças rachadas. Às vezes aspira um palito por engano.', lv: 4, c: 300, e: { autoRepair: 0.5 }, r: ['a1'] },
+    { id: 'a3', b: 'auto', n: 'Garra de Fliperama', d: 'Posiciona alguns palitos lentamente — só enquanto você joga.', lv: 5, c: 450, e: { autoPlace: 1 }, r: ['a1'] },
+    { id: 'a4', b: 'auto', n: 'Mata-Mosca Elétrico', d: 'Golpeia ameaças de vez em quando. Faz "bzzt".', lv: 5, c: 380, e: { autoDefend: 2 }, r: ['a1'] },
+    { id: 'a5', b: 'auto', n: 'Bateria Extra', d: 'A automação continua ativa por mais tempo após seu último toque.', lv: 4, c: 450, e: { autoActiveSec: 30 }, r: ['a7:2'] },
+    { id: 'a6', b: 'auto', n: 'Aspirador Turbo', d: 'Reparos automáticos mais frequentes.', lv: 4, c: 900, e: { autoRepair: 0.5 }, r: ['a2:4'] },
+    { id: 'a7', b: 'auto', n: 'Garra Calibrada', d: 'A garra finalmente acerta na primeira. Mais peças por minuto.', lv: 5, c: 1300, e: { autoPlace: 1 }, r: ['a3:5'] },
+    { id: 'a8', b: 'auto', n: 'Ventilador de Teto Defensivo', d: 'Espanta insetos e refresca o empilhador.', lv: 5, c: 1000, e: { autoDefend: 2 }, r: ['a4:5'] },
+    { id: 'a9', b: 'auto', n: 'Repositor Automático', d: 'O robô também repõe palitos que caíram, usando o estoque.', lv: 1, c: 2200, e: { autoRepairMissing: 1 }, r: ['a6'] },
+    { id: 'a10', b: 'auto', n: 'Termômetro de Torre', d: 'A régua mostra a saúde de cada trecho da torre.', lv: 1, c: 750, e: { rulerHeat: 1 }, r: ['a6'] },
+    { id: 'a11', b: 'auto', n: 'Planilha Automática', d: 'Estatísticas de produção e renda na tela.', lv: 1, c: 600, e: { statsPanel: 1 }, r: ['a5'] },
+    { id: 'a12', b: 'auto', n: 'DENTINHO, O ROBÔ', d: 'Um robô feito de escova de dente elétrica. Ajuda muito — mas nunca joga por você.', lv: 1, c: 7000, sp: true, e: { autoPlace: 5, autoRepair: 2, autoDefend: 5 }, r: ['a7', 'a8', 'a9', 'a11'] }
+  ]
+};

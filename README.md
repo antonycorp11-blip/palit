@@ -34,7 +34,9 @@ No Chrome/Edge do PC dá para instalar como app pelo ícone de instalar na barra
 js/data/        dados (tudo data-driven)
   stats.js        atributos que upgrades modificam + formatação
   materials.js    as 40 eras (stats base, visual, problemas, ameaças, desafio final)
-  trees/*.js      uma árvore por material (fosforo.js: 136 nós, 616 níveis, 10 ramos)
+  trees/*.js      uma árvore por material (fosforo.js: 136 nós · dente.js: 135 nós, ramo PONTAS)
+  story.js        personagens, cenas, pistas do mistério e comentários soltos
+  progression.js  missões, conquistas, eventos com escolha e bestiário
   threats.js      ameaças (tipo de movimento, dano, recompensa)
   events.js       eventos aleatórios
   scenes.js       cenário por altitude global
@@ -43,6 +45,7 @@ js/core/        simulação (sem DOM)
   econ.js         fórmulas de economia (compartilhadas com o simulador)
   tree.js         motor genérico de árvores (stats, custos, pré-requisitos, layout radial)
   state.js        save/load (localStorage)
+  progress.js     missões (sempre 3 ativas), conquistas, bestiário
   game.js         loop: produção, colocação, dano/reparo, vento, clima, eventos, ameaças,
                   automação, desafio final, reconstrução (altura global × local)
 js/ui/          apresentação
@@ -54,6 +57,8 @@ js/ui/          apresentação
   juice.js        efeitos de HUD e sons ligados aos eventos do jogo
   ambient.js      cenário vivo: dia/noite, camadas de profundidade, vida ao fundo
   desktop.js      layout de PC, atalhos de teclado, painel de melhorias e registro
+  story.js        diálogos (pausam o jogo), balões da vizinhança, pausa e vibração
+  panels.js       menu com abas, eventos com escolha, indicador de missões
 tools/
   validate.js     valida árvores (ids, pré-requisitos, sobreposição, limite estrutural)
   sim.js          simulação de balanceamento (`node tools/sim.js [fração ativa]`)

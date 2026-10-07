@@ -26,7 +26,15 @@ PALIT.State = {
       milestones: 0,
       freeRepairCount: 0,
       stormToken: false,
-      stats: { placed: 0, repaired: 0, defeated: 0, fallen: 0, earned: 0, playSec: 0, events: 0 },
+      stats: { placed: 0, repaired: 0, defeated: 0, fallen: 0, earned: 0, playSec: 0, events: 0, perfect: 0, bestStreak: 0, missions: 0, choices: 0, extinguished: 0 },
+      missions: [],
+      missionTier: 0,
+      ach: {},
+      bestiary: {},
+      story: {},
+      clues: [],
+      records: {},
+      flags: {},
       lastSeen: Date.now()
     };
   },

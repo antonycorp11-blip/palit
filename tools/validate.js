@@ -2,7 +2,7 @@
 const fs = require('fs'), vm = require('vm'), path = require('path');
 const ctx = { console, Math, Object, Array, Number, JSON };
 ctx.window = ctx; vm.createContext(ctx);
-['js/data/stats.js','js/data/materials.js','js/data/trees/fosforo.js','js/core/tree.js']
+['js/data/stats.js','js/data/materials.js','js/data/trees/fosforo.js','js/data/trees/dente.js','js/core/tree.js']
   .forEach(f => vm.runInContext(fs.readFileSync(path.join(__dirname, '..', f), 'utf8'), ctx, { filename: f }));
 const P = ctx.PALIT; let errors = 0;
 for (const tid of Object.keys(P.TREES)) {

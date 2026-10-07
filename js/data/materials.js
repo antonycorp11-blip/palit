@@ -22,6 +22,7 @@ var PALIT = window.PALIT = window.PALIT || {};
       passiveRate: o.passiveRate || 0.003,
       milestoneEvery: o.milestoneEvery || 100,
       costScale: o.costScale || 1,
+      slip: o.slip || 0,
       base: Object.assign({ capacity: 10, rechargeSec: 5, placeSec: 0.9, repairSec: 2 }, o.base || {}),
       look: Object.assign({ len: 26, body: '#e8c27a', light: '#f6dca0', shade: '#b8894a', head: null, headDark: null, headLen: 3 }, o.look || {}),
       mechanic: o.mechanic || null,
@@ -44,11 +45,14 @@ var PALIT = window.PALIT = window.PALIT || {};
       tree: 'fosforo'
     }),
     M(2, 'dente', 'Palito de Dente', 'palito', 'palitos', 10, {
-      base: { capacity: 12, rechargeSec: 6, placeSec: 1.0 },
+      costScale: 0.6, layerValue: 2, slip: 0.14,
+      base: { capacity: 12, rechargeSec: 6, placeSec: 1.0, repairSec: 2 },
       look: { len: 30, body: '#f0d9a8', light: '#fff1d0', shade: '#c9a46a' },
       traits: ['Um pouco maior', 'Mais rígido', 'Sem cabeça de fósforo'],
       problems: ['Pontas que escorregam', 'Vento mais forte', 'Pássaros maiores'],
-      threats: ['fly', 'bird', 'crow', 'cat', 'ball', 'kite', 'hail']
+      threats: ['fly', 'ant', 'beetle', 'bird', 'gecko', 'crow', 'cat', 'ball', 'kite', 'hail'],
+      challenge: { name: 'A REVOADA', dur: 100, gustEvery: 9, gustStr: 1.4, threatEvery: 6, minIntegrity: 60, startIntegrity: 80 },
+      tree: 'dente'
     }),
     M(3, 'churrasco', 'Palito de Churrasco', 'espeto', 'espetos', 30, {
       goalLayers: 900, base: { capacity: 10, rechargeSec: 9, placeSec: 1.3 },

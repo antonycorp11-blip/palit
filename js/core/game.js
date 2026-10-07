@@ -26,7 +26,8 @@ PALIT.Game = (function () {
       repairing: null,
       wind: { force: 0, pending: [], gust: null, breeze: 0, phase: 0 },
       rain: null, hail: 0, hailT: 0, heat: 0, heatT: 0, boost: 0, calm: 0, storm: 0, stormGustT: 0,
-      jam: false, jamTaps: 0, defect: 0,
+      jam: false, jamTaps: 0, defect: 0, luck: 0,
+      landAt: -9, streak: 0,
       threats: [], threatSeq: 1,
       threatT: 45, eventT: 30, spreadT: 20,
       fires: {},
@@ -45,6 +46,7 @@ PALIT.Game = (function () {
     rt = freshRuntime();
     setMaterial();
     rebuildDamageIndex(true);
+    eraRecord();
   }
 
   function setMaterial() {
@@ -55,6 +57,13 @@ PALIT.Game = (function () {
   }
 
   function levels() { return S.levels[mat.id]; }
+
+  /* recordes por era */
+  function eraRecord() {
+    S.records = S.records || {};
+    var r = S.records[mat.id] = S.records[mat.id] || { start: S.stats.playSec, master: null, bestStreak: 0, maxCombo: 0, fallen0: S.stats.fallen, defeated0: S.stats.defeated };
+    return r;
+  }
 
   function recalc() {
     st = P.Tree.computeStats(mat, def, levels());
@@ -167,7 +176,9 @@ PALIT.Game = (function () {
     return null;
   }
 
-  function tryPlace(auto) {
+  var PERFECT_WIN = 0.26;
+
+  function tryPlace(auto, queued) {
     if (!auto) rt.lastInput = rt.clock;
     if (rt.placing) { if (!auto && st.tapQueue) rt.queued = true; return false; }
     var r = blockReason();
@@ -178,6 +189,22 @@ PALIT.Game = (function () {
     if (!auto) {
       rt.combo = rt.clock - rt.lastPlaceAt < 1.8 ? Math.min(5, rt.combo + 1) : 0;
       rt.lastPlaceAt = rt.clock;
+      var rec = eraRecord();
+      if (rt.combo + 1 > rec.maxCombo) rec.maxCombo = rt.combo + 1;
+      // encaixe perfeito: tocar logo depois que o palito anterior encaixou
+      var since = rt.clock - rt.landAt;
+      if (!queued && since >= 0 && since <= PERFECT_WIN) {
+        rt.streak++;
+        S.stats.perfect = (S.stats.perfect || 0) + 1;
+        if (rt.streak > (S.stats.bestStreak || 0)) S.stats.bestStreak = rt.streak;
+        if (rt.streak > rec.bestStreak) rec.bestStreak = rt.streak;
+        var pm = E.layerMoney(mat, st, layersBuilt()) * 0.5 * (1 + Math.min(20, rt.streak) * 0.05);
+        addMoney(pm);
+        emit('perfect', { streak: rt.streak, money: pm });
+      } else if (!queued) {
+        if (rt.streak > 0) emit('streakLost', rt.streak);
+        rt.streak = 0;
+      }
     }
     var dur = E.placeTime(st, rt.combo);
     if (auto) dur = Math.max(dur, 0.6);
@@ -193,7 +220,11 @@ PALIT.Game = (function () {
     var c = rt.placing.cell;
     rt.placing = null;
     var v = OK;
-    if (rt.defect > 0) {
+    rt.landAt = rt.clock;
+    if (mat.slip && Math.random() < mat.slip * (1 - st.slipResist)) {
+      v = CRACK; emit('toast', { text: 'ESCORREGOU! ENCAIXOU TORTO', kind: 'bad', small: true });
+    }
+    if (v === OK && rt.defect > 0) {
       rt.defect--;
       if (Math.random() >= st.defectResist) { v = CRACK; emit('toast', { text: 'PEÇA DEFEITUOSA', kind: 'bad', small: true }); }
     }
@@ -208,7 +239,7 @@ PALIT.Game = (function () {
       if (rt.placing) rt.placing.dur = 0.12;
       return;
     }
-    if (rt.queued) { rt.queued = false; tryPlace(false); }
+    if (rt.queued) { rt.queued = false; tryPlace(false, true); }
   }
 
   function layerComplete(layer) {
@@ -234,6 +265,7 @@ PALIT.Game = (function () {
     var v = S.cells[c];
     if (v === FIRE) {
       setCell(c, CRACK); rt.known[c] = 1;
+      S.stats.extinguished = (S.stats.extinguished || 0) + 1;
       emit('toast', { text: 'FOGO APAGADO', kind: 'good', small: true });
       emit('extinguish', c);
       return true;
@@ -288,7 +320,7 @@ PALIT.Game = (function () {
       if (Math.random() < st.windImmune) continue;
       if (damage(pickCell(top - 80, top - 1, 0.6), Math.random() < 0.65 ? 'crack' : 'drop', 'wind')) hits++;
     }
-    if (!hits) emit('toast', { text: 'A TORRE RESISTIU AO VENTO', kind: 'good', small: true });
+    if (!hits) { emit('toast', { text: 'A TORRE RESISTIU AO VENTO', kind: 'good', small: true }); emit('gustSafe'); }
   }
 
   function updateWind(dt) {
@@ -323,10 +355,12 @@ PALIT.Game = (function () {
       if (rt.calm > 0 && (e.type === 'gust' || e.type === 'windy' || e.type === 'storm')) return false;
       if (e.type === 'spawn' && mat.threats.indexOf(e.threat) < 0) return false;
       if ((e.type === 'heat') && !mat.look.head) return false;
+      if (e.type === 'choice' && (rt.ch || (e.eras && e.eras.indexOf(mat.id) < 0))) return false;
       return true;
     });
     var tot = 0;
-    var ws = pool.map(function (e) { var w = e.w * (e.good ? 1 + st.eventLuck * 3 : 1); tot += w; return w; });
+    var luck = st.eventLuck + (rt.luck > 0 ? 0.2 : 0);
+    var ws = pool.map(function (e) { var w = e.w * (e.good ? 1 + luck * 3 : 1); tot += w; return w; });
     var r = Math.random() * tot;
     for (var i = 0; i < pool.length; i++) { r -= ws[i]; if (r <= 0) return pool[i]; }
     return pool[0];
@@ -368,6 +402,7 @@ PALIT.Game = (function () {
       }
       case 'calm': rt.calm = e.dur; break;
       case 'refill': S.pieces = Math.max(S.pieces, st.capacity); break;
+      case 'choice': emit('choice', { id: e.choice }); return;
     }
     if (show) emit('event', { e: e });
   }
@@ -613,6 +648,7 @@ PALIT.Game = (function () {
     }
     if (rt.boost > 0) rt.boost -= dt;
     if (rt.calm > 0) rt.calm -= dt;
+    if (rt.luck > 0) rt.luck -= dt;
   }
 
   function unjam() {
@@ -717,7 +753,7 @@ PALIT.Game = (function () {
     if (ch.threatT <= 0) { ch.threatT = c.threatEvery; var k = pickThreatType(); if (k) spawnThreat(k, 1); }
     if (ch.t <= 0) {
       rt.ch = null;
-      if (rt.integrity >= c.minIntegrity) { S.challengeDone = true; emit('challenge', 'won'); }
+      if (rt.integrity >= c.minIntegrity) { S.challengeDone = true; var rec = eraRecord(); if (rec.master == null) rec.master = S.stats.playSec; emit('challenge', 'won'); }
       else emit('challenge', 'lost');
     }
   }
@@ -739,6 +775,7 @@ PALIT.Game = (function () {
     var keepView = rt.viewW;
     rt = freshRuntime(); rt.viewW = keepView;
     setMaterial();
+    eraRecord();
     S.pieces = st.capacity;
     recomputeIntegrity();
     emit('rebuild');
@@ -787,6 +824,26 @@ PALIT.Game = (function () {
     updateChallenge(dt);
   }
 
+  /* ---------------- API para eventos com escolha ---------------- */
+  var fx = {
+    money: function (n) { if (n == null) return S.money; addMoney(n); return S.money; },
+    pay: function (n) { S.money = Math.max(0, S.money - n); },
+    pieces: function () { return Math.floor(S.pieces + S.reserve); },
+    takePieces: function (n) { for (var i = 0; i < n; i++) { if (S.pieces >= 1) S.pieces--; else if (S.reserve >= 1) S.reserve--; } },
+    price: function (base, perLayer) { return Math.round(base + layersBuilt() * perLayer); },
+    boost: function (sec) { rt.boost = Math.max(rt.boost, sec); },
+    calm: function (sec) { rt.calm = Math.max(rt.calm, sec); },
+    luck: function (sec) { rt.luck = Math.max(rt.luck, sec); },
+    jam: function () { rt.jam = true; rt.jamTaps = 0; },
+    crack: function (n) { for (var i = 0; i < n; i++) damage(pickCell(0, layersBuilt() - 1, 1), 'crack', 'event'); },
+    repairCracked: function () {
+      var n = 0;
+      for (var c = 0; c < S.cursor; c++) if (S.cells[c] === CRACK) { setCell(c, OK); n++; }
+      return n;
+    },
+    spawn: function (k, n) { spawnThreat(k, n); }
+  };
+
   /* ---------------- debug ---------------- */
   var debug = {
     money: function (n) { addMoney(n); },
@@ -813,6 +870,6 @@ PALIT.Game = (function () {
     damagedCells: damagedCells, blockReason: blockReason, prodRate: prodRate, sway: sway, threatsActive: threatsActive,
     layersBuilt: layersBuilt, topLayer: topLayer, limit: limit, localHeight: localHeight, globalHeight: globalHeight, progress: progress,
     get S() { return S; }, get mat() { return mat; }, get def() { return def; }, get st() { return st; }, get rt() { return rt; },
-    levels: levels, debug: debug
+    levels: levels, debug: debug, fx: fx, eraRecord: eraRecord
   };
 })();

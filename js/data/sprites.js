@@ -330,6 +330,34 @@ PALIT.SPRITES = {
     ['krrr..', 'krrrrd', 'krrdd.', 'k.....', 'k.....', 'k.....', 'k.....'],
     ['krr...', 'krrrr.', 'krrrdd', 'k.....', 'k.....', 'k.....', 'k.....']] },
 
+  /* ---------- retratos dos personagens (12x12) ---------- */
+  pt_ademir: { pal: { r: '#ff004d', y: '#ffec27', b: '#5f3a20', p: '#ffccaa', k: '#1a1423', w: '#fff1e8', m: '#ab5236', s: '#e0a080' }, fps: 2, frames: [
+    ['..rrrrrrrr..', '..ryyyyyyr..', '..rrrrrrrr..', '.bpppppppppb', '.pkkkpkkkpp.', '.pkwkpkwkpp.', '.pkkkpkkkpp.', '.ppppppppps.', '.ppmmmmmmpp.', '.pppwwwwppp.', '..pppppppp..', '...pppppp...'],
+    ['..rrrrrrrr..', '..ryyyyyyr..', '..rrrrrrrr..', '.bpppppppppb', '.pkkkpkkkpp.', '.pkwkpkwkpp.', '.pkkkpkkkpp.', '.ppppppppps.', '.ppmmmmmmpp.', '.ppkkkkkkpp.', '..pppppppp..', '...pppppp...']] },
+  pt_vo: { pal: { g: '#c2c3c7', p: '#ffccaa', k: '#5f574f', w: '#fff1e8', r: '#ff77a8', v: '#83769c' }, fps: 2, frames: [
+    ['....gggg....', '...gggggg...', '..gggggggg..', '.gppppppppg.', '.pkkpppkkpp.', '.kwwkpkwwkp.', '.pkkpppkkpp.', '.pppppppppp.', '.pppprrpppp.', '..pppppppp..', '.vvvvvvvvvv.', 'vvvwvvvvwvvv'],
+    ['....gggg....', '...gggggg...', '..gggggggg..', '.gppppppppg.', '.pkkpppkkpp.', '.kwwkpkwwkp.', '.pkkpppkkpp.', '.pppppppppp.', '.ppprrrrppp.', '..pppppppp..', '.vvvvvvvvvv.', 'vvvwvvvvwvvv']] },
+  pt_luca: { pal: { b: '#29adff', h: '#5f3a20', p: '#ffccaa', k: '#1a1423', w: '#fff1e8', f: '#e0705a', o: '#ffa300' }, fps: 2, frames: [
+    ['..bbbbbbbb..', '.bbbbbbbbbbb', '.hppppppppb.', '.pppppppppp.', '.pkwppppkwp.', '.pkwppppkwp.', '.pfppppppfp.', '.pppppppppp.', '.pppkkkkppp.', '..pppppppp..', '..oooooooo..', '.oooooooooo.'],
+    ['..bbbbbbbb..', '.bbbbbbbbbbb', '.hppppppppb.', '.pppppppppp.', '.pkwppppkwp.', '.pkwppppkwp.', '.pfppppppfp.', '.pppppppppp.', '.ppppkkpppp.', '..pppppppp..', '..oooooooo..', '.oooooooooo.']] },
+  pt_inspetor: { pal: { d: '#5f574f', y: '#ffec27', p: '#ffccaa', k: '#1a1423', s: '#e0a080', m: '#29233a', w: '#fff1e8' }, fps: 2, frames: [
+    ['..dddddddd..', '.dddddyddddd', 'dddddddddddd', '.pppppppppp.', '.pkkppppkkp.', '.pppppppppp.', '.ppppsppppp.', '.mmmmmmmmmm.', '.pppkkkkppp.', '..pppppppp..', '.dddwddwddd.', 'dddddwwddddd'],
+    ['..dddddddd..', '.dddddyddddd', 'dddddddddddd', '.pppppppppp.', '.pkkppppkkp.', '.pppppppppp.', '.ppppsppppp.', '.mmmmmmmmmm.', '.ppppkkpppp.', '..pppppppp..', '.dddwddwddd.', 'dddddwwddddd']] },
+  pt_pombo: { pal: { g: '#8a8c94', l: '#c2c3c7', o: '#ffa300', k: '#1a1423', y: '#5f574f', n: '#008751', p: '#7e2553' }, fps: 3, frames: [
+    ['....llll....', '...llllll...', '..lllollll..', '..lllklll...', 'yyllllllll..', '..llllllll..', '..nnnnnnnn..', '.nnpnnnnpnn.', '.gggggggggg.', 'gggggggggggg', 'gggggggggggg', 'gggggggggggg'],
+    ['....llll....', '...llllll...', '..lllollll..', '..lllklll...', '.yyllllllll.', '..llllllll..', '..nnnnnnnn..', '.nnpnnnnpnn.', '.gggggggggg.', 'gggggggggggg', 'gggggggggggg', 'gggggggggggg']] },
+  pt_voz: { pal: { k: '#1a1423', y: '#ffec27', d: '#29233a' }, fps: 1, frames: [
+    ['....dddd....', '...dkkkkd...', '..dkkkkkkd..', '..dkykkykd..', '..dkkkkkkd..', '...dkkkkd...', '....dkkd....', '...dkkkkd...', '..dkkkkkkd..', '.dkkkkkkkkd.', 'dkkkkkkkkkkd', 'kkkkkkkkkkkk'],
+    ['....dddd....', '...dkkkkd...', '..dkkkkkkd..', '..dkkkkkkd..', '..dkkkkkkd..', '...dkkkkd...', '....dkkd....', '...dkkkkd...', '..dkkkkkkd..', '.dkkkkkkkkd.', 'dkkkkkkkkkkd', 'kkkkkkkkkkkk']] },
+  pt_radio: { pal: { b: '#ab5236', w: '#c2c3c7', k: '#1a1423', y: '#ffec27', r: '#ff004d' }, fps: 3, frames: [
+    ['.....k......', '......k.....', '.......k....', '.bbbbbbbbbb.', '.bwwwwbyyyb.', '.bwkwkbyryb.', '.bwwwwbyyyb.', '.bwkwkbbbbb.', '.bwwwwbkbkb.', '.bbbbbbbbbb.', '..k......k..', '............'],
+    ['.....k......', '......k.....', '.......k....', '.bbbbbbbbbb.', '.bwkwkbyyyb.', '.bwwwwbyryb.', '.bwkwkbyyyb.', '.bwwwwbbbbb.', '.bwkwkbkbkb.', '.bbbbbbbbbb.', '..k......k..', '............']] },
+  pt_bilhete: { pal: { w: '#fff1e8', k: '#83769c', r: '#ff004d' }, frames: [
+    ['.wwwwwwwww..', '.wkkkkkwww..', '.wwwwwwwww..', '.wkkkkkkkw..', '.wwwwwwwww..', '.wkkkkwwww..', '.wwwwwwwww..', '.wkkkkkkkw..', '.wwwwwwwww..', '.wwwwwwrrw..', '.wwwwwwwww..', '............']] },
+  pt_gato: { pal: { k: '#1a1423', o: '#ffa300', d: '#ab5236', p: '#ff77a8', w: '#fff1e8', g: '#00e436' }, fps: 2, frames: [
+    ['.k........k.', 'kok......kok', 'kooddddddook', 'kooooooooook', 'kowgooooowgk', 'kowgooooowgk', 'koooookooook', '.koooppooook', '.kooooooook.', '..kooooook..', '...kkkkkk...', '............'],
+    ['.k........k.', 'kok......kok', 'kooddddddook', 'kooooooooook', 'kokkoooookkk', 'kooooooooook', 'koooookooook', '.koooppooook', '.kooooooook.', '..kooooook..', '...kkkkkk...', '............']] },
+
   /* ---------- ícones de HUD / ramos (7x7) ---------- */
   ico_match: { pal: { r: '#ff004d', d: '#7e2553', w: '#e8c27a', s: '#ab5236' }, frames: [[
     '.....rr', '....rdr', '...ws..', '..ws...', '.ws....', 'ws.....', 's......']] },
@@ -370,6 +398,14 @@ PALIT.SPRITES = {
     '...w...', '..ww.y.', 'www.y.y', 'www.y.y', 'www.y.y', '..ww.y.', '...w...']] },
   ico_mute: { pal: { w: '#c2c3c7', r: '#ff004d' }, frames: [[
     '...w...', '..ww...', 'wwwr.r.', 'www.r..', 'wwwr.r.', '..ww...', '...w...']] },
+  ico_note: { pal: { w: '#c2c3c7', y: '#ffec27' }, frames: [[
+    '...wwww', '...w..w', '...w..w', '...w..w', '.yyw.yy', 'yyyyyyy', '.yy..yy']] },
+  ico_star: { pal: { y: '#ffec27', o: '#ffa300' }, frames: [[
+    '...y...', '..yyy..', 'yyyyyyy', '.yyyyy.', '.yyoyy.', 'yyo.oyy', 'o.....o']] },
+  ico_book: { pal: { b: '#ab5236', w: '#fff1e8', k: '#5f3a20' }, frames: [[
+    'bbbbbbb', 'bwwbwwb', 'bwwbwwb', 'bwwbwwb', 'bwwbwwb', 'bbbbbbb', 'k.....k']] },
+  ico_q: { pal: { y: '#ffec27', k: '#ab5236' }, frames: [[
+    '.yyyyy.', 'yy...yy', '.....yy', '...yyy.', '...yy..', '.......', '...yy..']] },
   ico_close: { pal: { w: '#fff1e8' }, frames: [[
     'w.....w', '.w...w.', '..w.w..', '...w...', '..w.w..', '.w...w.', 'w.....w']] },
   ico_heart: { pal: { r: '#ff004d', w: '#fff1e8', d: '#7e2553' }, frames: [[

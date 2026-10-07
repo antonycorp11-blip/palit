@@ -640,6 +640,7 @@ PALIT.View = (function () {
     g.addEventListener('pointerdown', function (e) {
       if (isUI(e.target)) return;
       e.preventDefault();
+      if (P.Pause.active()) { if (P.Story.active()) P.Story.advance(); return; }
       var th = e.target.closest('.th');
       if (th) { G.hitThreat(+th.dataset.id); return; }
       ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, y0: e.clientY, cam0: cam.y, t: performance.now(), moved: false, lastY: e.clientY, lastT: performance.now(), v: 0 };

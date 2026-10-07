@@ -21,6 +21,7 @@ PALIT.Desktop = (function () {
     panel.id = 'deskpanel';
     panel.className = 'px';
     panel.innerHTML =
+      '<h3>' + P.SpriteCSS.html('ico_star') + 'MISSÕES</h3><div id="dp-mis"></div>' +
       '<h3>' + P.SpriteCSS.html('ico_tree') + 'PRÓXIMAS MELHORIAS</h3><div id="dp-up"></div>' +
       '<h3>' + P.SpriteCSS.html('ico_flag') + 'REGISTRO</h3><div id="dp-log"></div>' +
       '<div class="keys">' +
@@ -42,6 +43,7 @@ PALIT.Desktop = (function () {
     bindKeys();
     bindLog();
     bindTips();
+    $('dp-mis').addEventListener('click', function (e) { var b = e.target.closest('[data-claim]'); if (b) P.Progress.claim(+b.dataset.claim); });
     el.up.addEventListener('click', function (e) {
       var b = e.target.closest('[data-buy]');
       if (b) { e.stopPropagation(); if (!G.buy(b.dataset.buy, false)) P.Audio.sfx.blocked(); else { P.Audio.sfx.buy(G.levels()[b.dataset.buy] || 1, false); upKey = ''; } return; }
@@ -64,7 +66,7 @@ PALIT.Desktop = (function () {
       var l = lv[n.id] || 0;
       return l < n.lv && P.Tree.reqsMet(def, n, lv);
     }).map(function (n) { return { n: n, c: P.Tree.cost(def, G.mat, n, lv[n.id] || 0) }; })
-      .sort(function (a, b) { return a.c - b.c; }).slice(0, 7);
+      .sort(function (a, b) { return a.c - b.c; }).slice(0, 5);
     var key = list.map(function (x) { return x.n.id + (lv[x.n.id] || 0) + (money >= x.c ? 'y' : 'n'); }).join();
     if (key === upKey) return;
     upKey = key;
@@ -119,6 +121,7 @@ PALIT.Desktop = (function () {
       }
       if ($('splash')) { if (k === 'Space' || k === 'Enter') { e.preventDefault(); $('splash').querySelector('button').click(); } return; }
       if (!$('modal').hidden) return;
+      if (P.Story.active()) { if (k === 'Space' || k === 'Enter') { e.preventDefault(); P.Story.advance(); } return; }
       if (tree) {
         if (k === 'Enter' || k === 'KeyB') { e.preventDefault(); P.TreeView.buySelected(e.shiftKey); }
         else if (k === 'KeyT') P.TreeView.close();

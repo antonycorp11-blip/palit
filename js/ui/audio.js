@@ -4,10 +4,12 @@
 var PALIT = window.PALIT = window.PALIT || {};
 
 PALIT.Audio = (function () {
-  var ctx = null, master = null, noiseBuf = null;
-  var muted = false;
+  var ctx = null, master = null, noiseBuf = null, sfxBus = null, musicBus = null;
+  var muted = false, sfxOn = true, musicOn = true;
   var last = {};
-  try { muted = localStorage.getItem('palit.mute') === '1'; } catch (e) { /* sem storage */ }
+  function pref(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : v === '1'; } catch (e) { return d; } }
+  function setPref(k, v) { try { localStorage.setItem(k, v ? '1' : '0'); } catch (e) { /* sem storage */ } }
+  muted = pref('palit.mute', false); sfxOn = pref('palit.sfx', true); musicOn = pref('palit.music', true);
 
   // escala pentatônica (Dó maior) para a "melodia" das camadas
   var PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
@@ -22,6 +24,8 @@ PALIT.Audio = (function () {
     master.gain.value = muted ? 0 : 0.55;
     var comp = ctx.createDynamicsCompressor();
     master.connect(comp); comp.connect(ctx.destination);
+    sfxBus = ctx.createGain(); sfxBus.gain.value = sfxOn ? 1 : 0; sfxBus.connect(master);
+    musicBus = ctx.createGain(); musicBus.gain.value = musicOn ? 0.55 : 0; musicBus.connect(master);
     noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
     var d = noiseBuf.getChannelData(0);
     for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -33,7 +37,7 @@ PALIT.Audio = (function () {
   }
 
   function ok(key, gap) {
-    if (!ctx || muted) return false;
+    if (!ctx || muted || !sfxOn) return false;
     var t = ctx.currentTime;
     if (key && last[key] && t - last[key] < (gap || 0.03)) return false;
     if (key) last[key] = t;
@@ -51,7 +55,7 @@ PALIT.Audio = (function () {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(v, t + (o.att || 0.004));
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    osc.connect(g); g.connect(o.dest || master);
+    osc.connect(g); g.connect(o.dest || sfxBus);
     osc.start(t); osc.stop(t + dur + 0.02);
   }
 
@@ -71,7 +75,7 @@ PALIT.Audio = (function () {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(v, t + (o.att || 0.003));
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    src.connect(f); f.connect(g); g.connect(master);
+    src.connect(f); f.connect(g); g.connect(o.dest || sfxBus);
     src.start(t, Math.random() * 0.5); src.stop(t + dur + 0.02);
   }
 
@@ -174,18 +178,95 @@ PALIT.Audio = (function () {
     whoosh: function (up) { if (ok('whoosh', 0.1)) noise(0.25, { freq: up ? 500 : 2500, freqTo: up ? 2500 : 500, q: 1.2, vol: 0.12 }); },
     alarm: function () { if (ok('alarm', 1)) for (var i = 0; i < 3; i++) tone(500, 0.25, { to: 900, vol: 0.08, at: i * 0.3 }); },
     win: function () { if (ok('win', 1)) { arp([60, 64, 67, 72, 67, 72, 76, 79, 84], 0.11, { vol: 0.1 }); tone(midi(48), 1.4, { type: 'triangle', vol: 0.2 }); } },
-    lose: function () { if (ok('lose', 1)) arp([67, 63, 60, 55], 0.18, { vol: 0.09, len: 0.3 }); }
+    lose: function () { if (ok('lose', 1)) arp([67, 63, 60, 55], 0.18, { vol: 0.09, len: 0.3 }); },
+    /* encaixe perfeito: sino que sobe com a sequência */
+    perfect: function (streak) {
+      if (!ok('perfect', 0.03)) return;
+      var n = 79 + PENTA[Math.min(10, streak % 11)];
+      tone(midi(n), 0.12, { type: 'triangle', vol: 0.13 });
+      tone(midi(n + 12), 0.18, { type: 'square', vol: 0.04, at: 0.03 });
+      if (streak > 0 && streak % 10 === 0) arp([n, n + 4, n + 7, n + 12], 0.05, { vol: 0.07, at: 0.1 });
+    },
+    streakLost: function () { if (ok('sl', 0.3)) tone(392, 0.15, { to: 260, vol: 0.05, type: 'triangle' }); },
+    achievement: function () { if (ok('ach', 0.5)) { arp([72, 79, 84, 88], 0.07, { vol: 0.1 }); arp([91, 96], 0.09, { vol: 0.07, at: 0.3, type: 'triangle' }); } },
+    mission: function () { if (ok('mis', 0.3)) arp([76, 79, 84], 0.06, { vol: 0.09, type: 'triangle' }); },
+    page: function () { if (ok('page', 0.05)) noise(0.06, { freq: 3500, q: 2, vol: 0.12 }); },
+    /* "voz" dos personagens: bipe curto com timbre por personagem */
+    blip: function (pitch) {
+      if (!ok('blip', 0.045)) return;
+      tone(320 * (pitch || 1) * (0.92 + Math.random() * 0.16), 0.04, { type: 'square', vol: 0.045 });
+    }
   };
+
+  /* =========================================================
+     MÚSICA — chiptune gerada na hora.
+     Dia: Dó maior animado. Noite: lá menor tranquilo.
+     Desafio: tenso e rápido. Melodia muda a cada 4 compassos.
+     ========================================================= */
+  var CH = {
+    C: [48, 60, 64, 67], Am: [45, 57, 60, 64], F: [41, 53, 57, 60], G: [43, 55, 59, 62],
+    Dm: [38, 50, 53, 57], E: [40, 52, 56, 59], Em: [40, 52, 55, 59]
+  };
+  var MOODS = {
+    day:   { bpm: 96,  prog: ['C', 'Am', 'F', 'G'], scale: [60, 62, 64, 67, 69, 72, 74, 76], lead: 'square',   arp: true,  lv: 0.05 },
+    night: { bpm: 72,  prog: ['Am', 'F', 'C', 'Em'], scale: [57, 60, 62, 64, 67, 69, 72], lead: 'triangle', arp: false, lv: 0.07 },
+    tense: { bpm: 132, prog: ['Am', 'Dm', 'E', 'Am'], scale: [57, 59, 60, 62, 64, 65, 68, 69], lead: 'square', arp: true, lv: 0.05 }
+  };
+  var mood = 'day', step = 0, nextT = 0, phrase = [], timer = null;
+
+  function makePhrase(m) {
+    var out = [];
+    for (var i = 0; i < 32; i++) {
+      var r = Math.random();
+      out.push(r < 0.42 ? null : m.scale[Math.floor(Math.random() * m.scale.length)] + (r > 0.93 ? 12 : 0));
+    }
+    return out;
+  }
+
+  function schedule() {
+    if (!ctx || !musicOn || muted || ctx.state !== 'running') return;
+    var m = MOODS[mood];
+    var eighth = 60 / m.bpm / 2;
+    if (nextT < ctx.currentTime) nextT = ctx.currentTime + 0.05;
+    while (nextT < ctx.currentTime + 0.25) {
+      var bar = Math.floor(step / 8) % 4, beat = step % 8;
+      if (step % 64 === 0 || !phrase.length) phrase = makePhrase(m);
+      var ch = CH[m.prog[bar]];
+      var at = nextT - ctx.currentTime;
+      if (beat === 0 || beat === 4) tone(midi(ch[0]), eighth * 3.6, { type: 'triangle', vol: 0.16, at: at, dest: musicBus });
+      if (beat === 6 && mood !== 'night') tone(midi(ch[0] + 12), eighth * 0.9, { type: 'triangle', vol: 0.08, at: at, dest: musicBus });
+      if (m.arp) tone(midi(ch[1 + (beat % 3)] + 12), eighth * 0.8, { type: 'square', vol: 0.018, at: at, dest: musicBus });
+      var note = phrase[step % 32];
+      if (note && (beat % 2 === 0 || mood === 'tense')) tone(midi(note), eighth * 1.7, { type: m.lead, vol: m.lv, at: at, dest: musicBus });
+      if (mood !== 'night' && beat % 2 === 1) noise(0.03, { freq: 8000, filter: 'highpass', vol: 0.025, at: at, dest: musicBus });
+      if (mood === 'tense' && beat % 4 === 2) noise(0.08, { freq: 900, q: 1, vol: 0.06, at: at, dest: musicBus });
+      nextT += eighth;
+      step++;
+    }
+  }
+
+  function setMood(md) {
+    if (md === mood || !MOODS[md]) return;
+    mood = md; phrase = []; step = 0;
+  }
+
+  function startMusic() { if (!timer) timer = setInterval(schedule, 60); }
+  function setMusic(on) { musicOn = on; setPref('palit.music', on); if (musicBus) musicBus.gain.value = on ? 0.55 : 0; }
+  function setSfx(on) { sfxOn = on; setPref('palit.sfx', on); if (sfxBus) sfxBus.gain.value = on ? 1 : 0; }
 
   function setMuted(m) {
     muted = m;
     try { localStorage.setItem('palit.mute', m ? '1' : '0'); } catch (e) { /* sem storage */ }
     if (master) master.gain.value = m ? 0 : 0.55;
   }
+  startMusic();
 
   ['pointerdown', 'pointerup', 'keydown', 'touchstart', 'touchend', 'click'].forEach(function (ev) { window.addEventListener(ev, unlock, { passive: true }); });
   // iOS suspende/interrompe o áudio ao sair do app; retoma ao voltar
   document.addEventListener('visibilitychange', function () { if (!document.hidden && ctx && ctx.state !== 'running') ctx.resume(); });
 
-  return { sfx: S, unlock: unlock, setMuted: setMuted, get muted() { return muted; } };
+  return {
+    sfx: S, unlock: unlock, setMuted: setMuted, setMusic: setMusic, setSfx: setSfx, setMood: setMood,
+    get muted() { return muted; }, get musicOn() { return musicOn; }, get sfxOn() { return sfxOn; }
+  };
 })();
