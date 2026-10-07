@@ -411,7 +411,8 @@ PALIT.Game = (function () {
   /* geometria da torre em projeção oblíqua: L = comprimento da peça,
      D = recuo diagonal da profundidade (metade de L) */
   function geo() {
-    var L = mat.look.len, D = Math.round(L / 2);
+    var art = P.STICKS && P.STICKS[mat.id];
+    var L = mat.look.len, D = art ? art.depth : Math.round(L / 2);
     return { L: L, D: D, halfW: (L + D) / 2 };
   }
 

@@ -35,7 +35,9 @@ PALIT.View = (function () {
   function measure() {
     var desk = window.innerWidth >= 1000 && window.innerHeight >= 560;
     HU = window.innerWidth < 480 ? 3 : 4;
-    U = window.innerWidth < 480 ? 4 : desk && window.innerHeight >= 900 ? 6 : 5;
+    // pixel do mundo: a torre ocupa ~45% da largura (mín. 3, máx. 6)
+    var g0 = G.mat ? G.geo() : { L: 34, D: 24 };
+    U = Math.max(3, Math.min(desk && window.innerHeight >= 900 ? 6 : 5, Math.floor(window.innerWidth * (desk ? 0.3 : 0.46) / (g0.L + g0.D))));
     document.documentElement.style.setProperty('--u', HU + 'px');
     if (el.world) el.world.style.setProperty('--u', U + 'px');
     LH = U * G.LHU;
@@ -57,78 +59,98 @@ PALIT.View = (function () {
      gerado por material.                                            */
   function geo() {
     if (!G.mat) return;
-    L = G.mat.look.len; D = Math.round(L / 2);
+    var g = G.geo();
+    L = g.L; D = g.D;
     X0 = -Math.round((L + D) / 2);
     W = (L + D) * U;
   }
 
+  /* proporção da profundidade: z (0..L) → recuo diagonal (0..D) */
+  function dz(z) { return Math.round(z * D / L); }
   var ZN = 2;                           // recuo do palito da frente
   function zf() { return L - 4; }       // posição do palito do fundo
+  function xbOf(k) { return k === 0 ? 2 : L - 7; }   // palitos laterais
+  var SPR = {};                          // geometria de cada variante de sprite
+
+  /* Cada palito é uma lista de pixels [x, up, cor] com o corpo em up 0..2.
+     Usa a arte do material (PALIT.STICKS) ou o desenho procedural. */
+  function stickPixels(kind, headless) {
+    var art = P.STICKS && P.STICKS[G.mat.id];
+    var lk = G.mat.look, px = [];
+    function blob(cx, cu) {           // cabeça 5x5 centrada em (cx, cu)
+      if (headless) return;
+      art.head.forEach(function (row, r) {
+        for (var x = 0; x < row.length; x++) if (row[x] !== '.') px.push([cx - 2 + x, cu + 2 - r, art.pal[row[x]]]);
+      });
+    }
+    if (art) {
+      var p = art.pal;
+      if (kind === 'xl' || kind === 'xr') {
+        for (var x = 0; x < L; x++) art.body.forEach(function (c, r) { px.push([x, 2 - r, p[c]]); });
+        if (headless) { px.push([kind === 'xl' ? 0 : L - 1, 1, p.L]); }
+        blob(kind === 'xl' ? 2 : L - 3, 1);
+      } else {
+        for (var j = 0; j < D; j++) art.diag.forEach(function (c, s) { px.push([j + s, j, p[c]]); });
+        if (kind === 'zn') blob(1, 0); else blob(D + 1, D - 1);
+      }
+      return px;
+    }
+    // procedural (eras ainda sem arte)
+    var c = { l: lk.light, b: lk.body, s: lk.shade, h: headless || !lk.head ? lk.light : lk.head, d: headless || !lk.head ? lk.shade : lk.headDark };
+    var hl = lk.headLen || 3, hasHead = !headless && !!lk.head;
+    if (kind === 'xl' || kind === 'xr') {
+      var left = kind === 'xl';
+      for (var x2 = 0; x2 < L; x2++) {
+        var isH = hasHead && (left ? x2 < hl : x2 >= L - hl);
+        px.push([x2, 2, isH ? c.h : c.l], [x2, 1, isH ? c.h : c.b], [x2, 0, isH ? c.d : c.s]);
+      }
+      if (hasHead) px.push([left ? 1 : L - 2, 3, lk.head]);
+    } else {
+      var near = kind === 'zn';
+      for (var j2 = 0; j2 < D; j2++) {
+        var isH2 = hasHead && (near ? j2 < hl - 1 : j2 >= D - (hl - 1));
+        px.push([j2, j2 + 2, isH2 ? c.h : c.l], [j2, j2 + 1, isH2 ? c.h : c.b], [j2, j2, isH2 ? c.d : c.b], [j2 + 1, j2, isH2 ? c.d : c.s]);
+      }
+    }
+    return px;
+  }
 
   function compileSticks() {
-    var lk = G.mat.look, st = G.st;
-    var headless = !lk.head || st.visHeadless > 0;
-    var key = G.mat.id + U + headless;
+    var headless = G.st.visHeadless > 0;
+    var key = G.mat.id + U + headless + L + D;
     if (key === stickKey) return;
     stickKey = key;
-    var c = {
-      l: lk.light, b: lk.body, s: lk.shade,
-      h: headless ? lk.light : lk.head, d: headless ? lk.shade : lk.headDark, H: headless ? null : lk.head
-    };
-    var hl = lk.headLen || 3;
-    function css(px) {
-      return px.filter(function (p) { return p[2]; }).map(function (p) { return ((p[0] + 1) * U) + 'px ' + ((p[1] + 1) * U) + 'px 0 0 ' + p[2]; }).join(',');
-    }
-    // palito ao longo de X: linha 0 = volume da cabeça; 1 topo claro; 2 corpo; 3 lateral escura
-    function xs(headLeft) {
-      var px = [];
-      for (var x = 0; x < L; x++) {
-        var isH = headLeft ? x < hl : x >= L - hl;
-        var end = x === (headLeft ? L - 1 : 0);
-        px.push([x, 1, isH ? c.H || c.h : c.l]);
-        px.push([x, 2, isH ? c.h : (end ? c.l : c.b)]);
-        px.push([x, 3, isH ? c.d : (end ? c.b : c.s)]);
-      }
-      var h0 = headLeft ? 0 : L - hl;
-      for (var j = h0; j < h0 + hl; j++) if (c.H) px.push([j, 0, j === h0 || j === h0 + hl - 1 ? null : c.H]);
-      return css(px);
-    }
-    // palito ao longo de Z: diagonal subindo para a direita (1:1), D degraus, espessura 3
-    function zs(headNear) {
-      var px = [], top = D + 3;
-      for (var j = 0; j < D; j++) {
-        var isH = headNear ? j < hl - 1 : j >= D - (hl - 1);
-        px.push([j, top - (j + 2), isH ? c.H || c.h : c.l]);
-        px.push([j, top - (j + 1), isH ? c.h : c.b]);
-        px.push([j, top - j, isH ? c.d : (j === 0 ? c.l : c.b)]);
-        px.push([j + 1, top - j, isH ? c.d : c.s]);
-        if (isH && c.H && j === (headNear ? 0 : D - 1)) px.push([j, top - (j + 3), c.H]);
-      }
-      return css(px);
-    }
-    var out = [
-      '.sx-l,.sx-r{width:' + L * U + 'px;height:' + 4 * U + 'px}',
-      '.sz-n,.sz-f{width:' + (D + 2) * U + 'px;height:' + (D + 4) * U + 'px}',
-      '.sx-l::before{box-shadow:' + xs(true) + '}',
-      '.sx-r::before{box-shadow:' + xs(false) + '}',
-      '.sz-n::before{box-shadow:' + zs(true) + '}',
-      '.sz-f::before{box-shadow:' + zs(false) + '}'
-    ];
+    var out = [];
+    [['xl', 'sx-l'], ['xr', 'sx-r'], ['zn', 'sz-n'], ['zf', 'sz-f']].forEach(function (v) {
+      var px = stickPixels(v[0], headless);
+      var minX = 1e9, maxX = -1e9, minU = 1e9, maxU = -1e9;
+      px.forEach(function (p) { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minU = Math.min(minU, p[1]); maxU = Math.max(maxU, p[1]); });
+      var w = maxX - minX + 1, h = maxU - minU + 1;
+      SPR[v[1]] = { minX: minX, minU: minU, w: w, h: h };
+      var sh = px.map(function (p) { return ((p[0] - minX + 1) * U) + 'px ' + ((maxU - p[1] + 1) * U) + 'px 0 0 ' + p[2]; }).join(',');
+      out.push('.' + v[1] + '{width:' + w * U + 'px;height:' + h * U + 'px}');
+      out.push('.' + v[1] + '::before{box-shadow:' + sh + '}');
+    });
     var e = document.getElementById('stick-css') || document.createElement('style');
     e.id = 'stick-css';
     e.textContent = out.join('\n');
     document.head.appendChild(e);
   }
 
-  /* retângulo (em px, relativo à base da camada) e classe do sprite da peça k da camada i */
+  /* retângulo (px, relativo à base da camada) do sprite da peça k da camada i.
+     ox/ou = posição da âncora (início do corpo) dentro do elemento. */
   function stickRect(i, k) {
-    var A = i % 2 === 0;
+    var A = i % 2 === 0, cls, ax, au;
     if (A) {
-      var oz = Math.round((k === 0 ? zf() : ZN) / 2);
-      return { cls: ((i >> 1) % 2) ? 'sx-r' : 'sx-l', left: oz * U, bottom: oz * U, w: L * U, h: 4 * U, A: true, oz: oz };
+      var oz = dz(k === 0 ? zf() : ZN);
+      cls = ((i >> 1) % 2) ? 'sx-r' : 'sx-l'; ax = oz; au = oz;
+      var s = SPR[cls];
+      return { cls: cls, left: (ax + s.minX) * U, bottom: (au + s.minU) * U, w: s.w * U, h: s.h * U, A: true, oz: oz, ox: -s.minX * U, ou: -s.minU * U };
     }
-    var xb = k === 0 ? 2 : L - 4;
-    return { cls: (((i >> 1) + k) % 2) ? 'sz-f' : 'sz-n', left: xb * U, bottom: 0, w: (D + 2) * U, h: (D + 4) * U, A: false, xb: xb };
+    var xb = xbOf(k);
+    cls = (((i >> 1) + k) % 2) ? 'sz-f' : 'sz-n';
+    var t = SPR[cls];
+    return { cls: cls, left: (xb + t.minX) * U, bottom: t.minU * U, w: t.w * U, h: t.h * U, A: false, xb: xb, ox: -t.minX * U, ou: -t.minU * U };
   }
 
   /* segmento central da peça, em px de mundo (y para cima negativo) */
@@ -139,7 +161,7 @@ PALIT.View = (function () {
       var y = -(base + r.oz + 1.5) * U;
       return [(X0 + r.oz) * U + lx, y, (X0 + r.oz + L) * U + lx, y];
     }
-    return [(X0 + r.xb) * U + lx, -(base + 1.5) * U, (X0 + r.xb + D) * U + lx, -(base + 1.5 + D) * U];
+    return [(X0 + r.xb + 1.5) * U + lx, -(base + 1) * U, (X0 + r.xb + D + 1.5) * U + lx, -(base + D) * U];
   }
 
   function setupMaterial() {
@@ -232,13 +254,13 @@ PALIT.View = (function () {
         style += ';--pd:' + G.rt.placing.dur.toFixed(2) + 's;--sx:' + fl.sx + 'px;--sy:' + fl.sy + 'px;--sr:' + fl.sr + 'deg';
       }
       var inner = '';
-      var mx = A ? Math.round(L / 2) * U : Math.round(D / 2) * U;
-      var my = A ? U : Math.round(D / 2) * U;
+      var mx = r.ox + (A ? Math.round(L / 2) : Math.round(D / 2) + 1) * U;
+      var my = r.ou + (A ? U : Math.round(D / 2) * U);
       if (v === C.CRACK) inner = '<b class="crk" style="left:' + mx + 'px;bottom:' + my + 'px"></b>';
       if (v === C.FIRE) inner = P.SpriteCSS.html('fire').replace('class="', 'style="left:' + (mx - 2 * U) + 'px;bottom:' + (my + 2 * U) + 'px" class="');
       // faixa de linha a cada 10 camadas (Camada Reforçada)
       if (A && k === 1 && st.visBands && i % 10 === 0 && i > 0 && v === C.OK) {
-        inner += '<b class="thr" style="left:' + 4 * U + 'px"></b><b class="thr" style="left:' + (L - 5) * U + 'px"></b>';
+        inner += '<b class="thr" style="left:' + (r.ox + 7 * U) + 'px;bottom:' + r.ou + 'px"></b><b class="thr" style="left:' + (r.ox + (L - 8) * U) + 'px;bottom:' + r.ou + 'px"></b>';
       }
       html += '<i class="' + cls + '" data-c="' + c + '" style="' + style + '">' + inner + '</i>';
     }
@@ -251,11 +273,11 @@ PALIT.View = (function () {
       var wrap = st.visCorners > 0 && i % 6 === 1;
       for (var kk = 0; kk < ppl; kk++) {
         if (S.cells[i * ppl + kk] !== C.OK) continue;
-        var xb = kk === 0 ? 2 : L - 4;
+        var xb = xbOf(kk);
         [ZN, zf()].forEach(function (z, zi) {
           if (S.cells[(i - 1) * ppl + (zi === 0 ? 1 : 0)] !== C.OK) return;
-          var oz = Math.round(z / 2);
-          html += '<b class="' + (wrap ? 'wrp' : 'glu') + '" style="left:' + (xb + oz) * U + 'px;bottom:' + (oz - 1) * U + 'px"></b>';
+          var oz = dz(z);
+          html += '<b class="' + (wrap ? 'wrp' : 'glu') + '" style="left:' + (xb + oz + 1) * U + 'px;bottom:' + (oz - 1) * U + 'px"></b>';
         });
       }
     }
@@ -308,8 +330,8 @@ PALIT.View = (function () {
     if (!f) { f = el.flag = document.createElement('i'); f.className = 'sp sp-flag topflag'; el.fx.parentNode.appendChild(f); }
     f.hidden = built < 2;
     if (built >= 2) {
-      var fx = (X0 + L + Math.round(D / 2) - 2) * U + layerX(built - 1);
-      var fy = -(built * G.LHU + Math.round(D / 2) + 7) * U;
+      var fx = (X0 + L - 6 + D) * U + layerX(built - 1);
+      var fy = -(built * G.LHU + D + 7) * U;
       var key = fx + ',' + fy;
       if (f._k !== key) { f._k = key; f.style.transform = 'translate(' + fx + 'px,' + fy + 'px)'; }
     }

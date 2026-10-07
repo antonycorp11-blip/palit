@@ -41,6 +41,7 @@ js/data/        dados (tudo data-driven)
   events.js       eventos aleatórios
   scenes.js       cenário por altitude global
   sprites.js      pixel art ASCII
+  sticks.js       arte dos palitos por material (paleta, cabeça, padrão da diagonal, profundidade)
 js/core/        simulação (sem DOM)
   econ.js         fórmulas de economia (compartilhadas com o simulador)
   tree.js         motor genérico de árvores (stats, custos, pré-requisitos, layout radial)
