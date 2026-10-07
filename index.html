@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1d2b53">
+  <title>Palit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="game">
+    <div id="scene">
+      <div id="sky"></div>
+      <div id="stars"></div>
+      <i id="sun"></i>
+      <div id="clouds" class="layer-par"></div>
+      <div id="far" class="layer-par"></div>
+      <div id="mid" class="layer-par"></div>
+      <div id="near" class="layer-par"></div>
+    </div>
+    <div id="world">
+      <div id="ground"></div>
+      <div id="tower"></div>
+      <div id="ents"></div>
+      <div id="fx"></div>
+    </div>
+    <div id="weather"></div>
+    <div id="flash"></div>
+    <div id="hud">
+      <div id="topbar"></div>
+      <div id="wind-ind" hidden></div>
+      <div id="ch-ind" hidden></div>
+      <div id="alerts"></div>
+      <div id="ruler"></div>
+      <div id="arrows"></div>
+      <div id="side-btns"></div>
+      <div id="bottombar"></div>
+    </div>
+  </div>
+  <div id="tree-screen" hidden></div>
+  <div id="modal" hidden></div>
+  <div id="splash">
+    <i class="sp sp-ico_match"></i>
+    <h1>PALIT</h1>
+    <p>Uma caixa de fósforos.<br>Uma torre.<br>Um caminho absurdamente longo para cima.</p>
+    <p class="c-l">Toque para colocar uma peça. Arraste para descer pela torre. Toque em ameaças para expulsá-las. Toque em peças danificadas para repará-las.</p>
+    <button class="pxbtn gold">COMEÇAR</button>
+  </div>
+
+  <script src="js/data/stats.js"></script>
+  <script src="js/data/materials.js"></script>
+  <script src="js/data/trees/fosforo.js"></script>
+  <script src="js/data/threats.js"></script>
+  <script src="js/data/events.js"></script>
+  <script src="js/data/scenes.js"></script>
+  <script src="js/data/sprites.js"></script>
+  <script src="js/core/econ.js"></script>
+  <script src="js/core/tree.js"></script>
+  <script src="js/core/state.js"></script>
+  <script src="js/core/game.js"></script>
+  <script src="js/ui/spritecss.js"></script>
+  <script src="js/ui/view.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/treeview.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
