@@ -348,12 +348,5 @@ PALIT.HUD = (function () {
     return h + 'h ' + String(m).padStart(2, '0') + 'min';
   }
 
-  function welcome() {
-    var o = G.rt.offline;
-    if (o && (o.pieces > 0 || o.money >= 1)) {
-      toast('ENQUANTO VOCÊ ESTAVA FORA (' + Math.round(o.used / 60) + ' MIN): +' + o.pieces + ' ' + G.mat.pieces.toUpperCase() + ' · +$' + P.fmtMoney(o.money), 'good', false, { life: 5 });
-    }
-  }
-
-  return { init: init, update: update, toast: toast, modal: modal, close: close, welcome: welcome };
+  return { init: init, update: update, toast: toast, modal: modal, close: close };
 })();

@@ -35,8 +35,7 @@ PALIT.Game = (function () {
       autoPlaceT: 0, autoRepairT: 0, autoDefendT: 0,
       ch: null,
       integrity: 100, dmgCount: { crack: 0, miss: 0, fire: 0 },
-      viewW: 100,
-      offline: null
+      viewW: 100
     };
   }
 
@@ -46,7 +45,6 @@ PALIT.Game = (function () {
     rt = freshRuntime();
     setMaterial();
     rebuildDamageIndex(true);
-    offline();
   }
 
   function setMaterial() {
@@ -766,18 +764,7 @@ PALIT.Game = (function () {
     return bought;
   }
 
-  /* ---------------- offline ---------------- */
-  function offline() {
-    var sec = (Date.now() - (S.lastSeen || Date.now())) / 1000;
-    if (sec < 30) return;
-    var capped = Math.min(sec, st.offlineMin * 60);
-    var before = S.pieces + S.reserve;
-    var n = Math.floor(capped / E.effRecharge(st));
-    for (var i = 0; i < n && !boxFull(); i++) produceOne();
-    var m = E.passive(mat, st, layersBuilt(), rt.integrity / 100) * capped * 0.5;
-    addMoney(m);
-    rt.offline = { sec: sec, used: capped, pieces: S.pieces + S.reserve - before, money: m };
-  }
+  /* Sem ganhos offline: com o jogo fechado ou em segundo plano, nada é produzido. */
 
   /* ---------------- loop ---------------- */
   function update(dt) {

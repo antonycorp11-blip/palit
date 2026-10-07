@@ -40,11 +40,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
     document.addEventListener('visibilitychange', function () {
       if (document.hidden) P.save();
-      else { // retorno: aplica produção offline do período ausente
-        var s = P.State.load();
-        if (s && (Date.now() - s.lastSeen) > 30000) { G.init(s); P.View.measure(); G.emit('rebuild'); P.HUD.welcome(); }
-        last = performance.now();
-      }
+      else last = performance.now(); // sem ganhos offline: o tempo fora não conta
     });
     window.addEventListener('pagehide', P.save);
     G.on('bought', P.save);
@@ -52,7 +48,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
     var sp = document.getElementById('splash');
     var first = G.S.stats.placed === 0 && G.S.matIndex === 0;
-    if (!first) { sp.remove(); P.HUD.welcome(); }
+    if (!first) sp.remove();
     else {
       sp.querySelector('button').addEventListener('click', function () { sp.remove(); });
     }

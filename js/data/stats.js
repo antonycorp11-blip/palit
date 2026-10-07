@@ -11,7 +11,6 @@ PALIT.STATS = {
   rechargeSec:     { label: 'Recarga', fmt: 'sec1', fromMat: true, min: 0.8 },
   prodMult:        { label: 'Ritmo de produção', fmt: 'pct' },
   doubleChance:    { label: 'Chance de peça dupla', fmt: 'pct' },
-  offlineMin:      { label: 'Produção offline', fmt: 'min', base: 5 },
   attackProd:      { label: 'Produção durante ataques', fmt: 'pct', base: 0.5, max: 1 },
   rechargeWhileRepair: { label: 'Recarga durante reparos', fmt: 'flag' },
 
