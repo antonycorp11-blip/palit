@@ -305,6 +305,10 @@ PALIT.SPRITES = {
     '...r...', '...r...', '...r...', 'rrr.rrr', '.rrrrr.', '..rrr..', '...r...']] },
   ico_menu: { pal: { w: '#fff1e8' }, frames: [[
     '.......', 'wwwwwww', '.......', 'wwwwwww', '.......', 'wwwwwww', '.......']] },
+  ico_sound: { pal: { w: '#fff1e8', y: '#ffec27' }, frames: [[
+    '...w...', '..ww.y.', 'www.y.y', 'www.y.y', 'www.y.y', '..ww.y.', '...w...']] },
+  ico_mute: { pal: { w: '#c2c3c7', r: '#ff004d' }, frames: [[
+    '...w...', '..ww...', 'wwwr.r.', 'www.r..', 'wwwr.r.', '..ww...', '...w...']] },
   ico_close: { pal: { w: '#fff1e8' }, frames: [[
     'w.....w', '.w...w.', '..w.w..', '...w...', '..w.w..', '.w...w.', 'w.....w']] },
   ico_heart: { pal: { r: '#ff004d', w: '#fff1e8', d: '#7e2553' }, frames: [[

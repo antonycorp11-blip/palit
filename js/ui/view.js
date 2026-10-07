@@ -5,7 +5,9 @@ var PALIT = window.PALIT = window.PALIT || {};
 
 PALIT.View = (function () {
   var P = PALIT, G, C;
-  var U = 4, LH = 8, W = 104;
+  var U = 4, HU = 3, LH = 8, W = 104;  // U = pixel do mundo, HU = pixel do HUD
+  var L = 26, D = 13, X0 = -19;          // geometria oblíqua em unidades
+  var stickKey = '';
   var el = {};
   var cam = { y: 0, follow: true, vel: 0, drag: null, returning: false };
   var H = 800, VW = 400, focal = 400;
@@ -31,28 +33,118 @@ PALIT.View = (function () {
   }
 
   function measure() {
-    U = window.innerWidth < 480 ? 3 : 4;
-    document.documentElement.style.setProperty('--u', U + 'px');
+    HU = window.innerWidth < 480 ? 3 : 4;
+    U = window.innerWidth < 480 ? 4 : 5;
+    document.documentElement.style.setProperty('--u', HU + 'px');
+    if (el.world) el.world.style.setProperty('--u', U + 'px');
     LH = U * G.LHU;
     H = window.innerHeight; VW = window.innerWidth;
     focal = Math.round(H * 0.5);
     if (G.rt) G.rt.viewW = VW / U;
-    W = G.mat ? G.mat.look.len * U : 104;
-    P.SpriteCSS.compile(U);
+    geo();
+    P.SpriteCSS.compile(HU);
+    P.SpriteCSS.compile(U, '#world ', 'sprite-css-world');
+    stickKey = '';
   }
 
-  /* ---------------- material / torre ---------------- */
+  /* ---------------- material / torre ----------------
+     Projeção oblíqua (como uma torre de palitos vista de cima/frente):
+       ponto (x, z, h) → tela (x + z/2, h + z/2)
+     Camadas pares: palitos ao longo de X (frente e fundo).
+     Camadas ímpares: palitos ao longo de Z (esquerda e direita),
+     desenhados em diagonal 1:1. Cada palito é um sprite box-shadow
+     gerado por material.                                            */
+  function geo() {
+    if (!G.mat) return;
+    L = G.mat.look.len; D = Math.round(L / 2);
+    X0 = -Math.round((L + D) / 2);
+    W = (L + D) * U;
+  }
+
+  var ZN = 2;                           // recuo do palito da frente
+  function zf() { return L - 4; }       // posição do palito do fundo
+
+  function compileSticks() {
+    var lk = G.mat.look, st = G.st;
+    var headless = !lk.head || st.visHeadless > 0;
+    var key = G.mat.id + U + headless;
+    if (key === stickKey) return;
+    stickKey = key;
+    var c = {
+      l: lk.light, b: lk.body, s: lk.shade,
+      h: headless ? lk.light : lk.head, d: headless ? lk.shade : lk.headDark, H: headless ? null : lk.head
+    };
+    var hl = lk.headLen || 3;
+    function css(px) {
+      return px.filter(function (p) { return p[2]; }).map(function (p) { return ((p[0] + 1) * U) + 'px ' + ((p[1] + 1) * U) + 'px 0 0 ' + p[2]; }).join(',');
+    }
+    // palito ao longo de X: linha 0 = volume da cabeça; 1 topo claro; 2 corpo; 3 lateral escura
+    function xs(headLeft) {
+      var px = [];
+      for (var x = 0; x < L; x++) {
+        var isH = headLeft ? x < hl : x >= L - hl;
+        var end = x === (headLeft ? L - 1 : 0);
+        px.push([x, 1, isH ? c.H || c.h : c.l]);
+        px.push([x, 2, isH ? c.h : (end ? c.l : c.b)]);
+        px.push([x, 3, isH ? c.d : (end ? c.b : c.s)]);
+      }
+      var h0 = headLeft ? 0 : L - hl;
+      for (var j = h0; j < h0 + hl; j++) if (c.H) px.push([j, 0, j === h0 || j === h0 + hl - 1 ? null : c.H]);
+      return css(px);
+    }
+    // palito ao longo de Z: diagonal subindo para a direita (1:1), D degraus, espessura 3
+    function zs(headNear) {
+      var px = [], top = D + 3;
+      for (var j = 0; j < D; j++) {
+        var isH = headNear ? j < hl - 1 : j >= D - (hl - 1);
+        px.push([j, top - (j + 2), isH ? c.H || c.h : c.l]);
+        px.push([j, top - (j + 1), isH ? c.h : c.b]);
+        px.push([j, top - j, isH ? c.d : (j === 0 ? c.l : c.b)]);
+        px.push([j + 1, top - j, isH ? c.d : c.s]);
+        if (isH && c.H && j === (headNear ? 0 : D - 1)) px.push([j, top - (j + 3), c.H]);
+      }
+      return css(px);
+    }
+    var out = [
+      '.sx-l,.sx-r{width:' + L * U + 'px;height:' + 4 * U + 'px}',
+      '.sz-n,.sz-f{width:' + (D + 2) * U + 'px;height:' + (D + 4) * U + 'px}',
+      '.sx-l::before{box-shadow:' + xs(true) + '}',
+      '.sx-r::before{box-shadow:' + xs(false) + '}',
+      '.sz-n::before{box-shadow:' + zs(true) + '}',
+      '.sz-f::before{box-shadow:' + zs(false) + '}'
+    ];
+    var e = document.getElementById('stick-css') || document.createElement('style');
+    e.id = 'stick-css';
+    e.textContent = out.join('\n');
+    document.head.appendChild(e);
+  }
+
+  /* retângulo (em px, relativo à base da camada) e classe do sprite da peça k da camada i */
+  function stickRect(i, k) {
+    var A = i % 2 === 0;
+    if (A) {
+      var oz = Math.round((k === 0 ? zf() : ZN) / 2);
+      return { cls: ((i >> 1) % 2) ? 'sx-r' : 'sx-l', left: oz * U, bottom: oz * U, w: L * U, h: 4 * U, A: true, oz: oz };
+    }
+    var xb = k === 0 ? 2 : L - 4;
+    return { cls: (((i >> 1) + k) % 2) ? 'sz-f' : 'sz-n', left: xb * U, bottom: 0, w: (D + 2) * U, h: (D + 4) * U, A: false, xb: xb };
+  }
+
+  /* segmento central da peça, em px de mundo (y para cima negativo) */
+  function cellSeg(c) {
+    var ppl = G.mat.piecesPerLayer, i = Math.floor(c / ppl), k = c % ppl;
+    var r = stickRect(i, k), base = i * G.LHU, lx = layerX(i);
+    if (r.A) {
+      var y = -(base + r.oz + 1.5) * U;
+      return [(X0 + r.oz) * U + lx, y, (X0 + r.oz + L) * U + lx, y];
+    }
+    return [(X0 + r.xb) * U + lx, -(base + 1.5) * U, (X0 + r.xb + D) * U + lx, -(base + 1.5 + D) * U];
+  }
+
   function setupMaterial() {
-    var m = G.mat, lk = m.look;
-    W = lk.len * U;
-    var t = el.tower.style;
-    t.setProperty('--pc-body', lk.body);
-    t.setProperty('--pc-light', lk.light);
-    t.setProperty('--pc-shade', lk.shade);
-    t.setProperty('--pc-head', lk.head || lk.body);
-    t.setProperty('--pc-headd', lk.headDark || lk.shade);
-    t.setProperty('--head-len', lk.headLen || 3);
-    el.tower.classList.toggle('nohead', !lk.head);
+    geo();
+    stickKey = '';
+    compileSticks();
     el.tower.innerHTML = '';
     layers = {}; dirty = {}; allDirty = true;
     Object.keys(ents).forEach(function (k) { ents[k].remove(); });
@@ -65,8 +157,7 @@ PALIT.View = (function () {
 
   function applyVisualFlags() {
     var st = G.st;
-    el.tower.classList.toggle('headless', st.visHeadless > 0);
-    el.tower.classList.toggle('glue', st.visGlue > 0);
+    compileSticks();
     var glue = ['#fff1e8', '#fff1e8', '#ffccaa', '#ffec27', '#c2c3c7', '#29adff'][Math.min(5, st.visGlue)];
     el.tower.style.setProperty('--glue', glue);
     allDirty = true;
@@ -75,9 +166,11 @@ PALIT.View = (function () {
   function buildGround() {
     var g = el.ground;
     g.innerHTML = '';
+    var slab = '<div class="slab" style="left:' + ((X0 - 4) * U) + 'px;width:' + (W + 8 * U) + 'px"></div>' +
+      '<div class="shadow" style="left:' + ((X0 + 1) * U) + 'px;width:' + ((L + D) * U) + 'px"></div>';
     if (G.S.matIndex === 0) {
       g.className = '';
-      var html = '<div class="fence"></div><div class="slab" style="left:' + (-W / 2 - 4 * U) + 'px;width:' + (W + 8 * U) + 'px"></div>';
+      var html = '<div class="fence"></div>' + slab;
       var seed = 7;
       for (var i = 0; i < 26; i++) {
         seed = (seed * 9301 + 49297) % 233280;
@@ -90,7 +183,7 @@ PALIT.View = (function () {
     } else {
       g.className = 'platform';
       var last = G.S.history[G.S.history.length - 1];
-      g.innerHTML = '<div class="cp-label t-px">CHECKPOINT ' + String(G.S.history.length).padStart(2, '0') + ' — ' + P.fmtHeight(G.S.globalBase) + (last ? ' · ' + last.name.toUpperCase() : '') + '</div>';
+      g.innerHTML = slab + '<div class="cp-label t-px">CHECKPOINT ' + String(G.S.history.length).padStart(2, '0') + ' — ' + P.fmtHeight(G.S.globalBase) + (last ? ' · ' + last.name.toUpperCase() : '') + '</div>';
     }
   }
 
@@ -100,53 +193,71 @@ PALIT.View = (function () {
     for (var k = 0; k < ppl; k++) {
       var c = i * ppl + k;
       var v = S.cells[c] || 0;
-      if (c === S.cursor && !r.placing) v = 9; // fantasma
+      if (c === S.cursor && !r.placing) v = 9; // fantasma: próxima posição
       out += v;
       if (r.repairing && r.repairing.cell === c) out += 'r';
     }
+    // reforços dependem da camada de baixo
+    if (i % 2 === 1) out += '|' + (S.cells[(i - 1) * ppl] || 0) + (S.cells[(i - 1) * ppl + 1] || 0);
     return out;
   }
 
   function renderLayer(i, sig) {
-    var L = layers[i];
-    if (!L) {
+    var Ly = layers[i];
+    if (!Ly) {
       var d = document.createElement('div');
       d.className = 'ly';
       el.tower.appendChild(d);
-      L = layers[i] = { el: d, sig: null, x: null };
-      d.style.width = W + 'px';
-      d.style.top = (-(i + 1) * LH) + 'px';
-      d.style.left = (-W / 2) + 'px';
+      Ly = layers[i] = { el: d, sig: null, x: null };
+      d.style.top = (-(i * G.LHU) * U) + 'px';
+      d.style.left = (X0 * U) + 'px';
+      d.style.zIndex = i;
     }
-    L.sig = sig;
+    Ly.sig = sig;
     var S = G.S, st = G.st, ppl = G.mat.piecesPerLayer;
     var A = i % 2 === 0;
-    var cls = 'ly';
-    if (!A && st.visCorners && i % 6 === 1) cls += ' wrap';
-    if (A && st.visBands && i % 10 === 0 && i > 0) cls += ' band';
-    L.el.className = cls;
     var html = '';
     for (var k = 0; k < ppl; k++) {
       var c = i * ppl + k;
       var v = S.cells[c] || 0;
       var ghost = c === S.cursor && !G.rt.placing;
       if (v === 0 && !ghost) continue;
-      var pc = 'pc ';
-      if (A) pc += (k === 0 ? 'a-b ' : 'a-f ') + (((i >> 1) % 2) ? 'hr ' : 'hl ');
-      else pc += (k === 0 ? 'b-l ' : 'b-r ') + ((((i >> 1) + k) % 2) ? '' : 'he ');
-      pc += ghost ? 'ghost' : 's' + v;
-      if (G.rt.repairing && G.rt.repairing.cell === c) pc += ' rep';
-      var style = '';
-      if (v === C.PLACING && G.rt.placing) style = ' style="--pd:' + G.rt.placing.dur.toFixed(2) + 's"';
-      html += '<i class="' + pc + '" data-c="' + c + '"' + style + '>' + (v === C.FIRE ? P.SpriteCSS.html('fire') : '') + '</i>';
+      var r = stickRect(i, k);
+      var cls = 'sp stk ' + r.cls + ' ' + (ghost ? 'ghost' : 's' + v);
+      if (G.rt.repairing && G.rt.repairing.cell === c) cls += ' rep';
+      var style = 'left:' + r.left + 'px;bottom:' + r.bottom + 'px';
+      if (v === C.PLACING && G.rt.placing) style += ';--pd:' + G.rt.placing.dur.toFixed(2) + 's';
+      var inner = '';
+      var mx = A ? Math.round(L / 2) * U : Math.round(D / 2) * U;
+      var my = A ? U : Math.round(D / 2) * U;
+      if (v === C.CRACK) inner = '<b class="crk" style="left:' + mx + 'px;bottom:' + my + 'px"></b>';
+      if (v === C.FIRE) inner = P.SpriteCSS.html('fire').replace('class="', 'style="left:' + (mx - 2 * U) + 'px;bottom:' + (my + 2 * U) + 'px" class="');
+      // faixa de linha a cada 10 camadas (Camada Reforçada)
+      if (A && k === 1 && st.visBands && i % 10 === 0 && i > 0 && v === C.OK) {
+        inner += '<b class="thr" style="left:' + 4 * U + 'px"></b><b class="thr" style="left:' + (L - 5) * U + 'px"></b>';
+      }
+      html += '<i class="' + cls + '" data-c="' + c + '" style="' + style + '">' + inner + '</i>';
     }
-    L.el.innerHTML = html;
+    // cola e amarração nos cruzamentos (camadas Z sobre camadas X)
+    if (!A && (st.visGlue > 0 || st.visCorners > 0)) {
+      var wrap = st.visCorners > 0 && i % 6 === 1;
+      for (var kk = 0; kk < ppl; kk++) {
+        if (S.cells[i * ppl + kk] !== C.OK) continue;
+        var xb = kk === 0 ? 2 : L - 4;
+        [ZN, zf()].forEach(function (z, zi) {
+          if (S.cells[(i - 1) * ppl + (zi === 0 ? 1 : 0)] !== C.OK) return;
+          var oz = Math.round(z / 2);
+          html += '<b class="' + (wrap ? 'wrp' : 'glu') + '" style="left:' + (xb + oz) * U + 'px;bottom:' + (oz - 1) * U + 'px"></b>';
+        });
+      }
+    }
+    Ly.el.innerHTML = html;
   }
 
   function visibleRange() {
     var top = (cam.y + focal) / LH;
-    var bot = (cam.y + focal - H) / LH;
-    return [Math.max(0, Math.floor(bot) - 3), Math.ceil(top) + 3];
+    var bot = (cam.y + focal - H - D * U) / LH;
+    return [Math.max(0, Math.floor(bot) - 2), Math.ceil(top) + 2];
   }
 
   function updateTower() {
@@ -162,19 +273,19 @@ PALIT.View = (function () {
     var amp = 5 * U * Math.min(2.2, 0.4 + top / 250);
     for (var i = lo; i <= hi; i++) {
       var sig = layerSig(i);
-      var L = layers[i];
-      if (!L || allDirty || dirty[i] || L.sig !== sig) renderLayer(i, sig);
-      L = layers[i];
+      var Ly = layers[i];
+      if (!Ly || allDirty || dirty[i] || Ly.sig !== sig) renderLayer(i, sig);
+      Ly = layers[i];
       var x = Math.round(sw * amp * Math.pow(i / top, 1.6) / U) * U;
-      if (L.x !== x) { L.x = x; L.el.style.transform = x ? 'translateX(' + x + 'px)' : ''; }
+      if (Ly.x !== x) { Ly.x = x; Ly.el.style.transform = x ? 'translateX(' + x + 'px)' : ''; }
     }
     dirty = {}; allDirty = false;
   }
 
-  function layerX(i) { var L = layers[i]; return L ? L.x || 0 : 0; }
+  function layerX(i) { var Ly = layers[i]; return Ly ? Ly.x || 0 : 0; }
 
   /* ---------------- câmera ---------------- */
-  function topY() { return G.topLayer() * LH; }
+  function topY() { return (G.topLayer() * G.LHU + D) * U; }
   function camMin() { return Math.round(H * 0.8) - focal; }
   function targetCam() { return Math.max(camMin(), topY() + LH * 2); }
 
@@ -209,7 +320,7 @@ PALIT.View = (function () {
 
   function goLayer(layer) {
     cam.follow = false; cam.vel = 0;
-    cam.jump = Math.max(camMin(), layer * LH + LH);
+    cam.jump = Math.max(camMin(), layer * LH + D * U / 2);
     if (G.st.quickReturn) { cam.y = cam.jump; cam.jump = null; }
   }
 
@@ -318,10 +429,8 @@ PALIT.View = (function () {
 
   /* ---------------- efeitos ---------------- */
   function cellPos(c) {
-    var ppl = G.mat.piecesPerLayer, i = Math.floor(c / ppl), k = c % ppl;
-    var A = i % 2 === 0;
-    var x = A ? 0 : (k === 0 ? -W / 2 + U : W / 2 - U);
-    return { x: x + layerX(i), y: -(i + 0.5) * LH, i: i };
+    var g = cellSeg(c);
+    return { x: (g[0] + g[2]) / 2, y: (g[1] + g[3]) / 2, i: Math.floor(c / G.mat.piecesPerLayer) };
   }
 
   function floatText(x, y, text, cls) {
@@ -347,14 +456,14 @@ PALIT.View = (function () {
   }
 
   function fallingPiece(c) {
-    var p = cellPos(c);
-    var A = p.i % 2 === 0;
+    var ppl = G.mat.piecesPerLayer, i = Math.floor(c / ppl), k = c % ppl;
+    var r = stickRect(i, k);
     var d = document.createElement('i');
-    d.className = 'falling';
-    d.style.width = (A ? W : 2 * U) + 'px';
-    d.style.left = (p.x - (A ? W / 2 : U)) + 'px';
-    d.style.top = (p.y - U) + 'px';
-    d.style.background = G.mat.look.body;
+    d.className = 'sp stk falling ' + r.cls;
+    d.style.left = (X0 * U + r.left + layerX(i)) + 'px';
+    d.style.top = (-(i * G.LHU) * U - r.bottom - r.h) + 'px';
+    d.style.setProperty('--rot', (Math.random() < 0.5 ? -1 : 1) * 90 + 'deg');
+    d.style.setProperty('--fx', Math.round((Math.random() * 2 - 1) * 20) * U + 'px');
     el.fx.appendChild(d);
     setTimeout(function () { d.remove(); }, 1300);
   }
@@ -397,21 +506,51 @@ PALIT.View = (function () {
     el.weather.classList.toggle('heat', r.heat > 0);
   }
 
+  function shake(px) {
+    var g = el.game;
+    g.style.setProperty('--sh', (px || 2) * HU + 'px');
+    g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake');
+  }
+
+  /* brilho correndo pela camada recém-completada */
+  function layerShine(i) {
+    var d = document.createElement('i');
+    d.className = 'shine';
+    d.style.left = (X0 * U + layerX(i)) + 'px';
+    d.style.top = (-(i * G.LHU + 4) * U) + 'px';
+    d.style.width = W + 'px';
+    el.fx.appendChild(d);
+    setTimeout(function () { d.remove(); }, 600);
+  }
+
+  function dust(x, y) {
+    for (var i = 0; i < 4; i++) {
+      var s = document.createElement('i');
+      s.className = 'spark dust';
+      s.style.left = x + 'px'; s.style.top = y + 'px';
+      s.style.setProperty('--dx', ((i < 2 ? -1 : 1) * (3 + i % 2 * 3)) * U + 'px');
+      s.style.setProperty('--dy', (-1 - i % 2) * U + 'px');
+      el.fx.appendChild(s);
+      setTimeout(function (s) { s.remove(); }.bind(null, s), 500);
+    }
+  }
+
   function flash() { el.flash.classList.remove('on'); void el.flash.offsetWidth; el.flash.classList.add('on'); }
 
   /* ---------------- eventos do jogo ---------------- */
   function bindGame() {
     G.on('cell', function (c) { dirty[Math.floor(c / G.mat.piecesPerLayer)] = 1; });
     G.on('stats', function () { applyVisualFlags(); });
+    G.on('placeDone', function (c) { var p = cellPos(c); dust(p.x, p.y); });
     G.on('reset', function () { allDirty = true; });
     G.on('rebuild', function () { setupMaterial(); cam.y = targetCam(); cam.follow = true; });
     G.on('layerDone', function (d) {
-      var p = cellPos(d.layer * G.mat.piecesPerLayer);
-      floatText(W / 2 + 6 * U, p.y - 2 * U, '+$' + P.fmtMoney(Math.max(1, d.money)));
+      floatText(W / 2 + 2 * U, -(d.layer * G.LHU + D) * U, '+$' + P.fmtMoney(Math.max(1, d.money)));
+      layerShine(d.layer);
     });
     G.on('milestone', function (d) {
-      floatText(0, -(d.layer + 3) * LH, 'MARCO ' + d.layer + '! +$' + P.fmtMoney(d.money), 'good');
-      sparks(0, -d.layer * LH, '#ffec27', 14);
+      floatText(0, -(d.layer * G.LHU + D + 8) * U, 'MARCO ' + d.layer + '!', 'good');
+      sparks(0, -(d.layer * G.LHU + D / 2) * U, '#ffec27', 18);
     });
     G.on('fall', function (d) { if (!d.burnt) fallingPiece(d.cell); });
     G.on('repaired', function (c) { var p = cellPos(c); sparks(p.x, p.y, '#ff77a8', 5); });
@@ -439,27 +578,28 @@ PALIT.View = (function () {
     return { x: sx - VW / 2, y: focal + cam.y - sy };
   }
 
-  /* encontra peça danificada mais próxima do toque */
+  /* encontra peça danificada mais próxima do toque (distância ao segmento da peça) */
   function findDamaged(sx, sy) {
     var w = screenToWorld(sx, sy);
+    var px = w.x, py = -w.y;
     var ppl = G.mat.piecesPerLayer, S = G.S;
     var li = Math.floor(w.y / LH);
     var best = -1, bd = 1e9;
-    for (var i = li - 4; i <= li + 4; i++) {
+    for (var i = li - Math.ceil(D / 2) - 4; i <= li + 4; i++) {
       if (i < 0) continue;
       for (var k = 0; k < ppl; k++) {
         var c = i * ppl + k;
         var v = S.cells[c];
         if (v !== C.CRACK && v !== C.MISS && v !== C.FIRE) continue;
-        var p = cellPos(c);
-        var A = i % 2 === 0;
-        var dx = A ? Math.max(0, Math.abs(w.x - p.x) - W / 2) : Math.abs(w.x - p.x);
-        var dy = Math.abs(-w.y - p.y);
-        var d = Math.sqrt(dx * dx + dy * dy);
+        var g = cellSeg(c);
+        var dx = g[2] - g[0], dy = g[3] - g[1];
+        var t = Math.max(0, Math.min(1, ((px - g[0]) * dx + (py - g[1]) * dy) / (dx * dx + dy * dy)));
+        var ex = g[0] + dx * t - px, ey = g[1] + dy * t - py;
+        var d = Math.sqrt(ex * ex + ey * ey);
         if (d < bd) { bd = d; best = c; }
       }
     }
-    return bd <= 28 ? best : -1;
+    return bd <= 26 ? best : -1;
   }
 
   function bindInput() {
@@ -521,6 +661,9 @@ PALIT.View = (function () {
     init: init, frame: frame, goTop: goTop, goLayer: goLayer, nearTop: nearTop,
     get cam() { return cam; }, get LH() { return LH; }, get U() { return U; },
     viewLayers: function () { return [(cam.y + focal - H) / LH, (cam.y + focal) / LH]; },
-    measure: measure
+    measure: measure, sparks: sparks, findDamaged: function (x, y) { return findDamaged(x, y); },
+    cellScreen: function (c) { var p = cellPos(c); return { x: VW / 2 + p.x, y: focal + cam.y + p.y }; },
+    toScreen: function (wx, wy) { return { x: VW / 2 + wx, y: focal + cam.y + wy }; },
+    shake: shake, get W() { return W; }, get D() { return D; }
   };
 })();

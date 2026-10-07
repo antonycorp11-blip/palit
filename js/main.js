@@ -16,6 +16,7 @@ var PALIT = window.PALIT = window.PALIT || {};
     P.View.init();
     P.HUD.init();
     P.TreeView.init();
+    P.Juice.init();
     if (/[?&]debug/.test(location.search)) debugPanel();
 
     var last = performance.now(), hudT = 0, slowT = 0, saveT = 0;

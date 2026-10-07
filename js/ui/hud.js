@@ -36,7 +36,7 @@ PALIT.HUD = (function () {
         '<div class="timer"><div class="bar"><i id="h-timer" style="--c:var(--orange)"></i></div><span id="h-timer-t"></span></div>' +
         '<div class="alts"><div class="alt"><span>ALT. GLOBAL</span><b id="h-glob"></b></div><div class="alt"><span>TORRE</span><b id="h-loc" class="c-g"></b></div></div>' +
       '</div>' +
-      '<div class="integ"><span>ESTRUTURA</span><div class="bar"><i id="h-int"></i></div><b id="h-int-t"></b></div>' +
+      '<div class="integ" id="h-integ"><span>ESTRUTURA</span><div class="bar"><i id="h-int"></i></div><b id="h-int-t"></b></div>' +
       '<div class="chips" id="h-chips"></div>';
     $('h-box').addEventListener('click', function () { G.unjam(); });
   }
@@ -45,6 +45,7 @@ PALIT.HUD = (function () {
     el.bottombar.innerHTML =
       '<button class="pxbtn" id="b-tree">' + spr('ico_tree') + '<span>ÁRVORE <span class="pct" id="b-tree-p"></span></span></button>' +
       '<div id="status"></div>' +
+      '<button class="pxbtn" id="b-snd" aria-label="Som">' + spr(P.Audio.muted ? 'ico_mute' : 'ico_sound') + '</button>' +
       '<button class="pxbtn" id="b-menu" aria-label="Menu">' + spr('ico_menu') + '</button>';
     el['side-btns'].innerHTML =
       '<button class="pxbtn gold" id="b-ch" hidden>' + spr('ico_flag') + 'DESAFIO FINAL</button>' +
@@ -53,6 +54,11 @@ PALIT.HUD = (function () {
       '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>';
     $('b-tree').addEventListener('click', function () { P.TreeView.open(); });
     $('b-menu').addEventListener('click', openMenu);
+    $('b-snd').addEventListener('click', function () {
+      P.Audio.unlock();
+      P.Audio.setMuted(!P.Audio.muted);
+      $('b-snd').innerHTML = spr(P.Audio.muted ? 'ico_mute' : 'ico_sound');
+    });
     $('b-top').addEventListener('click', function () { V.goTop(); });
     $('b-dmg').addEventListener('click', jumpDamage);
     $('b-ch').addEventListener('click', confirmChallenge);
@@ -74,7 +80,7 @@ PALIT.HUD = (function () {
     var S = G.S, st = G.st, m = G.mat, rt = G.rt;
     $('h-mat').textContent = m.name.toUpperCase();
     $('h-era').textContent = 'ERA ' + String(m.era).padStart(2, '0') + ' · CAMADA ' + P.fmtNum(G.layersBuilt()) + ' / ' + P.fmtNum(m.goalLayers);
-    $('h-money').textContent = '$' + P.fmtMoney(S.money);
+    $('h-money').textContent = '$' + P.fmtMoney(P.Juice.money());
     $('h-pieces').innerHTML = Math.floor(S.pieces) + '<small>/' + st.capacity + '</small>';
     $('h-box').classList.toggle('jam', rt.jam);
     $('h-res').textContent = st.reserveCap > 0 ? '+' + S.reserve + '/' + st.reserveCap : '';

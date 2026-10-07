@@ -2,14 +2,14 @@
    JOGO — simulação. Não toca no DOM; a UI escuta eventos.
    Coordenadas de mundo em "unidades de pixel" (U):
      x relativo ao centro da torre, y a partir da base.
-     camada i ocupa y ∈ [i*LHU, (i+1)*LHU], LHU = 2.
+     camada i ocupa y ∈ [i*LHU, (i+1)*LHU], LHU = 3.
    ========================================================= */
 var PALIT = window.PALIT = window.PALIT || {};
 
 PALIT.Game = (function () {
   var P = PALIT, E = P.ECON;
   var EMPTY = 0, OK = 1, CRACK = 2, MISS = 3, FIRE = 4, PLACING = 5;
-  var LHU = 2;
+  var LHU = 3;
 
   var S, mat, def, st, rt;
   var listeners = {};
@@ -202,6 +202,7 @@ PALIT.Game = (function () {
     setCell(c, v);
     if (v === CRACK) rt.known[c] = 1;
     S.stats.placed++;
+    emit('placeDone', c);
     if ((c + 1) % ppl() === 0) layerComplete(Math.floor(c / ppl()));
     if (Math.random() < st.doublePlace && !blockReason()) {
       emit('toast', { text: 'MÃO DUPLA!', kind: 'good', small: true });
@@ -374,6 +375,13 @@ PALIT.Game = (function () {
   }
 
   /* ---------------- ameaças ---------------- */
+  /* geometria da torre em projeção oblíqua: L = comprimento da peça,
+     D = recuo diagonal da profundidade (metade de L) */
+  function geo() {
+    var L = mat.look.len, D = Math.round(L / 2);
+    return { L: L, D: D, halfW: (L + D) / 2 };
+  }
+
   function spawnThreat(type, count) {
     var d = P.THREATS[type];
     var top = layersBuilt();
@@ -381,7 +389,7 @@ PALIT.Game = (function () {
     count = count || 1;
     for (var i = 0; i < count; i++) {
       var side = Math.random() < 0.5 ? -1 : 1;
-      var halfW = mat.look.len / 2;
+      var g = geo(), halfW = g.halfW;
       var target = Math.max(0, top - 1 - rint(0, Math.min(25, top - 1)));
       var t = {
         id: rt.threatSeq++, type: type, def: d, hp: d.hp, maxHp: d.hp,
@@ -391,7 +399,7 @@ PALIT.Game = (function () {
       var speed = d.speed / 4;
       if (d.tags && d.tags.indexOf('insect') >= 0) speed *= 1 - st.insectSlow;
       t.speed = speed;
-      var ty = target * LHU + 1;
+      var ty = target * LHU + 1 + (side > 0 ? g.D : 0);
       if (d.kind === 'flyer') {
         t.x = side * (rt.viewW / 2 + 12 + i * 4); t.y = ty + rnd(-10, 30);
         t.tx = side * (halfW + 4 + rnd(0, 4)); t.ty = ty;
@@ -402,8 +410,8 @@ PALIT.Game = (function () {
         t.x = side * (rt.viewW / 2 + 10); t.y = ty + 6;
         t.sx = t.x; t.sy = t.y; t.tx = side * (halfW + 1); t.ty = ty;
       } else if (d.kind === 'faller') {
-        t.x = rnd(-halfW + 1, halfW - 1); t.y = top * LHU + 70 + rnd(0, 30);
-        t.tx = t.x; t.ty = Math.max(0, top - rint(0, 6)) * LHU + 1;
+        t.x = rnd(-halfW + 1, halfW - 1); t.y = top * LHU + g.D + 70 + rnd(0, 30);
+        t.tx = t.x; t.ty = Math.max(0, top - rint(0, 6)) * LHU + 1 + Math.round((t.x + halfW) / (2 * halfW) * g.D);
       }
       rt.threats.push(t);
       emit('threatSpawn', t);
@@ -631,7 +639,7 @@ PALIT.Game = (function () {
   function produceOne() {
     var n = Math.random() < st.doubleChance ? 2 : 1;
     for (var i = 0; i < n; i++) {
-      if (S.pieces < st.capacity) S.pieces++;
+      if (S.pieces < st.capacity) { S.pieces++; emit('produce', 'box'); }
       else if (S.reserve < st.reserveCap) {
         S.reserveP += st.reserveFill;
         if (S.reserveP >= 1) { S.reserveP -= 1; S.reserve++; }
@@ -810,6 +818,7 @@ PALIT.Game = (function () {
   };
 
   return {
+    geo: function () { return geo(); },
     CELL: { EMPTY: EMPTY, OK: OK, CRACK: CRACK, MISS: MISS, FIRE: FIRE, PLACING: PLACING }, LHU: LHU,
     init: init, update: update, on: on, emit: emit,
     tryPlace: tryPlace, repairCell: repairCell, hitThreat: hitThreat, unjam: unjam, buy: buy,

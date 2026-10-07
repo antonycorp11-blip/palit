@@ -1,7 +1,7 @@
 # PALIT
 
 Jogo incremental de construção vertical em pixel art, **100% HTML + CSS + JS puro** (sem build, sem imagens).
-Toda a arte é CSS: sprites em `box-shadow` gerados a partir de ASCII, cenário em blocos/degradês de corte seco, paleta PICO-8.
+Toda a arte é CSS: sprites em `box-shadow` gerados a partir de ASCII, torre em projeção oblíqua (palitos gerados por material), cenário em blocos/degradês de corte seco, paleta PICO-8. Todos os sons são sintetizados em tempo real (Web Audio).
 
 Abra `index.html` (ou sirva a pasta: `python3 -m http.server`). Use `?debug` para o painel de testes.
 
@@ -26,7 +26,9 @@ js/ui/          apresentação
   spritecss.js    compila sprites ASCII → CSS
   view.js         cena, torre virtualizada, câmera, ameaças, efeitos, entrada
   hud.js          HUD, régua da era, alertas, modais
-  treeview.js     árvore arrastável com zoom
+  treeview.js     árvore arrastável com zoom + efeitos de compra
+  audio.js        sons 8-bit sintetizados (Web Audio)
+  juice.js        efeitos de HUD e sons ligados aos eventos do jogo
 tools/
   validate.js     valida árvores (ids, pré-requisitos, sobreposição, limite estrutural)
   sim.js          simulação de balanceamento (`node tools/sim.js [fração ativa]`)

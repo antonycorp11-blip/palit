@@ -5,7 +5,8 @@
 var PALIT = window.PALIT = window.PALIT || {};
 
 PALIT.SpriteCSS = {
-  compile: function (U) {
+  compile: function (U, scope, id) {
+    scope = scope || '';
     var css = [];
     Object.keys(PALIT.SPRITES).forEach(function (name) {
       var sp = PALIT.SPRITES[name];
@@ -22,18 +23,19 @@ PALIT.SpriteCSS = {
         });
         return out.join(',') || 'none';
       });
-      css.push('.sp-' + name + '{width:' + (w * U) + 'px;height:' + (h * U) + 'px}');
+      css.push(scope + '.sp-' + name + '{width:' + (w * U) + 'px;height:' + (h * U) + 'px}');
       var anim = '';
       if (shadows.length > 1) {
         var dur = (shadows.length / (sp.fps || 6)).toFixed(3);
         var kf = shadows.map(function (s, i) { return (i * 100 / shadows.length).toFixed(2) + '%{box-shadow:' + s + '}'; }).join('');
-        css.push('@keyframes sp-' + name + '{' + kf + '}');
-        anim = 'animation:sp-' + name + ' ' + dur + 's steps(1) infinite;';
+        var an = 'sp-' + name + (scope ? '-w' : '');
+        css.push('@keyframes ' + an + '{' + kf + '}');
+        anim = 'animation:' + an + ' ' + dur + 's steps(1) infinite;';
       }
-      css.push('.sp-' + name + '::before{box-shadow:' + shadows[0] + ';' + anim + '}');
+      css.push(scope + '.sp-' + name + '::before{box-shadow:' + shadows[0] + ';' + anim + '}');
     });
-    var el = document.getElementById('sprite-css') || document.createElement('style');
-    el.id = 'sprite-css';
+    var el = document.getElementById(id || 'sprite-css') || document.createElement('style');
+    el.id = id || 'sprite-css';
     el.textContent = css.join('\n');
     document.head.appendChild(el);
   },
