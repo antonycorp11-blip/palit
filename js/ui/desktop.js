@@ -13,7 +13,10 @@ PALIT.Desktop = (function () {
   var hover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   function $(id) { return document.getElementById(id); }
-  function isDesk() { return window.innerWidth >= 1000 && window.innerHeight >= 560; }
+  function isDesk() {
+    var land = window.innerWidth > window.innerHeight && window.innerHeight < 600;
+    return (window.innerWidth >= 1000 && window.innerHeight >= 560) || (land && window.innerWidth >= 600);
+  }
 
   function init() {
     G = P.Game; V = P.View;
@@ -27,7 +30,7 @@ PALIT.Desktop = (function () {
       '<div class="keys">' +
         '<span><kbd>ESPAÇO</kbd> colocar</span><span><kbd>T</kbd> árvore</span><span><kbd>ESC</kbd> fechar</span>' +
         '<span><kbd>↑</kbd><kbd>↓</kbd> rolar</span><span><kbd>HOME</kbd> topo</span><span><kbd>D</kbd> dano</span>' +
-        '<span><kbd>M</kbd> som</span><span><kbd>ENTER</kbd> comprar (árvore)</span>' +
+        '<span><kbd>+</kbd><kbd>−</kbd> zoom</span><span><kbd>M</kbd> som</span><span><kbd>ENTER</kbd> comprar (árvore)</span>' +
       '</div>';
     $('hud').appendChild(panel);
     el.panel = panel; el.up = $('dp-up'); el.log = $('dp-log');
@@ -142,6 +145,8 @@ PALIT.Desktop = (function () {
       else if (k === 'KeyM') $('b-snd').click();
       else if (k === 'KeyD') { var b = $('b-dmg'); if (b && !b.hidden) b.click(); }
       else if (k === 'Home') V.goTop();
+      else if (k === 'Equal' || k === 'NumpadAdd') V.zoomBy(1);
+      else if (k === 'Minus' || k === 'NumpadSubtract') V.zoomBy(-1);
       else if (k === 'ArrowUp') { e.preventDefault(); V.scrollBy(V.LH * 8); }
       else if (k === 'ArrowDown') { e.preventDefault(); V.scrollBy(-V.LH * 8); }
       else if (k === 'PageUp') { e.preventDefault(); V.scrollBy(window.innerHeight * 0.6); }
@@ -172,5 +177,5 @@ PALIT.Desktop = (function () {
     G.on('bought', function () { el.tip.hidden = true; });
   }
 
-  return { init: init, update: update, isDesk: isDesk, log: add };
+  return { init: init, update: update, isDesk: isDesk, log: add, apply: function () { if (el.panel) apply(); } };
 })();

@@ -218,6 +218,16 @@ PALIT.STORY = [
     ['ademir', 'Então o tic-tic... era alguém empilhando lá em cima esse tempo todo?'],
     ['voz', '...tic... tic...']
   ] },
+  { id: 'dente_pombos', era: 'dente', when: { on: 'pigeon' }, lines: [
+    ['pombo', 'Pruu! PRUU!'],
+    ['ademir', 'São os primos do Gervásio! Os Pombos Cascudos. Moram nos telhados e roubam qualquer coisa que não esteja pregada.'],
+    ['pombo', 'Pruu...'],
+    ['ademir', 'O Gervásio pediu desculpas pela família. Toque neles antes que levem seus palitos!']
+  ] },
+  { id: 'dente_janela', era: 'dente', when: { on: 'paperplane' }, lines: [
+    ['luca', 'MOÇO! Eu me mudei pro prédio do lado! Olha meu aviãozinho!'],
+    ['ademir', 'Toque no avião antes dele bater. Ele dobra papel melhor do que estuda.']
+  ] },
   { id: 'dente_slip', era: 'dente', when: { layer: 12 }, lines: [
     ['ademir', 'Viu? Às vezes o palito escorrega e encaixa torto, já rachado.'],
     ['ademir', 'O ramo PONTAS da árvore resolve isso. Ponta bem feita, torre bem feita.']

@@ -631,3 +631,113 @@ html.desk #ch-ind { top: 16px; }
 #modal .btns { flex-direction: column; align-items: stretch; }
 #dp-mis .mis { margin-bottom: 0; }
 #deskpanel { gap: 10px; }
+
+/* =========================================================
+   CENÁRIOS POR ERA — camadas extras e pontos de partida
+   ========================================================= */
+#far .bldg, #far .bldg.ant::before { background-color: var(--city, #3a4a7a); }
+#mountains .mtn { background: var(--mtn, #4a5a8a); }
+#mountains .mtn.snow { background: var(--snow, #c7f0ff); }
+#mid .hill { background: var(--hill, #2a7a4a); }
+#mid .hill.d { background: var(--hill2, #1f6a3c); }
+.deep { position: absolute; inset: 0; pointer-events: none; }
+/* telhados */
+#roofs .rf { position: absolute; bottom: 0; background: #a8a29a; box-shadow: inset calc(var(--u) * -3) 0 0 0 rgba(0,0,0,.18); }
+#roofs .rf::after { content: ''; position: absolute; left: calc(var(--u) * 3); top: calc(var(--u) * 8); width: calc(var(--u) * 4); height: calc(var(--u) * 5); background: #c7f0ff; box-shadow: calc(var(--u) * 8) 0 0 0 #c7f0ff, calc(var(--u) * 16) 0 0 0 #c7f0ff; }
+#game.is-night #roofs .rf::after { background: #ffec27; box-shadow: calc(var(--u) * 8) 0 0 0 #1d2b53, calc(var(--u) * 16) 0 0 0 #ffa300; }
+#roofs .tiles { position: absolute; left: calc(var(--u) * -2); right: calc(var(--u) * -2); top: calc(var(--u) * -4); height: calc(var(--u) * 5);
+  background: repeating-linear-gradient(90deg, var(--roof, #c8644a) 0 calc(var(--u) * 3), #9a3a28 calc(var(--u) * 3) calc(var(--u) * 4)); box-shadow: inset 0 calc(var(--u) * -1) 0 0 #6a2a1a; }
+#roofs .tank { position: absolute; right: 18%; top: calc(var(--u) * -12); width: calc(var(--u) * 8); height: calc(var(--u) * 8); background: #29adff; box-shadow: inset calc(var(--u) * -2) 0 0 0 #1d6fd8, 0 calc(var(--u) * -1) 0 0 #1d2b53; }
+#roofs .chim { position: absolute; right: 22%; top: calc(var(--u) * -10); width: calc(var(--u) * 4); height: calc(var(--u) * 7); background: #ab5236; box-shadow: 0 calc(var(--u) * -1) 0 0 #5f574f; }
+#roofs .ant { position: absolute; top: calc(var(--u) * -16); width: var(--u); height: calc(var(--u) * 12); background: #5f574f; box-shadow: calc(var(--u) * -2) calc(var(--u) * 2) 0 0 #5f574f, calc(var(--u) * 2) calc(var(--u) * 2) 0 0 #5f574f, calc(var(--u) * -3) calc(var(--u) * 5) 0 0 #5f574f, calc(var(--u) * 3) calc(var(--u) * 5) 0 0 #5f574f; }
+#roofs .line { position: absolute; left: 10%; right: 10%; top: calc(var(--u) * -8); height: 2px; background: #c2c3c7; box-shadow: 10px 2px 0 0 transparent; }
+#roofs .line::before { content: ''; position: absolute; left: 20%; top: 2px; width: calc(var(--u) * 4); height: calc(var(--u) * 5); background: #ff77a8; box-shadow: calc(var(--u) * 7) 0 0 0 #29adff, calc(var(--u) * 14) 0 0 0 #ffec27; }
+/* arranha-céus */
+#skyline .sk { position: absolute; bottom: 0; background: var(--sky2, #2a3860);
+  background-image: repeating-linear-gradient(180deg, rgba(255,236,39,.35) 0 var(--u), transparent var(--u) calc(var(--u) * 4));
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 calc(var(--u) * 2), rgba(0,0,0,.85) calc(var(--u) * 2) calc(var(--u) * 3)); }
+#skyline .spire { position: absolute; left: 45%; top: calc(var(--u) * -14); width: var(--u); height: calc(var(--u) * 14); background: var(--sky2, #2a3860); }
+#skyline .spire::after { content: ''; position: absolute; top: 0; left: 0; width: var(--u); height: var(--u); background: #ff004d; animation: blink 1s steps(2) infinite; }
+/* mar de nuvens */
+#seaclouds .sea { position: absolute; left: 0; right: 0; bottom: 0; height: 18vh; background: linear-gradient(180deg, #fff1e8 0 30%, #e8e4f0 30% 65%, #c2c3c7 65%); }
+#seaclouds .seac { position: absolute; bottom: calc(18vh - 6px); transform-origin: bottom left; }
+/* curvatura da Terra */
+#curve .earth { position: absolute; left: -60vw; width: 220vw; height: 220vw; top: 62vh; border-radius: 50%; background: #1d4a8a;
+  box-shadow: 0 -6px 0 0 var(--curve, #4ab0f0), 0 -14px 0 0 rgba(74, 176, 240, .35), 0 -26px 0 0 rgba(74, 176, 240, .15), inset 0 30px 0 0 #2a6ac0, inset 0 60px 0 0 #1d5aa0; }
+#curve .earth::after { content: ''; position: absolute; left: 30%; top: 6%; width: 40%; height: 8%; background: rgba(255,241,232,.55); border-radius: 50%; filter: none; }
+/* planeta */
+#planet .pl { position: absolute; transform: translate(-50%, -50%); border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, var(--pc) 0 45%, var(--pd) 45% 100%), var(--pc);
+  box-shadow: 0 0 0 4px var(--pg); }
+#planet .pl::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(180deg, transparent 0 12%, var(--pb) 12% 16%); opacity: .5; }
+#planet .ring { position: absolute; left: -45%; right: -45%; top: 42%; height: 16%; border-radius: 50%; border: 4px solid var(--pr, #ffccaa); transform: rotate(-12deg); }
+/* nebulosa, galáxia, teia cósmica */
+#nebula .nb { position: absolute; border-radius: 50%; }
+#nebula .nb.a { left: -10%; top: 5%; width: 70vmax; height: 50vmax; background: radial-gradient(closest-side, var(--neb1, transparent) 0 40%, transparent 41% 60%, var(--neb1, transparent) 61% 64%, transparent 65%); }
+#nebula .nb.b { right: -20%; top: 30%; width: 80vmax; height: 60vmax; background: radial-gradient(closest-side, var(--neb2, transparent) 0 30%, transparent 31% 55%, var(--neb2, transparent) 56% 58%, transparent 59%); }
+#nebula .nb.c { left: 20%; top: 60%; width: 50vmax; height: 30vmax; background: radial-gradient(closest-side, var(--neb1, transparent) 0 50%, transparent 51%); }
+#galaxy .gx { position: absolute; left: -30%; right: -30%; top: 35%; height: 22%; transform: rotate(-18deg);
+  background: linear-gradient(180deg, transparent 0 20%, rgba(194,195,199,.08) 20% 35%, rgba(255,241,232,.18) 35% 65%, rgba(194,195,199,.08) 65% 80%, transparent 80%),
+              repeating-linear-gradient(90deg, rgba(255,241,232,.25) 0 2px, transparent 2px 9px); }
+#web .wb { position: absolute; inset: 0; opacity: .35;
+  background: repeating-linear-gradient(35deg, rgba(255,241,232,.2) 0 2px, transparent 2px 80px), repeating-linear-gradient(-55deg, rgba(255,119,168,.2) 0 2px, transparent 2px 110px); }
+#asteroids .ast { position: absolute; transform-origin: center; animation: spin linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+#moonland .land, #marsland .land { position: absolute; left: 0; right: 0; bottom: -20vh; height: 34vh; }
+.land.moon { background: radial-gradient(circle at 20% 30%, #8a8c94 0 3%, transparent 3.1%), radial-gradient(circle at 70% 20%, #8a8c94 0 4%, transparent 4.1%), linear-gradient(180deg, #c2c3c7 0 6%, #a8a8b0 6% 40%, #8a8c94 40%); }
+.land.mars { background: radial-gradient(circle at 30% 25%, #7e2553 0 3%, transparent 3.1%), linear-gradient(180deg, #ff6a3a 0 5%, #ab5236 5% 45%, #7a3a20 45%); }
+
+/* pontos de partida (plataforma da era) */
+#ground.platform.roof { background: linear-gradient(180deg, #c8644a 0 var(--u), #9a3a28 var(--u) calc(var(--u) * 3), #a8a29a calc(var(--u) * 3) calc(var(--u) * 5), transparent calc(var(--u) * 5)), repeating-linear-gradient(90deg, rgba(0,0,0,.2) 0 var(--u), transparent var(--u) calc(var(--u) * 6)); }
+#ground.platform.slab { background: linear-gradient(180deg, #e0e0e0 0 var(--u), #a8a29a var(--u) calc(var(--u) * 4), #76706a calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.metal { background: linear-gradient(180deg, #c2c3c7 0 var(--u), #5f6a78 var(--u) calc(var(--u) * 4), #3a424e calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)), repeating-linear-gradient(90deg, #ffec27 0 calc(var(--u) * 3), #1a1423 calc(var(--u) * 3) calc(var(--u) * 6)); background-size: 100% 100%, 100% var(--u); background-repeat: no-repeat; }
+#ground.platform.rock { background: linear-gradient(180deg, #8a7a70 0 var(--u), #5a4a44 var(--u) calc(var(--u) * 4), #2a201c calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.cloud { background: linear-gradient(180deg, #fff1e8 0 calc(var(--u) * 2), #c2c3c7 calc(var(--u) * 2) calc(var(--u) * 4), transparent calc(var(--u) * 4)); }
+#ground.platform.crystal { background: linear-gradient(180deg, #e0ffff 0 var(--u), #9ae0e8 var(--u) calc(var(--u) * 4), #4aa0b0 calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.moon, #ground.platform.ice { background: linear-gradient(180deg, #fff1e8 0 var(--u), #c2c3c7 var(--u) calc(var(--u) * 4), #8a8c94 calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.mars { background: linear-gradient(180deg, #ff6a3a 0 var(--u), #ab5236 var(--u) calc(var(--u) * 4), #7a3a20 calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.alien, #ground.platform.plasma { background: linear-gradient(180deg, #a0ffb0 0 var(--u), #00e436 var(--u) calc(var(--u) * 4), #008751 calc(var(--u) * 4) calc(var(--u) * 5), transparent calc(var(--u) * 5)); }
+#ground.platform.void, #ground.platform.light { background: linear-gradient(180deg, #fff1e8 0 var(--u), #83769c var(--u) calc(var(--u) * 3), transparent calc(var(--u) * 3)); }
+
+/* =========================================================
+   ZOOM + CELULAR DEITADO (layout de PC compacto)
+   ========================================================= */
+.zoom-btns { display: flex; gap: calc(var(--u) * 3); }
+.zoom-btns .pxbtn { padding: calc(var(--u) * 1.5) calc(var(--u) * 2); }
+html.land #topbar { width: 250px; top: calc(8px + env(safe-area-inset-top)); left: calc(8px + env(safe-area-inset-left)); padding: 8px 10px; gap: 6px; }
+html.land .mat-name { font-size: 9px; } html.land .era-tag { font-size: 7px; }
+html.land .money, html.land .pieces { font-size: 11px; }
+html.land .alt b { font-size: 9px; } html.land .alt span, html.land .timer span, html.land .integ span { font-size: 6px; }
+html.land .chip { font-size: 6px; }
+html.land #deskpanel { width: 230px; right: calc(8px + env(safe-area-inset-right)); top: 8px; bottom: 8px; padding: 8px; gap: 6px; }
+html.land #deskpanel h3 { font-size: 8px; }
+html.land #deskpanel .keys, html.land #deskpanel h3:nth-of-type(3), html.land #dp-log { display: none; }
+html.land .dp-row { padding: 4px 6px; gap: 6px; }
+html.land .dp-txt b { font-size: 7px; } html.land .dp-txt span { font-size: 13px; }
+html.land .dp-row .pxbtn, html.land .mis .pxbtn { font-size: 7px; padding: 4px 5px; }
+html.land .mis { padding: 5px; } html.land .mis-t b { font-size: 7px; } html.land .mis-t span { font-size: 13px; }
+html.land #ruler { right: calc(8px + 230px + 24px + env(safe-area-inset-right)); top: 12%; bottom: 14%; }
+html.land #side-btns { right: calc(8px + 230px + 54px + env(safe-area-inset-right)); bottom: 64px; gap: 8px; }
+html.land #side-btns .pxbtn { font-size: 7px; padding: 5px 6px; }
+html.land #bottombar { left: calc(8px + 250px + 16px + env(safe-area-inset-left)); right: calc(8px + 230px + 54px); bottom: calc(8px + env(safe-area-inset-bottom)); }
+html.land #bottombar .pxbtn { font-size: 7px; padding: 5px 6px; }
+html.land #status { font-size: 7px; }
+html.land #wind-ind { top: 8px; left: calc(8px + 250px + 16px); right: auto; font-size: 8px; }
+html.land #ch-ind { top: 8px; right: calc(8px + 230px + 16px); font-size: 8px; }
+html.land #alerts { top: 44px; width: 360px; }
+html.land .toast { font-size: 8px; }
+html.land #dialog { left: calc(8px + 250px + 16px); right: calc(8px + 230px + 16px); bottom: 52px; min-height: 0; padding: 8px 10px 12px; }
+html.land .dg-por { width: 52px; height: 52px; } html.land .dg-por .sp { transform: scale(1.2); }
+html.land .dg-text { font-size: 17px; min-height: 0; } html.land .dg-name { font-size: 8px; }
+html.land #bubble { left: calc(8px + 250px + 16px); bottom: 52px; max-width: 360px; }
+html.land #modal .box { max-height: 100%; }
+html.land.desk #tree-screen { grid-template-columns: 1fr 300px; }
+html.land #tree-head { padding: 8px 12px; }
+html.land #tree-head h2 { font-size: 8px; }
+html.land #tree-detail { padding: 12px; }
+/* celular deitado: botões na coluna esquerda, centro livre para a torre */
+html.land #bottombar { left: calc(8px + env(safe-area-inset-left)); right: auto; width: 250px; bottom: calc(8px + env(safe-area-inset-bottom)); justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+html.land #status { position: fixed; left: 50%; top: calc(8px + env(safe-area-inset-top)); transform: translateX(-50%); width: auto; max-width: 300px; padding: 4px 8px; font-size: 7px; }
+html.land #side-btns { left: calc(8px + env(safe-area-inset-left)); right: auto; bottom: calc(52px + env(safe-area-inset-bottom)); justify-items: start; }
+html.land #wind-ind { top: 30px; }
+html.land #alerts { top: 52px; }

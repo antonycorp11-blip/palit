@@ -50,7 +50,7 @@ var PALIT = window.PALIT = window.PALIT || {};
       look: { len: 30, body: '#f0d9a8', light: '#fff1d0', shade: '#c9a46a' },
       traits: ['Um pouco maior', 'Mais rígido', 'Sem cabeça de fósforo'],
       problems: ['Pontas que escorregam', 'Vento mais forte', 'Pássaros maiores'],
-      threats: ['fly', 'ant', 'beetle', 'bird', 'gecko', 'crow', 'cat', 'ball', 'kite', 'hail'],
+      threats: ['pigeon', 'wasp', 'paperplane', 'toydrone', 'cat', 'kite', 'crow', 'hail'],
       challenge: { name: 'A REVOADA', dur: 100, gustEvery: 9, gustStr: 1.4, threatEvery: 6, minIntegrity: 60, startIntegrity: 80 },
       tree: 'dente'
     }),

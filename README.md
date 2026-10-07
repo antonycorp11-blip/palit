@@ -28,6 +28,15 @@ Atalhos: `Espaço`/`Enter` colocar · `T` árvore · `Esc` fechar · `↑ ↓ Pg
 `M` som · na árvore: `Enter` comprar (`Shift+Enter` máximo), setas para mover, `+`/`−` zoom.
 No Chrome/Edge do PC dá para instalar como app pelo ícone de instalar na barra de endereço.
 
+## Celular deitado e zoom
+
+Com o celular deitado, o jogo usa o layout de PC em versão compacta. A torre tem zoom em passos inteiros de pixel
+(a arte continua nítida): pinça com dois dedos, botões de lupa, `+`/`−` no teclado ou Ctrl + roda do mouse.
+
+## Prompts dos palitos
+
+`docs/PROMPTS-PALITOS.md` tem um prompt por era (palito horizontal; as diagonais o jogo monta).
+
 ## Arquitetura
 
 ```
@@ -39,7 +48,7 @@ js/data/        dados (tudo data-driven)
   progression.js  missões, conquistas, eventos com escolha e bestiário
   threats.js      ameaças (tipo de movimento, dano, recompensa)
   events.js       eventos aleatórios
-  scenes.js       cenário por altitude global
+  scenes.js       cenário de cada era (camadas, cores, céu, vida ao fundo, plataforma de partida)
   sprites.js      pixel art ASCII
   sticks.js       arte dos palitos por material (paleta, cabeça, padrão da diagonal, profundidade)
 js/core/        simulação (sem DOM)

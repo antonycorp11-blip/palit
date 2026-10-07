@@ -8,6 +8,8 @@ PALIT.View = (function () {
   var U = 4, HU = 3, LH = 8, W = 104;  // U = pixel do mundo, HU = pixel do HUD
   var L = 26, D = 13, X0 = -19;          // geometria oblíqua em unidades
   var stickKey = '';
+  var zoomOff = 0;
+  try { zoomOff = parseInt(localStorage.getItem('palit.zoom') || '0', 10) || 0; } catch (e) { /* sem storage */ }
   var el = {};
   var cam = { y: 0, follow: true, vel: 0, drag: null, returning: false };
   var H = 800, VW = 400, focal = 400;
@@ -24,7 +26,10 @@ PALIT.View = (function () {
     G = P.Game; C = G.CELL;
     ['game', 'world', 'tower', 'ents', 'fx', 'ground', 'sky', 'stars', 'far', 'mid', 'near', 'clouds', 'sun', 'weather', 'flash', 'arrows'].forEach(function (k) { el[k] = $(k); });
     measure();
-    window.addEventListener('resize', function () { measure(); allDirty = true; });
+    window.addEventListener('resize', function () {
+      measure(); el.tower.innerHTML = ''; layers = {}; allDirty = true; buildGround(); lastParKey = '';
+      if (P.Desktop) P.Desktop.apply();
+    });
     buildScenery();
     setupMaterial();
     bindInput();
@@ -33,11 +38,15 @@ PALIT.View = (function () {
   }
 
   function measure() {
-    var desk = window.innerWidth >= 1000 && window.innerHeight >= 560;
+    var land = window.innerWidth > window.innerHeight && window.innerHeight < 600;
+    var desk = (window.innerWidth >= 1000 && window.innerHeight >= 560) || (land && window.innerWidth >= 600);
+    document.documentElement.classList.toggle('land', land);
     HU = window.innerWidth < 480 ? 3 : 4;
     // pixel do mundo: a torre ocupa ~45% da largura (mín. 3, máx. 6)
     var g0 = G.mat ? G.geo() : { L: 34, D: 24 };
-    U = Math.max(3, Math.min(desk && window.innerHeight >= 900 ? 6 : 5, Math.floor(window.innerWidth * (desk ? 0.3 : 0.46) / (g0.L + g0.D))));
+    var baseU = Math.max(3, Math.min(desk && window.innerHeight >= 900 ? 6 : 5, Math.floor(window.innerWidth * (desk ? 0.3 : 0.46) / (g0.L + g0.D))));
+    if (land) baseU = Math.max(2, Math.min(baseU, Math.floor(window.innerHeight / 90)));
+    U = Math.max(2, Math.min(8, baseU + zoomOff));
     document.documentElement.style.setProperty('--u', HU + 'px');
     if (el.world) el.world.style.setProperty('--u', U + 'px');
     LH = U * G.LHU;
@@ -204,7 +213,7 @@ PALIT.View = (function () {
       }
       g.innerHTML = html;
     } else {
-      g.className = 'platform';
+      g.className = 'platform ' + (P.sceneOf(G.mat).ground || 'slab');
       var last = G.S.history[G.S.history.length - 1];
       g.innerHTML = slab + '<div class="cp-label t-px">CHECKPOINT ' + String(G.S.history.length).padStart(2, '0') + ' — ' + P.fmtHeight(G.S.globalBase) + (last ? ' · ' + last.name.toUpperCase() : '') + '</div>';
     }
@@ -415,14 +424,7 @@ PALIT.View = (function () {
   }
 
   function updateScene() {
-    var sc = P.sceneFor(G.globalHeight());
-    if (sc !== sceneKey) {
-      sceneKey = sc;
-      el.far.hidden = !sc.city; el.mid.hidden = !sc.hills; el.near.hidden = true;
-      el.clouds.hidden = !sc.clouds;
-      $('mountains').hidden = !sc.hills; $('cloudbank').hidden = !sc.clouds;
-      $('trees').hidden = $('houses').hidden = !(sc.fence && G.S.matIndex === 0);
-    }
+    el.near.hidden = true;
     var base = cam.y - camMin();
     var key = Math.round(base);
     if (key === lastParKey) return;
@@ -656,6 +658,22 @@ PALIT.View = (function () {
     return bd <= 26 ? best : -1;
   }
 
+  /* zoom da torre: muda o pixel do mundo em passos inteiros (arte continua nítida) */
+  var pinch = null, wheelAcc = 0;
+  function zoomBy(d) {
+    var oldU = U, before = zoomOff;
+    zoomOff = Math.max(-4, Math.min(4, zoomOff + d));
+    measure();
+    if (U === oldU) { zoomOff = before; return; }
+    try { localStorage.setItem('palit.zoom', String(zoomOff)); } catch (e) { /* sem storage */ }
+    cam.y = cam.y * U / oldU;
+    el.tower.innerHTML = ''; layers = {}; allDirty = true;
+    buildGround();
+    lastParKey = '';
+    if (P.Audio) P.Audio.sfx.click();
+    P.HUD.toast('ZOOM ' + (U > oldU ? '+' : '−'), 'info', true);
+  }
+
   function bindInput() {
     var g = el.game;
     var ptrs = {};
@@ -666,10 +684,26 @@ PALIT.View = (function () {
       var th = e.target.closest('.th');
       if (th) { G.hitThreat(+th.dataset.id); return; }
       ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, y0: e.clientY, cam0: cam.y, t: performance.now(), moved: false, lastY: e.clientY, lastT: performance.now(), v: 0 };
+      var ids = Object.keys(ptrs);
+      if (ids.length === 2) {   // pinça: zoom na torre
+        var a = ptrs[ids[0]], b = ptrs[ids[1]];
+        pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) };
+        a.moved = b.moved = true; a.pinch = b.pinch = true;
+        cam.drag = null;
+      }
     });
     g.addEventListener('pointermove', function (e) {
       var p = ptrs[e.pointerId];
       if (!p) return;
+      p.x = e.clientX; p.y = e.clientY;
+      if (pinch) {
+        var ids = Object.keys(ptrs);
+        if (ids.length < 2) return;
+        var d = Math.hypot(ptrs[ids[0]].x - ptrs[ids[1]].x, ptrs[ids[0]].y - ptrs[ids[1]].y);
+        if (d / pinch.d > 1.35) { zoomBy(1); pinch.d = d; }
+        else if (d / pinch.d < 0.74) { zoomBy(-1); pinch.d = d; }
+        return;
+      }
       var dy = e.clientY - p.y0;
       if (!p.moved && Math.abs(dy) > 10) { p.moved = true; cam.follow = false; cam.jump = null; cam.drag = true; }
       if (p.moved) {
@@ -683,6 +717,7 @@ PALIT.View = (function () {
       var p = ptrs[e.pointerId];
       if (!p) return;
       delete ptrs[e.pointerId];
+      if (p.pinch) { if (!Object.keys(ptrs).length) pinch = null; return; }
       if (p.moved) { cam.drag = null; cam.vel = p.v; return; }
       // toque simples
       var c = findDamaged(e.clientX, e.clientY);
@@ -691,9 +726,10 @@ PALIT.View = (function () {
       else P.HUD.toast('VOLTE AO TOPO PARA CONSTRUIR', 'warn', true);
     }
     g.addEventListener('pointerup', end);
-    g.addEventListener('pointercancel', function (e) { delete ptrs[e.pointerId]; cam.drag = null; });
+    g.addEventListener('pointercancel', function (e) { delete ptrs[e.pointerId]; cam.drag = null; if (!Object.keys(ptrs).length) pinch = null; });
     g.addEventListener('wheel', function (e) {
       if (isUI(e.target)) return;
+      if (e.ctrlKey) { wheelAcc += e.deltaY; if (Math.abs(wheelAcc) > 60) { zoomBy(wheelAcc < 0 ? 1 : -1); wheelAcc = 0; } return; }
       cam.follow = false; cam.jump = null; cam.vel = 0;
       cam.y -= e.deltaY;
     }, { passive: true });
@@ -712,7 +748,7 @@ PALIT.View = (function () {
     init: init, frame: frame, goTop: goTop, goLayer: goLayer, nearTop: nearTop,
     get cam() { return cam; }, get LH() { return LH; }, get U() { return U; },
     viewLayers: function () { return [(cam.y + focal - H) / LH, (cam.y + focal) / LH]; },
-    measure: measure, sparks: sparks, findDamaged: function (x, y) { return findDamaged(x, y); },
+    measure: measure, sparks: sparks, zoomBy: zoomBy, findDamaged: function (x, y) { return findDamaged(x, y); },
     cellScreen: function (c) { var p = cellPos(c); return { x: VW / 2 + p.x, y: focal + cam.y + p.y }; },
     toScreen: function (wx, wy) { return { x: VW / 2 + wx, y: focal + cam.y + wy }; },
     scrollBy: function (dy) { cam.follow = false; cam.jump = null; cam.vel = 0; cam.y += dy; },

@@ -358,6 +358,37 @@ PALIT.SPRITES = {
     ['.k........k.', 'kok......kok', 'kooddddddook', 'kooooooooook', 'kowgooooowgk', 'kowgooooowgk', 'koooookooook', '.koooppooook', '.kooooooook.', '..kooooook..', '...kkkkkk...', '............'],
     ['.k........k.', 'kok......kok', 'kooddddddook', 'kooooooooook', 'kokkoooookkk', 'kooooooooook', 'koooookooook', '.koooppooook', '.kooooooook.', '..kooooook..', '...kkkkkk...', '............']] },
 
+  /* ---------- vida ao fundo: eras altas ---------- */
+  heli: { pal: { r: '#ff004d', d: '#7e2553', k: '#1a1423', c: '#c7f0ff', g: '#5f574f' }, fps: 12, frames: [
+    ['kkkkkkkkkkkk.....', '.....k...........', '...rrrrr......k..', '..rccrrrrrrrrrrk.', '..rccrrrrdd....k.', '...rrrrr.........', '....k..k.........', '..kkkkkkkk.......'],
+    ['....kkkk.........', '.....k...........', '...rrrrr.......k.', '..rccrrrrrrrrrrk.', '..rccrrrrdd...k..', '...rrrrr.........', '....k..k.........', '..kkkkkkkk.......']] },
+  comet: { pal: { w: '#fff1e8', y: '#ffec27', o: '#ffa300', c: '#c7f0ff' }, fps: 6, frames: [
+    ['o.........', '.oo.......', '..oyy.....', '...yyww...', '....ywww..', '.....www..', '......ww..'],
+    ['..........', 'o.........', '.ooy......', '..yyyww...', '....ywww..', '.....www..', '......ww..']] },
+  satellite: { pal: { b: '#29adff', d: '#1d2b53', g: '#c2c3c7', y: '#ffec27' }, frames: [[
+    'bbbb.......bbbb', 'bdbb..ggg..bdbb', 'bbbbggggggggbbbb', 'bdbb..gyg..bdbb', 'bbbb...g...bbbb']] },
+  station: { pal: { b: '#29adff', d: '#1d2b53', g: '#c2c3c7', w: '#fff1e8' }, frames: [[
+    'bb.bb.....bb.bb', 'bb.bb..g..bb.bb', 'ggggggggggggggg', 'bb.bb.gwg.bb.bb', 'bb.bb.ggg.bb.bb', '......ggg......']] },
+  ufo: { pal: { g: '#c2c3c7', d: '#5f574f', c: '#00e436', y: '#ffec27', w: '#c7f0ff' }, fps: 4, frames: [
+    ['....www....', '...wcccw...', '.ggggggggg.', 'gdgygdgygdg', '.ggggggggg.'],
+    ['....www....', '...wcccw...', '.ggggggggg.', 'gygdgygdgyg', '.ggggggggg.']] },
+  asteroid: { pal: { g: '#8a7a70', d: '#5a4a44', k: '#2a201c', l: '#b0a090' }, frames: [[
+    '..gggg..', '.glggdg.', 'gggdkggg', 'gdggggdg', 'ggkgggdg', '.gggdgg.', '..dddd..']] },
+
+  /* ---------- inimigos da era 2 (telhados) ---------- */
+  pigeon: { pal: { g: '#8a8c94', l: '#c2c3c7', n: '#008751', p: '#7e2553', o: '#ffa300', k: '#1a1423' }, fps: 8, frames: [
+    ['.ll.......', '..lll.....', '...llll.gg', '..gglllgok', '.gnpgggg..', '...gg.....', '...o.o....'],
+    ['..........', '..........', '.......gg.', '.lllllggok', 'llnpgggg..', '.llgg.....', '...o.o....']] },
+  wasp: { pal: { y: '#ffec27', k: '#1a1423', w: '#c7f0ff' }, fps: 14, frames: [
+    ['..ww.ww..', '..wwkww..', 'kykykyk..', 'ykykykyk.', 'kykykyk.k', '..k..k...'],
+    ['.........', '.........', 'kykykykww', 'ykykykykw', 'kykykyk.k', '..k..k...']] },
+  paperplane: { pal: { w: '#fff1e8', g: '#c2c3c7', k: '#83769c' }, fps: 4, frames: [
+    ['w.........', 'ww........', 'wwww......', 'wwwwwwww..', '.ggggkkwww', '..gkk.....'],
+    ['..........', 'w.........', 'www.......', 'wwwwwwww..', '.ggggkkwww', '..gkk.....']] },
+  toydrone: { pal: { g: '#5f574f', l: '#c2c3c7', r: '#ff004d', k: '#1a1423', b: '#29adff' }, fps: 14, frames: [
+    ['kkk.....kkk', '.k.......k.', '.lllllllll.', '..lgbbbgl..', '..lllrlll..', '...k...k...'],
+    ['.kkk...kkk.', '.k.......k.', '.lllllllll.', '..lgbbbgl..', '..lllrlll..', '...k...k...']] },
+
   /* ---------- ícones de HUD / ramos (7x7) ---------- */
   ico_match: { pal: { r: '#ff004d', d: '#7e2553', w: '#e8c27a', s: '#ab5236' }, frames: [[
     '.....rr', '....rdr', '...ws..', '..ws...', '.ws....', 'ws.....', 's......']] },
@@ -406,6 +437,8 @@ PALIT.SPRITES = {
     'bbbbbbb', 'bwwbwwb', 'bwwbwwb', 'bwwbwwb', 'bwwbwwb', 'bbbbbbb', 'k.....k']] },
   ico_q: { pal: { y: '#ffec27', k: '#ab5236' }, frames: [[
     '.yyyyy.', 'yy...yy', '.....yy', '...yyy.', '...yy..', '.......', '...yy..']] },
+  ico_zin: { pal: { w: '#fff1e8' }, frames: [['.wwww..', 'w....w.', 'w.ww.w.', 'w....w.', '.wwww..', '.....ww', '......w']] },
+  ico_zout: { pal: { w: '#fff1e8' }, frames: [['.wwww..', 'w....w.', 'w....w.', 'w....w.', '.wwww..', '.....ww', '......w']] },
   ico_close: { pal: { w: '#fff1e8' }, frames: [[
     'w.....w', '.w...w.', '..w.w..', '...w...', '..w.w..', '.w...w.', 'w.....w']] },
   ico_heart: { pal: { r: '#ff004d', w: '#fff1e8', d: '#7e2553' }, frames: [[

@@ -52,6 +52,7 @@ PALIT.ACHIEVEMENTS = [
   { id: 't50',    icon: 'ico_tree',   name: 'Copa',                  desc: '50% de uma árvore.',                         test: function (s, g) { return g.progress() >= 0.5; }, reward: 300 },
   { id: 't100',   icon: 'ico_tree',   name: 'Floresta',              desc: '100% de uma árvore.',                        test: function (s, g) { return g.progress() >= 1; }, reward: 1000 },
   { id: 'best',   icon: 'ico_book',   name: 'Naturalista',           desc: 'Veja todas as ameaças da era do fósforo.',   test: function (s) { var b = s.bestiary || {}; return ['fly', 'ant', 'beetle', 'ball', 'bird', 'gecko', 'cat', 'lens', 'kite', 'crow', 'hail'].every(function (k) { return b[k] && b[k].seen; }); }, reward: 400 },
+  { id: 'best2',  icon: 'ico_book',   name: 'Naturalista dos Telhados', desc: 'Veja todas as ameaças da era do palito de dente.', test: function (s) { var b = s.bestiary || {}; return ['pigeon', 'wasp', 'paperplane', 'toydrone'].every(function (k) { return b[k] && b[k].seen; }); }, reward: 800 },
   { id: 'clue5',  icon: 'ico_q',      name: 'Curioso',               desc: 'Descubra 5 pistas do mistério.',             test: function (s) { return (s.clues || []).length >= 5; }, reward: 100 },
   { id: 'clue10', icon: 'ico_q',      name: 'Detetive de Palitos',   desc: 'Descubra 10 pistas do mistério.',            test: function (s) { return (s.clues || []).length >= 10; }, reward: 500 },
   { id: 'owl',    icon: 'ico_star',   name: 'Coruja',                desc: 'Atinja um marco durante a noite.',           test: function (s) { return !!(s.flags && s.flags.nightMilestone); }, reward: 60 },
@@ -129,5 +130,9 @@ PALIT.BESTIARY = {
   cat:    'Bartolomeu, o gato do vizinho. Odeia verticalidade.',
   kite:   'Não tem cerol, mas enrosca, balança e rasga a paciência.',
   crow:   'Inteligente demais. Já tentou negociar os palitos com o Gervásio.',
-  hail:   'Gelo caindo do céu. Parece pessoal.'
+  hail:   'Gelo caindo do céu. Parece pessoal.',
+  pigeon: 'Primo do Gervásio. Não tem a mesma educação.',
+  wasp:   'Mora na calha do vizinho. Paga aluguel em ferroadas.',
+  paperplane: 'Lançado da janela do 3º andar. Engenharia aeronáutica infantil.',
+  toydrone: 'O vizinho ganhou de Natal. Ainda não aprendeu a pilotar.'
 };

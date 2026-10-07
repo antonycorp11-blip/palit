@@ -51,7 +51,8 @@ PALIT.HUD = (function () {
       '<button class="pxbtn gold" id="b-ch" hidden>' + spr('ico_flag') + 'DESAFIO FINAL</button>' +
       '<button class="pxbtn gold" id="b-master" hidden>' + spr('ico_flag') + 'MATERIAL DOMINADO</button>' +
       '<button class="pxbtn red" id="b-dmg" hidden>' + spr('ico_down') + 'DANO</button>' +
-      '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>';
+      '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>' +
+      '<div class="zoom-btns"><button class="pxbtn" id="b-zin" aria-label="Aproximar">' + spr('ico_zin') + '</button><button class="pxbtn" id="b-zout" aria-label="Afastar">' + spr('ico_zout') + '</button></div>';
     $('b-tree').addEventListener('click', function () { P.TreeView.open(); });
     $('b-menu').addEventListener('click', function () { P.Panels.open(); });
     $('b-snd').addEventListener('click', function () {
@@ -60,6 +61,8 @@ PALIT.HUD = (function () {
       $('b-snd').innerHTML = spr(P.Audio.muted ? 'ico_mute' : 'ico_sound');
     });
     $('b-top').addEventListener('click', function () { V.goTop(); });
+    $('b-zin').addEventListener('click', function () { V.zoomBy(1); });
+    $('b-zout').addEventListener('click', function () { V.zoomBy(-1); });
     $('b-dmg').addEventListener('click', jumpDamage);
     $('b-ch').addEventListener('click', confirmChallenge);
     $('b-master').addEventListener('click', masteryModal);
