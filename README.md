@@ -20,6 +20,14 @@ Notas:
   Para forçar, aumente `VERSION` em `sw.js`.
 - Ícones: `python3 tools/make_icons.py` regenera os PNGs em `icons/`.
 
+## Versão desktop
+
+Em telas com 1000px de largura ou mais, o jogo muda para o layout de PC: status à esquerda, painel à direita com
+**próximas melhorias** (compra direta) e **registro de eventos**, e árvore em duas colunas com dicas ao passar o mouse.
+Atalhos: `Espaço`/`Enter` colocar · `T` árvore · `Esc` fechar · `↑ ↓ PgUp PgDn` rolar · `Home` topo · `D` próximo dano ·
+`M` som · na árvore: `Enter` comprar (`Shift+Enter` máximo), setas para mover, `+`/`−` zoom.
+No Chrome/Edge do PC dá para instalar como app pelo ícone de instalar na barra de endereço.
+
 ## Arquitetura
 
 ```
@@ -45,6 +53,7 @@ js/ui/          apresentação
   audio.js        sons 8-bit sintetizados (Web Audio)
   juice.js        efeitos de HUD e sons ligados aos eventos do jogo
   ambient.js      cenário vivo: dia/noite, camadas de profundidade, vida ao fundo
+  desktop.js      layout de PC, atalhos de teclado, painel de melhorias e registro
 tools/
   validate.js     valida árvores (ids, pré-requisitos, sobreposição, limite estrutural)
   sim.js          simulação de balanceamento (`node tools/sim.js [fração ativa]`)

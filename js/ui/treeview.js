@@ -69,6 +69,7 @@ PALIT.TreeView = (function () {
       var d = document.createElement('div');
       var br = brById[n.b];
       d.className = 'tn' + (n.sp ? ' sp-node' : '') + (n.b ? '' : ' root');
+      d.dataset.id = n.id;
       d.style.left = n.x + 'px'; d.style.top = n.y + 'px';
       d.style.setProperty('--bc', br ? br.color : '#ffa300');
       d.innerHTML = P.SpriteCSS.html(br ? 'ico_' + br.icon : 'ico_match') + '<span class="lv"></span>';
@@ -308,5 +309,25 @@ PALIT.TreeView = (function () {
   function tick() { if (!el.screen.hidden) { $('t-money').textContent = '$' + P.fmtMoney(G.S.money); } }
   function slowTick() { if (!el.screen.hidden) refresh(); }
 
-  return { init: init, open: open, close: close, tick: tick, slowTick: slowTick };
+  /* abre a árvore já centralizada num nó (painel desktop) */
+  function focus(id) {
+    open();
+    var n = G.def.byId[id];
+    if (!n) return;
+    view.z = Math.max(view.z, 0.9);
+    view.x = -n.x * view.z; view.y = -n.y * view.z;
+    apply();
+    select(id);
+  }
+  function buySelected(max) {
+    if (!sel) return;
+    if (!G.buy(sel, max)) P.Audio.sfx.blocked();
+  }
+  function pan(dx, dy) { view.x += dx; view.y += dy; apply(); }
+
+  return {
+    init: init, open: open, close: close, tick: tick, slowTick: slowTick,
+    focus: focus, buySelected: buySelected, pan: pan, zoom: zoom,
+    isOpen: function () { return !el.screen.hidden; }
+  };
 })();

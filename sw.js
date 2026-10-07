@@ -2,7 +2,7 @@
    Estratégia: pré-cache do app + "stale-while-revalidate" (abre na hora pelo
    cache e baixa a versão nova em segundo plano para a próxima abertura).
    Ao publicar mudanças grandes, aumente VERSION. */
-var VERSION = 'palit-v3';
+var VERSION = 'palit-v4';
 var ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',
@@ -11,7 +11,7 @@ var ASSETS = [
   'js/data/stats.js', 'js/data/materials.js', 'js/data/trees/fosforo.js', 'js/data/threats.js', 'js/data/events.js',
   'js/data/scenes.js', 'js/data/sprites.js',
   'js/core/econ.js', 'js/core/tree.js', 'js/core/state.js', 'js/core/game.js',
-  'js/ui/audio.js', 'js/ui/spritecss.js', 'js/ui/view.js', 'js/ui/hud.js', 'js/ui/treeview.js', 'js/ui/juice.js', 'js/ui/ambient.js',
+  'js/ui/audio.js', 'js/ui/spritecss.js', 'js/ui/view.js', 'js/ui/hud.js', 'js/ui/treeview.js', 'js/ui/juice.js', 'js/ui/ambient.js', 'js/ui/desktop.js',
   'js/main.js'
 ];
 

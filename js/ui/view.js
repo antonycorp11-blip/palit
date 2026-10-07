@@ -33,8 +33,9 @@ PALIT.View = (function () {
   }
 
   function measure() {
+    var desk = window.innerWidth >= 1000 && window.innerHeight >= 560;
     HU = window.innerWidth < 480 ? 3 : 4;
-    U = window.innerWidth < 480 ? 4 : 5;
+    U = window.innerWidth < 480 ? 4 : desk && window.innerHeight >= 900 ? 6 : 5;
     document.documentElement.style.setProperty('--u', HU + 'px');
     if (el.world) el.world.style.setProperty('--u', U + 'px');
     LH = U * G.LHU;
@@ -673,10 +674,6 @@ PALIT.View = (function () {
       cam.follow = false; cam.jump = null; cam.vel = 0;
       cam.y -= e.deltaY;
     }, { passive: true });
-    window.addEventListener('keydown', function (e) {
-      if (e.code === 'Space') { e.preventDefault(); if (nearTop()) G.tryPlace(false); }
-      if (e.code === 'Home') goTop();
-    });
   }
 
   /* ---------------- frame ---------------- */
@@ -695,6 +692,7 @@ PALIT.View = (function () {
     measure: measure, sparks: sparks, findDamaged: function (x, y) { return findDamaged(x, y); },
     cellScreen: function (c) { var p = cellPos(c); return { x: VW / 2 + p.x, y: focal + cam.y + p.y }; },
     toScreen: function (wx, wy) { return { x: VW / 2 + wx, y: focal + cam.y + wy }; },
+    scrollBy: function (dy) { cam.follow = false; cam.jump = null; cam.vel = 0; cam.y += dy; },
     shake: shake, get W() { return W; }, get D() { return D; }
   };
 })();

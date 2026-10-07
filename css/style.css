@@ -486,3 +486,61 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 #ios-tip { font-family: var(--font-txt); font-size: 18px; max-width: 300px; line-height: 1.1; }
 input, button { -webkit-appearance: none; appearance: none; border-radius: 0; }
+
+/* =========================================================
+   DESKTOP (html.desk: largura ≥ 1000px)
+   ========================================================= */
+#deskpanel { display: none; }
+html.desk #topbar { left: 16px; right: auto; top: 16px; width: 340px; transform: none; }
+html.desk #deskpanel { position: absolute; right: 16px; top: 16px; bottom: 16px; width: 350px; display: flex; flex-direction: column; gap: 12px; padding: 14px; overflow: hidden; pointer-events: auto; }
+html.desk #deskpanel[hidden] { display: none; }
+html.desk #ruler { right: calc(16px + 350px + 34px); top: 16%; bottom: 16%; }
+html.desk #side-btns { right: calc(16px + 350px + 70px); bottom: 110px; }
+html.desk #bottombar { left: calc(16px + 340px + 24px); right: calc(16px + 350px + 70px); width: auto; transform: none; }
+html.desk #wind-ind { top: 16px; left: calc(16px + 340px + 24px); }
+html.desk #ch-ind { top: 16px; right: calc(16px + 350px + 24px); }
+html.desk #alerts { top: 70px; width: 520px; }
+html.desk #game { cursor: pointer; }
+html.desk .th { cursor: crosshair; }
+html.desk #status { font-size: 11px; }
+
+#deskpanel h3 { font-family: var(--font-px); font-size: 11px; font-weight: normal; color: var(--peach); display: flex; align-items: center; gap: 8px; }
+#dp-up { display: grid; gap: 8px; }
+.dp-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: #1c1628; box-shadow: inset 4px 0 0 0 var(--bc); cursor: pointer; }
+.dp-row:hover { background: #2a2238; }
+.dp-row .sp { opacity: .55; }
+.dp-row.ok .sp { opacity: 1; }
+.dp-txt { flex: 1; min-width: 0; display: grid; gap: 3px; }
+.dp-txt b { font-family: var(--font-px); font-size: 9px; font-weight: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-txt span { font-size: 16px; color: var(--lgray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dp-row .pxbtn { font-size: 9px; padding: 6px 8px; flex: none; }
+.dp-row:not(.ok) .pxbtn { color: var(--lgray); opacity: .7; }
+#dp-log { flex: 1; min-height: 0; overflow: hidden; display: grid; align-content: start; gap: 4px; -webkit-mask: linear-gradient(#000 70%, transparent); mask: linear-gradient(#000 70%, transparent); }
+.dp-log { font-size: 17px; line-height: 1; color: var(--lgray); animation: toastin .2s steps(2); }
+.dp-log i { font-style: normal; color: var(--dgray); margin-right: 6px; }
+.dp-log.good { color: var(--lime); } .dp-log.bad { color: var(--red); } .dp-log.gold { color: var(--yellow); } .dp-log.info { color: var(--blue); }
+#deskpanel .keys { display: flex; flex-wrap: wrap; gap: 6px 12px; font-size: 16px; color: var(--lav); border-top: 4px dotted var(--dgray); padding-top: 10px; }
+kbd { font-family: var(--font-px); font-size: 8px; color: var(--white); background: var(--ink); padding: 2px 4px; margin-right: 3px; box-shadow: 0 2px 0 0 var(--dgray); }
+
+/* árvore em duas colunas */
+html.desk #tree-screen { display: grid; grid-template-columns: 1fr 420px; grid-template-rows: auto 1fr; }
+html.desk #tree-head { grid-column: 1 / -1; }
+html.desk #tree-detail { max-height: none; min-height: 0; align-content: start; box-shadow: calc(var(--u) * -1) 0 0 0 var(--ink); padding: 24px; gap: 12px; }
+html.desk #tree-detail h3 { font-size: 13px; }
+html.desk .tn { cursor: pointer; }
+html.desk .tn:hover { filter: brightness(1.35); }
+#tip { position: fixed; left: 0; top: 0; z-index: 95; max-width: 280px; padding: 10px 12px; display: grid; gap: 5px; pointer-events: none; }
+#tip b { font-family: var(--font-px); font-size: 10px; font-weight: normal; color: var(--peach); }
+#tip span { font-family: var(--font-px); font-size: 8px; color: var(--yellow); }
+#tip em { font-style: normal; font-size: 17px; color: var(--lgray); line-height: 1; }
+html.desk .mat-name { font-size: 12px; }
+html.desk .era-tag { font-size: 9px; }
+html.desk .money, html.desk .pieces { font-size: 14px; }
+html.desk .pieces small, html.desk .reserve { font-size: 9px; }
+html.desk .alt b { font-size: 12px; }
+html.desk .alt span, html.desk .timer span, html.desk .integ span { font-size: 8px; }
+html.desk .integ b { font-size: 9px; }
+html.desk .chip { font-size: 8px; }
+html.desk #topbar { gap: 12px; padding: 14px 16px; }
+html.desk .toast { font-size: 11px; }
+html.desk .toast.small { font-size: 9px; }

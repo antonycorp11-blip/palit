@@ -18,6 +18,7 @@ var PALIT = window.PALIT = window.PALIT || {};
     P.TreeView.init();
     P.Juice.init();
     P.Ambient.init();
+    P.Desktop.init();
     if (/[?&]debug/.test(location.search)) debugPanel();
 
     var last = performance.now(), hudT = 0, slowT = 0, saveT = 0;
@@ -29,7 +30,7 @@ var PALIT = window.PALIT = window.PALIT || {};
       P.Ambient.tick(dt);
       P.Juice.tick(dt);
       hudT += dt; slowT += dt; saveT += dt;
-      if (hudT > 0.1) { hudT = 0; P.HUD.update(); P.TreeView.tick(); }
+      if (hudT > 0.1) { hudT = 0; P.HUD.update(); P.TreeView.tick(); P.Desktop.update(); }
       if (slowT > 1) { slowT = 0; P.TreeView.slowTick(); }
       if (saveT > 5) { saveT = 0; P.save(); }
       requestAnimationFrame(loop);
