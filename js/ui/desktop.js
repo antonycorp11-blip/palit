@@ -14,8 +14,7 @@ PALIT.Desktop = (function () {
 
   function $(id) { return document.getElementById(id); }
   function isDesk() {
-    var land = window.innerWidth > window.innerHeight && window.innerHeight < 600;
-    return (window.innerWidth >= 1000 && window.innerHeight >= 560) || (land && window.innerWidth >= 600);
+    return window.innerWidth >= 1000 && window.innerHeight >= 560;
   }
 
   function init() {

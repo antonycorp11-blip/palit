@@ -26,8 +26,11 @@ PALIT.TreeView = (function () {
       '<div class="prog"><span>PROGRESSO DA ÁRVORE: <b id="t-prog" class="c-g"></b></span><span>MATERIAL DOMINADO: <b id="t-dom"></b></span><span id="t-next" class="c-l"></span></div></div>' +
       '<div id="tree-view"><div id="tree-canvas"><svg id="tree-lines"></svg></div>' +
       '<div id="tree-zoom"><button class="pxbtn" id="t-zin">+</button><button class="pxbtn" id="t-zout">−</button><button class="pxbtn" id="t-zc">◎</button></div></div>' +
-      '<div id="tree-detail"></div>';
-    el.view = $('tree-view'); el.canvas = $('tree-canvas'); el.lines = $('tree-lines'); el.detail = $('tree-detail');
+      '';
+    el.view = $('tree-view'); el.canvas = $('tree-canvas'); el.lines = $('tree-lines'); el.detail = document.createElement('div');
+    el.detail.id = 'tree-pop'; el.detail.className = 'px'; el.detail.hidden = true;
+    el.view.appendChild(el.detail);
+    el.detail.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
     $('t-close').addEventListener('click', close);
     $('t-zin').addEventListener('click', function () { zoom(1.25); });
     $('t-zout').addEventListener('click', function () { zoom(0.8); });
@@ -189,16 +192,13 @@ PALIT.TreeView = (function () {
 
   function renderDetail() {
     var def = G.def;
-    if (!sel) {
-      el.detail.innerHTML = '<p class="c-l">Toque em um nó para ver detalhes. Arraste para navegar, use + / − para zoom.</p>' +
-        '<div class="meta"><span>' + def.nodes.length + ' NÓS</span><span>' + def.totalLevels + ' NÍVEIS</span><span>' + def.branches.length + ' RAMOS</span></div>';
-      return;
-    }
+    if (!sel) { el.detail.hidden = true; return; }
+    el.detail.hidden = false;
     var n = def.byId[sel], lv = G.levels(), l = lv[n.id] || 0;
     var br = def.branches.filter(function (b) { return b.id === n.b; })[0];
     var state = P.Tree.nodeState(def, n, lv);
     var cost = state === 'max' ? 0 : P.Tree.cost(def, G.mat, n, l);
-    var html = '<h3 style="color:' + (br ? br.color : '#ffa300') + '">' + n.n.toUpperCase() + '</h3>' +
+    var html = '<button class="pop-x" aria-label="Fechar">×</button><h3 style="color:' + (br ? br.color : '#ffa300') + '">' + n.n.toUpperCase() + '</h3>' +
       '<div class="meta"><span>' + (br ? br.name : 'RAIZ') + '</span><span>NÍVEL ' + l + '/' + n.lv + '</span>' + (n.sp ? '<span class="c-y">NÓ ESPECIAL</span>' : '') + '</div>' +
       '<p>' + n.d + '</p>' +
       '<div class="eff" style="--bc:' + (br ? br.color : '#ffa300') + '">' + P.Tree.effectLines(n).map(function (t) { return '<div>' + t + '</div>'; }).join('') + '</div>';
@@ -235,11 +235,28 @@ PALIT.TreeView = (function () {
     }
     if (b1) b1.addEventListener('click', function () { tryBuy(false); });
     if (b2) b2.addEventListener('click', function () { tryBuy(true); });
+    var bx = el.detail.querySelector('.pop-x');
+    if (bx) bx.addEventListener('click', function () { sel = null; refresh(); });
+    placePop();
+  }
+
+  /* balão ao lado do nó selecionado (acompanha arrastar e zoom) */
+  function placePop() {
+    if (!sel || el.detail.hidden || !nodesEl[sel]) return;
+    var vr = el.view.getBoundingClientRect(), nr = nodesEl[sel].getBoundingClientRect();
+    var pw = el.detail.offsetWidth, ph = el.detail.offsetHeight;
+    var x = nr.right - vr.left + 12;
+    if (x + pw > vr.width - 8) x = nr.left - vr.left - pw - 12;
+    var y = nr.top - vr.top + nr.height / 2 - ph / 2;
+    if (x < 8) { x = Math.max(8, Math.min(vr.width - pw - 8, nr.left - vr.left + nr.width / 2 - pw / 2)); y = nr.bottom - vr.top + 12; if (y + ph > vr.height - 8) y = nr.top - vr.top - ph - 12; }
+    y = Math.max(8, Math.min(vr.height - ph - 8, y));
+    el.detail.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
   }
 
   /* ---------------- pan / zoom ---------------- */
   function apply() {
     el.canvas.style.transform = 'translate(' + Math.round(view.x) + 'px,' + Math.round(view.y) + 'px) scale(' + view.z.toFixed(3) + ')';
+    placePop();
   }
   function zoom(f, cx, cy) {
     var nz = Math.max(0.3, Math.min(2, view.z * f));

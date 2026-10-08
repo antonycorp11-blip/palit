@@ -2,7 +2,7 @@
    Estratégia: pré-cache do app + "stale-while-revalidate" (abre na hora pelo
    cache e baixa a versão nova em segundo plano para a próxima abertura).
    Ao publicar mudanças grandes, aumente VERSION. */
-var VERSION = 'palit-v8';
+var VERSION = 'palit-v9';
 var ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',

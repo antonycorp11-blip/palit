@@ -327,19 +327,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .tn.root { width: 64px; height: 64px; margin: -32px 0 0 -32px; --bc: var(--orange); }
 .br-label { position: absolute; transform: translate(-50%, -50%); font-family: var(--font-px); font-size: 9px; white-space: nowrap; padding: 3px 5px; background: var(--ink); color: var(--bc); pointer-events: none; }
 #tree-zoom { position: absolute; right: 16px; top: 16px; display: grid; gap: calc(var(--u) * 3); }
-#tree-detail { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom)); background: var(--panel); box-shadow: 0 calc(var(--u) * -1) 0 0 var(--ink); display: grid; gap: calc(var(--u) * 2); min-height: 120px; max-height: 46vh; overflow-y: auto; touch-action: pan-y; z-index: 2; }
-#tree-detail h3 { font-family: var(--font-px); font-size: 11px; font-weight: normal; line-height: 1.5; }
-#tree-detail .meta { font-family: var(--font-px); font-size: 9px; color: var(--lav); display: flex; gap: calc(var(--u) * 3); flex-wrap: wrap; line-height: 1.5; }
-#tree-detail p { font-size: 19px; color: var(--lgray); line-height: 1.05; }
-#tree-detail .eff { font-size: 19px; line-height: 1.05; }
-#tree-detail .eff div::before { content: '▸ '; color: var(--bc, var(--lime)); }
-#tree-detail .pv { display: grid; gap: 2px; font-size: 19px; }
-#tree-detail .pv b { font-weight: normal; color: var(--lime); }
-#tree-detail .reqs { font-size: 18px; color: var(--lgray); }
-#tree-detail .reqs .ok { color: var(--lime); } #tree-detail .reqs .no { color: var(--red); }
-#tree-detail .buy { display: flex; gap: calc(var(--u) * 4); align-items: center; flex-wrap: wrap; margin-top: var(--u); }
-#tree-detail .cost { font-family: var(--font-px); font-size: 11px; color: var(--yellow); }
-#tree-detail .cost.no { color: var(--red); }
+#tree-pop h3 { font-family: var(--font-px); font-size: 11px; font-weight: normal; line-height: 1.5; }
+#tree-pop .meta { font-family: var(--font-px); font-size: 9px; color: var(--lav); display: flex; gap: calc(var(--u) * 3); flex-wrap: wrap; line-height: 1.5; }
+#tree-pop p { font-size: 19px; color: var(--lgray); line-height: 1.05; }
+#tree-pop .eff { font-size: 19px; line-height: 1.05; }
+#tree-pop .eff div::before { content: '▸ '; color: var(--bc, var(--lime)); }
+#tree-pop .pv { display: grid; gap: 2px; font-size: 19px; }
+#tree-pop .pv b { font-weight: normal; color: var(--lime); }
+#tree-pop .reqs { font-size: 18px; color: var(--lgray); }
+#tree-pop .reqs .ok { color: var(--lime); } #tree-pop .reqs .no { color: var(--red); }
+#tree-pop .buy { display: flex; gap: calc(var(--u) * 4); align-items: center; flex-wrap: wrap; margin-top: var(--u); }
+#tree-pop .cost { font-family: var(--font-px); font-size: 11px; color: var(--yellow); }
+#tree-pop .cost.no { color: var(--red); }
 
 /* =========================================================
    MODAL
@@ -439,7 +438,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 @keyframes spend { 0%, 50% { color: var(--red); transform: translateY(3px); } }
 #tree-view.boom { animation: boom .5s steps(5); }
 @keyframes boom { 0% { background-color: #ffec27; } 20% { transform: translate(6px, -4px); } 40% { transform: translate(-6px, 4px); background-color: #3a2a10; } 60% { transform: translate(4px, 2px); } }
-#tree-detail .cost.nope { animation: nope .3s steps(4); }
+#tree-pop .cost.nope { animation: nope .3s steps(4); }
 .pxbtn.ready { animation: ready 1s steps(2) infinite; }
 @keyframes ready { 50% { background: #8a6a20; } }
 .pxbtn.dim { opacity: .6; }
@@ -523,10 +522,9 @@ html.desk #status { font-size: 11px; }
 kbd { font-family: var(--font-px); font-size: 8px; color: var(--white); background: var(--ink); padding: 2px 4px; margin-right: 3px; box-shadow: 0 2px 0 0 var(--dgray); }
 
 /* árvore em duas colunas */
-html.desk #tree-screen { display: grid; grid-template-columns: 1fr 420px; grid-template-rows: auto 1fr; }
+
 html.desk #tree-head { grid-column: 1 / -1; }
-html.desk #tree-detail { max-height: none; min-height: 0; align-content: start; box-shadow: calc(var(--u) * -1) 0 0 0 var(--ink); padding: 24px; gap: 12px; }
-html.desk #tree-detail h3 { font-size: 13px; }
+html.desk #tree-pop h3 { font-size: 13px; }
 html.desk .tn { cursor: pointer; }
 html.desk .tn:hover { filter: brightness(1.35); }
 #tip { position: fixed; left: 0; top: 0; z-index: 95; max-width: 280px; padding: 10px 12px; display: grid; gap: 5px; pointer-events: none; }
@@ -704,40 +702,61 @@ html.desk #ch-ind { top: 16px; }
    ========================================================= */
 .zoom-btns { display: flex; gap: calc(var(--u) * 3); }
 .zoom-btns .pxbtn { padding: calc(var(--u) * 1.5) calc(var(--u) * 2); }
-html.land #topbar { width: 250px; top: calc(8px + env(safe-area-inset-top)); left: calc(8px + env(safe-area-inset-left)); padding: 8px 10px; gap: 6px; }
+
+
+/* celular deitado: botões na coluna esquerda, centro livre para a torre */
+
+/* balão de compra junto ao nó da árvore */
+#tree-pop { position: absolute; left: 0; top: 0; z-index: 5; width: 270px; max-height: calc(100% - 16px); overflow-y: auto; padding: 12px 12px 10px;
+  display: grid; gap: 6px; touch-action: pan-y; overscroll-behavior: contain; animation: popin .15s steps(2); }
+@keyframes popin { from { opacity: 0; } }
+#tree-pop h3 { font-size: 10px; padding-right: 22px; }
+#tree-pop p, #tree-pop .eff, #tree-pop .pv { font-size: 17px; }
+#tree-pop .reqs { font-size: 16px; }
+#tree-pop .buy { margin-top: 4px; gap: 8px; }
+#tree-pop .buy .pxbtn { flex: 1; font-size: 10px; padding: 8px 6px; }
+#tree-pop .pop-x { position: absolute; right: 6px; top: 4px; font-size: 22px; line-height: 1; color: var(--lgray); padding: 2px 6px; }
+
+/* =========================================================
+   CELULAR DEITADO — layout próprio
+   esquerda: informações + missão · direita: botões + régua
+   centro: torre livre
+   ========================================================= */
+html.land { --sl: env(safe-area-inset-left); --sr: env(safe-area-inset-right); }
+html.land #topbar { left: calc(8px + var(--sl)); right: auto; top: 8px; width: 214px; transform: none; padding: 8px 10px; gap: 6px; }
+html.land .tb-row { flex-wrap: wrap; gap: 6px; }
+html.land .tb-row .grow { min-width: 120px; }
+html.land .alts { margin-left: 0; width: 100%; justify-content: space-between; text-align: left; }
+html.land .timer { width: 64px; }
 html.land .mat-name { font-size: 9px; } html.land .era-tag { font-size: 7px; }
 html.land .money, html.land .pieces { font-size: 11px; }
-html.land .alt b { font-size: 9px; } html.land .alt span, html.land .timer span, html.land .integ span { font-size: 6px; }
-html.land .chip { font-size: 6px; }
-html.land #deskpanel { width: 230px; right: calc(8px + env(safe-area-inset-right)); top: 8px; bottom: 8px; padding: 8px; gap: 6px; }
-html.land #deskpanel h3 { font-size: 8px; }
-html.land #deskpanel .keys, html.land #deskpanel h3:nth-of-type(3), html.land #dp-log { display: none; }
-html.land .dp-row { padding: 4px 6px; gap: 6px; }
-html.land .dp-txt b { font-size: 7px; } html.land .dp-txt span { font-size: 13px; }
-html.land .dp-row .pxbtn, html.land .mis .pxbtn { font-size: 7px; padding: 4px 5px; }
-html.land .mis { padding: 5px; } html.land .mis-t b { font-size: 7px; } html.land .mis-t span { font-size: 13px; }
-html.land #ruler { right: calc(8px + 230px + 24px + env(safe-area-inset-right)); top: 12%; bottom: 14%; }
-html.land #side-btns { right: calc(8px + 230px + 54px + env(safe-area-inset-right)); bottom: 64px; gap: 8px; }
-html.land #side-btns .pxbtn { font-size: 7px; padding: 5px 6px; }
-html.land #bottombar { left: calc(8px + 250px + 16px + env(safe-area-inset-left)); right: calc(8px + 230px + 54px); bottom: calc(8px + env(safe-area-inset-bottom)); }
-html.land #bottombar .pxbtn { font-size: 7px; padding: 5px 6px; }
-html.land #status { font-size: 7px; }
-html.land #wind-ind { top: 8px; left: calc(8px + 250px + 16px); right: auto; font-size: 8px; }
-html.land #ch-ind { top: 8px; right: calc(8px + 230px + 16px); font-size: 8px; }
-html.land #alerts { top: 44px; width: 360px; }
-html.land .toast { font-size: 8px; }
-html.land #dialog { left: calc(8px + 250px + 16px); right: calc(8px + 230px + 16px); bottom: 52px; min-height: 0; padding: 8px 10px 12px; }
+html.land .alt b { font-size: 10px; } html.land .alt span, html.land .timer span, html.land .integ span { font-size: 7px; }
+html.land .integ b { font-size: 8px; }
+html.land .chips { max-height: 34px; overflow: hidden; }
+html.land .chip { font-size: 7px; }
+html.land #mission-pill { left: calc(8px + var(--sl)); top: auto; bottom: 8px; max-width: 214px; width: 214px; }
+html.land #bottombar { left: auto; right: calc(8px + var(--sr)); top: 8px; bottom: 8px; width: 52px; flex-direction: column; justify-content: flex-start; align-items: stretch; gap: 10px; transform: none; }
+html.land #bottombar .pxbtn { padding: 8px 4px; font-size: 8px; flex-direction: column; gap: 4px; }
+html.land #b-tree > span { font-size: 0; } html.land #b-tree .pct { font-size: 8px; }
+html.land #status { position: fixed; left: 50%; bottom: 6px; top: auto; transform: translateX(-50%); font-size: 7px; padding: 2px 6px; white-space: nowrap; flex: none; }
+html.land #ruler { right: calc(8px + var(--sr) + 52px + 22px); top: 14%; bottom: 14%; }
+html.land #side-btns { right: calc(8px + var(--sr) + 52px + 52px); left: auto; bottom: 8px; gap: 8px; justify-items: end; }
+html.land #side-btns .pxbtn { font-size: 8px; padding: 6px 7px; }
+html.land .zoom-btns .pxbtn { padding: 6px; }
+html.land #wind-ind { top: 8px; left: calc(8px + var(--sl) + 214px + 14px); right: auto; font-size: 8px; padding: 4px 6px; }
+html.land #ch-ind { top: 8px; right: calc(8px + var(--sr) + 52px + 60px); font-size: 8px; padding: 4px 6px; }
+html.land #alerts { top: 8px; width: 330px; gap: 6px; }
+html.land .toast { font-size: 8px; padding: 4px 8px; }
+html.land .toast.small { font-size: 7px; }
+html.land #dialog { left: calc(8px + var(--sl) + 214px + 14px); right: calc(8px + var(--sr) + 52px + 90px); bottom: 8px; min-height: 0; padding: 8px 10px 12px; gap: 10px; }
 html.land .dg-por { width: 52px; height: 52px; } html.land .dg-por .sp { transform: scale(1.2); }
 html.land .dg-text { font-size: 17px; min-height: 0; } html.land .dg-name { font-size: 8px; }
-html.land #bubble { left: calc(8px + 250px + 16px); bottom: 52px; max-width: 360px; }
-html.land #modal .box { max-height: 100%; }
-html.land.desk #tree-screen { grid-template-columns: 1fr 300px; }
-html.land #tree-head { padding: 8px 12px; }
+html.land #bubble { left: calc(8px + var(--sl) + 214px + 14px); right: auto; bottom: 8px; max-width: 340px; }
+html.land #tree-head { padding: 6px 12px; gap: 4px; }
 html.land #tree-head h2 { font-size: 8px; }
-html.land #tree-detail { padding: 12px; }
-/* celular deitado: botões na coluna esquerda, centro livre para a torre */
-html.land #bottombar { left: calc(8px + env(safe-area-inset-left)); right: auto; width: 250px; bottom: calc(8px + env(safe-area-inset-bottom)); justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
-html.land #status { position: fixed; left: 50%; top: calc(8px + env(safe-area-inset-top)); transform: translateX(-50%); width: auto; max-width: 300px; padding: 4px 8px; font-size: 7px; }
-html.land #side-btns { left: calc(8px + env(safe-area-inset-left)); right: auto; bottom: calc(52px + env(safe-area-inset-bottom)); justify-items: start; }
-html.land #wind-ind { top: 30px; }
-html.land #alerts { top: 52px; }
+html.land #tree-head .prog { font-size: 7px; }
+html.land #modal { padding: 8px; }
+html.land #modal .box { max-height: 100%; }
+html.land #arrows .arr { display: none; }
+html.land #tree-pop { width: 250px; padding: 8px 10px; }
+html.land #tree-pop p { display: none; }

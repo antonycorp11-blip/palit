@@ -39,7 +39,7 @@ PALIT.View = (function () {
 
   function measure() {
     var land = window.innerWidth > window.innerHeight && window.innerHeight < 600;
-    var desk = (window.innerWidth >= 1000 && window.innerHeight >= 560) || (land && window.innerWidth >= 600);
+    var desk = window.innerWidth >= 1000 && window.innerHeight >= 560;
     document.documentElement.classList.toggle('land', land);
     HU = window.innerWidth < 480 ? 3 : 4;
     // pixel do mundo: a torre ocupa ~45% da largura (mín. 3, máx. 6)
@@ -57,6 +57,7 @@ PALIT.View = (function () {
     P.SpriteCSS.compile(HU);
     P.SpriteCSS.compile(U, '#world ', 'sprite-css-world');
     stickKey = '';
+    if (G.mat && G.st) compileSticks();   // sprites dos palitos sempre na escala atual
   }
 
   /* ---------------- material / torre ----------------
