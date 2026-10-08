@@ -247,7 +247,7 @@ PALIT.HUD = (function () {
     });
     G.on('blocked', function (r) {
       var msg = {
-        empty: 'SEM ' + G.mat.pieces.toUpperCase() + '!', emptyRepair: 'SEM PEÇAS PARA O REPARO', money: 'DINHEIRO INSUFICIENTE',
+        empty: 'SEM ' + G.mat.pieces.toUpperCase() + '!', emptyRepair: G.rt.jam ? 'CAIXA EMPERRADA — TOQUE 3x' : 'SEM PEÇAS E SEM DINHEIRO PARA O REPARO', money: 'DINHEIRO INSUFICIENTE',
         limit: 'LIMITE ESTRUTURAL — MELHORE A ÁRVORE', unstable: 'ESTRUTURA INSTÁVEL — REPARE A TORRE', goal: 'ALTURA MÁXIMA DA ERA',
         chIntegrity: 'INTEGRIDADE MÍNIMA DE ' + (G.mat.challenge ? G.mat.challenge.startIntegrity : 0) + '% PARA INICIAR'
       }[r] || r;

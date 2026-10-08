@@ -292,7 +292,12 @@ PALIT.Game = (function () {
       if (!skip) {
         if (S.reserve >= 1) S.reserve--;
         else if (S.pieces >= 1) S.pieces--;
-        else { S.freeRepairCount--; emit('blocked', 'emptyRepair'); return false; }
+        else {
+          var extra = emergencyPiece(layer);
+          if (S.money < fee + extra) { S.freeRepairCount--; emit('blocked', 'emptyRepair'); return false; }
+          S.money -= extra;
+          emit('toast', { text: 'PEÇA AVULSA COMPRADA −$' + P.fmtMoney(extra), kind: 'info', small: true });
+        }
       } else emit('toast', { text: 'REPARO SEM CUSTO DE PEÇA', kind: 'good', small: true });
     }
     S.money -= fee;
@@ -301,6 +306,9 @@ PALIT.Game = (function () {
     emit('repairStart', rt.repairing);
     return true;
   }
+
+  /* sem peças na caixa, o reparo compra uma peça avulsa (nunca trava o jogo) */
+  function emergencyPiece(layer) { return Math.max(2, Math.round(E.repairFee(mat, st, layer) * 0.5)); }
 
   function finishRepair() {
     var c = rt.repairing.cell;
@@ -389,7 +397,7 @@ PALIT.Game = (function () {
       case 'heat': rt.heat = e.dur; rt.heatT = 6; break;
       case 'jam':
         if (Math.random() < st.jamResist) { emit('toast', { text: 'A CAIXA QUASE EMPERROU', kind: 'good', small: true }); return; }
-        rt.jam = true; rt.jamTaps = 0; break;
+        rt.jam = true; rt.jamTaps = 0; rt.jamT = 25; break;
       case 'defect': rt.defect += e.n; break;
       case 'loose': damage(pickCell(0, top - 1, 1), 'crack', 'event'); break;
       case 'bump':
@@ -500,7 +508,10 @@ PALIT.Game = (function () {
       emit('impact', t);
       leave(t); return;
     }
-    if (d.dmg === 'crack' && t.type === 'hail' && Math.random() < st.hailResist) { remove(t); return; }
+    if (d.dmg === 'crack' && t.type === 'hail') {
+      // granizo só racha peças inteiras: nunca derruba peça já rachada
+      if (Math.random() < st.hailResist || S.cells[c] !== OK) { remove(t); return; }
+    }
     damage(c, d.dmg === 'steal' ? 'steal' : d.dmg, t.type);
     if (d.dmg === 'steal' && ++t.steals >= 3) { leave(t); return; }
     if (d.kind === 'flyer') {
@@ -528,7 +539,7 @@ PALIT.Game = (function () {
     }
     if (rt.hail > 0) {
       rt.hail -= dt; rt.hailT -= dt;
-      if (rt.hailT <= 0) { rt.hailT = rnd(0.4, 0.9); spawnThreat('hail', 1); }
+      if (rt.hailT <= 0) { rt.hailT = rnd(0.9, 1.6); spawnThreat('hail', 1); }
     }
     for (var i = rt.threats.length - 1; i >= 0; i--) {
       var t = rt.threats[i], d = t.def;
@@ -695,6 +706,7 @@ PALIT.Game = (function () {
   function boxFull() { return S.pieces >= st.capacity && S.reserve >= st.reserveCap; }
 
   function updateProduction(dt) {
+    if (rt.jam && (rt.jamT -= dt) <= 0) { rt.jam = false; emit('toast', { text: 'A CAIXA DESEMPERROU SOZINHA', kind: 'good', small: true }); }
     if (boxFull()) { S.prodP = 0; return; }
     S.prodP += dt * prodRate();
     while (S.prodP >= 1) { S.prodP -= 1; produceOne(); if (boxFull()) { S.prodP = 0; break; } }
@@ -848,15 +860,16 @@ PALIT.Game = (function () {
               emit('extinguish', h.cell); h.t = 0;
             } else {
               var fee = E.repairFee(mat, st, Math.floor(h.cell / ppl()));
-              var need = cv === MISS;
-              if (S.money >= fee && (!need || S.reserve + S.pieces >= 1)) {
-                S.money -= fee;
-                if (need) { if (S.reserve >= 1) S.reserve--; else S.pieces--; }
+              var need = cv === MISS, buyP = need && S.reserve + S.pieces < 1;
+              var tot = fee + (buyP ? emergencyPiece(Math.floor(h.cell / ppl())) : 0);
+              if (S.money >= tot) {
+                S.money -= tot;
+                if (need && !buyP) { if (S.reserve >= 1) S.reserve--; else S.pieces--; }
                 var done = h.cell;
                 setCell(done, OK); S.stats.repaired++;
                 emit('repaired', done); emit('fixerDone', { h: h, cell: done });
                 h.cell = null; h.state = 'back';
-              } else if (!h.wait) { h.wait = true; emit('fixerWait', { h: h, cell: h.cell, need: need && S.reserve + S.pieces < 1 ? 'piece' : 'money' }); }
+              } else if (!h.wait) { h.wait = true; emit('fixerWait', { h: h, cell: h.cell, need: 'money' }); }
             }
           }
         } else if (h.state === 'back') {

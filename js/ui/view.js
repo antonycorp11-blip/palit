@@ -741,7 +741,8 @@ PALIT.View = (function () {
       delete ptrs[e.pointerId];
       if (p.pinch) { if (!Object.keys(ptrs).length) pinch = null; return; }
       if (p.moved) { cam.drag = null; cam.vel = p.v; return; }
-      // toque simples
+      // toque simples (com a caixa emperrada, qualquer toque ajuda a desemperrar)
+      if (G.rt.jam) { G.unjam(); return; }
       var c = findDamaged(e.clientX, e.clientY);
       if (c >= 0) { G.repairCell(c); return; }
       if (nearTop()) G.tryPlace(false);
