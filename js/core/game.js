@@ -34,6 +34,7 @@ PALIT.Game = (function () {
       known: {},
       lastInput: 0,
       autoPlaceT: 0, autoRepairT: 0, autoDefendT: 0,
+      helpers: [], helperSeq: 1,
       ch: null,
       integrity: 100, dmgCount: { crack: 0, miss: 0, fire: 0 },
       viewW: 100
@@ -120,9 +121,15 @@ PALIT.Game = (function () {
     return out;
   }
 
+  /* camadas de baixo blindadas por tábuas (cada upgrade de limite reforça a base).
+     As 15 camadas do topo nunca ficam blindadas: sempre há o que defender. */
+  function braced() {
+    return Math.max(0, Math.min(Math.floor(st.limitLayers || 0), layersBuilt() - 15));
+  }
+
   /* escolhe célula construída entre camadas lo..hi, enviesada para o topo */
   function pickCell(lo, hi, bias) {
-    lo = Math.max(0, lo); hi = Math.min(layersBuilt() - 1, hi);
+    lo = Math.max(0, lo, braced()); hi = Math.min(layersBuilt() - 1, hi);
     if (hi < lo) return -1;
     for (var i = 0; i < 12; i++) {
       var f = Math.pow(Math.random(), bias || 1);
@@ -139,6 +146,7 @@ PALIT.Game = (function () {
     if (c < 0) return false;
     var v = S.cells[c];
     if (v !== OK && v !== CRACK) return false;
+    if (Math.floor(c / ppl()) < braced()) { emit('braceBlock', c); return false; }
     var nv;
     if (kind === 'crack') nv = v === OK ? CRACK : MISS;
     else if (kind === 'fire') nv = FIRE;
@@ -412,7 +420,7 @@ PALIT.Game = (function () {
      D = recuo diagonal da profundidade (metade de L) */
   function geo() {
     var art = P.STICKS && P.STICKS[mat.id];
-    var L = mat.look.len, D = art ? art.depth : Math.round(L / 2);
+    var L = mat.look.len, D = art && art.depth ? art.depth : Math.round(L / 2);
     return { L: L, D: D, halfW: (L + D) / 2 };
   }
 
@@ -424,7 +432,8 @@ PALIT.Game = (function () {
     for (var i = 0; i < count; i++) {
       var side = Math.random() < 0.5 ? -1 : 1;
       var g = geo(), halfW = g.halfW;
-      var target = Math.max(0, top - 1 - rint(0, Math.min(25, top - 1)));
+      var lowB = braced();
+      var target = Math.max(lowB, top - 1 - rint(0, Math.min(25, top - 1 - lowB)));
       var t = {
         id: rt.threatSeq++, type: type, def: d, hp: d.hp, maxHp: d.hp,
         side: side, layer: target, state: 'approach', t: 0, life: 0, atk: 0, steals: 0,
@@ -512,7 +521,8 @@ PALIT.Game = (function () {
     if (!rt.ch) {
       rt.threatT -= dt;
       if (rt.threatT <= 0) {
-        rt.threatT = rnd(40, 75) * Math.max(0.5, 1 - top / 2000);
+        // com ajudantes contratados, as ameaças vêm com mais frequência
+        rt.threatT = rnd(40, 75) * Math.max(0.5, 1 - top / 2000) / (1 + 0.18 * (st.helpers || 0));
         if (live < 5) { var k = pickThreatType(); if (k) spawnThreat(k, P.THREATS[k].group ? rint(P.THREATS[k].group[0], P.THREATS[k].group[1]) : 1); }
       }
     }
@@ -730,6 +740,136 @@ PALIT.Game = (function () {
     }
   }
 
+  /* ---------------- ajudantes (bichinhos do topo) ----------------
+     'def': correm até as ameaças e dão dano pequeno (o toque do jogador
+     continua sendo o principal). 'fix': descem até peças danificadas,
+     marcam o lugar e consertam (pagando a taxa normal de reparo). */
+  function liveThreat(id) {
+    for (var i = 0; i < rt.threats.length; i++) {
+      var t = rt.threats[i];
+      if (t.id === id) return (t.state === 'approach' || t.state === 'attack' || t.state === 'windup') ? t : null;
+    }
+    return null;
+  }
+
+  function homeOf(h) {
+    var g = geo();
+    return { x: h.hx * (g.halfW - 3), y: layersBuilt() * LHU + g.D * 0.5 + 1 };
+  }
+
+  /* posição aproximada (mundo) de uma peça; a view refina com a geometria exata */
+  function cellPos(c) {
+    var g = geo(), L = g.L, D = g.D, X0 = -Math.round((L + D) / 2);
+    var i = Math.floor(c / ppl()), k = c % ppl(), base = i * LHU;
+    if (i % 2 === 0) {
+      var oz = Math.round((k === 0 ? L - 4 : 2) * D / L);
+      return { x: X0 + oz + L / 2, y: base + oz + 1.5 };
+    }
+    var xb = k === 0 ? 2 : L - 7;
+    return { x: X0 + xb + 1.5 + D / 2, y: base + (1 + D) / 2 };
+  }
+
+  function fixTarget(h) {
+    var taken = {};
+    rt.helpers.forEach(function (o) { if (o !== h && o.kind === 'fix' && o.cell != null) taken[o.cell] = 1; });
+    var best = -1, bs = -1e9;
+    for (var c = S.cursor - 1; c >= 0; c--) {
+      var v = S.cells[c];
+      if ((v !== CRACK && v !== MISS && v !== FIRE) || !rt.known[c] || taken[c]) continue;
+      if (rt.repairing && rt.repairing.cell === c) continue;
+      var sc = (v === FIRE ? 1000 : v === CRACK ? 200 : 100) - Math.abs(cellPos(c).y - h.y) / 30;
+      if (sc > bs) { bs = sc; best = c; }
+    }
+    return best;
+  }
+
+  function updateHelpers(dt) {
+    var H = rt.helpers;
+    var want = { def: Math.round(st.helpers || 0), fix: Math.round(st.fixers || 0) }, have = { def: 0, fix: 0 };
+    H.forEach(function (h) { have[h.kind]++; });
+    ['def', 'fix'].forEach(function (k) {
+      while (have[k] < want[k]) {
+        var n = have[k]++;
+        var h = { id: rt.helperSeq++, kind: k, state: 'home', t: 0, hx: (k === 'def' ? -0.7 + n * 0.45 : 0.75 - n * 0.4), target: null, cell: null, face: 1 };
+        var hp = homeOf(h); h.x = hp.x; h.y = hp.y + 30;
+        H.push(h); emit('helperNew', h);
+      }
+    });
+    var spD = 42 * (1 + st.helperSpeed), spF = 40 * (1 + st.fixerSpeed);
+    var atkInt = 1.5 / (1 + st.helperAtk), dmg = st.threatPower * st.helperDmg;
+    var targeted = {};
+    H.forEach(function (h) { if (h.target) targeted[h.target] = (targeted[h.target] || 0) + 1; });
+    H.forEach(function (h) {
+      h.t += dt;
+      var px = h.x, home = homeOf(h);
+      if (h.kind === 'def') {
+        var t = h.target ? liveThreat(h.target) : null;
+        if (h.target && !t) { h.target = null; h.state = 'back'; }
+        if (h.state === 'home' || h.state === 'back') {
+          var best = null, bc = 99;
+          rt.threats.forEach(function (o) {
+            if (o.def.kind === 'faller' || !liveThreat(o.id)) return;
+            var c = targeted[o.id] || 0;
+            if (c < bc) { bc = c; best = o; }
+          });
+          if (best) { h.target = best.id; targeted[best.id] = (targeted[best.id] || 0) + 1; h.state = 'go'; emit('helperGo', h); t = best; }
+        }
+        if (h.state === 'go' && t) {
+          h.tx = t.x - t.side * 3; h.ty = t.y;
+          if (moveTo(h, dt, spD)) { h.state = 'fight'; h.t = 0; }
+        } else if (h.state === 'fight' && t) {
+          h.x = t.x - t.side * 3; h.y = t.y;
+          if (h.t >= atkInt) { h.t = 0; emit('helperHit', { h: h, t: t }); hitThreat(t.id, dmg); }
+        } else if (h.state === 'back') {
+          h.tx = home.x; h.ty = home.y;
+          if (moveTo(h, dt, spD)) h.state = 'home';
+        } else if (h.state === 'home') {
+          h.x = home.x + Math.sin(rt.clock * 0.7 + h.id) * 2; h.y = home.y;
+        }
+      } else {
+        var v = h.cell != null ? S.cells[h.cell] : -1;
+        var bad = v === CRACK || v === MISS || v === FIRE;
+        if (h.cell != null && (!bad || (rt.repairing && rt.repairing.cell === h.cell))) { h.cell = null; h.state = 'back'; }
+        if ((h.state === 'home' || h.state === 'back') && h.t > 0.4) {
+          h.t = 0;
+          var c2 = fixTarget(h);
+          if (c2 >= 0) { h.cell = c2; h.state = 'go'; emit('fixerGo', { h: h, cell: c2 }); }
+        }
+        if (h.state === 'go') {
+          var cp = cellPos(h.cell);
+          h.tx = cp.x; h.ty = cp.y;
+          if (moveTo(h, dt, spF)) { h.state = 'fix'; h.t = 0; h.wait = false; emit('fixerAt', { h: h, cell: h.cell }); }
+        } else if (h.state === 'fix') {
+          var cv = S.cells[h.cell], dur = (cv === FIRE ? 1.5 : cv === CRACK ? 3 : 4.5) / (1 + st.fixRate);
+          if (h.t >= dur) {
+            if (cv === FIRE) {
+              setCell(h.cell, CRACK); rt.known[h.cell] = 1;
+              S.stats.extinguished = (S.stats.extinguished || 0) + 1;
+              emit('extinguish', h.cell); h.t = 0;
+            } else {
+              var fee = E.repairFee(mat, st, Math.floor(h.cell / ppl()));
+              var need = cv === MISS;
+              if (S.money >= fee && (!need || S.reserve + S.pieces >= 1)) {
+                S.money -= fee;
+                if (need) { if (S.reserve >= 1) S.reserve--; else S.pieces--; }
+                var done = h.cell;
+                setCell(done, OK); S.stats.repaired++;
+                emit('repaired', done); emit('fixerDone', { h: h, cell: done });
+                h.cell = null; h.state = 'back';
+              } else if (!h.wait) { h.wait = true; emit('fixerWait', { h: h, cell: h.cell, need: need && S.reserve + S.pieces < 1 ? 'piece' : 'money' }); }
+            }
+          }
+        } else if (h.state === 'back') {
+          h.tx = home.x; h.ty = home.y;
+          if (moveTo(h, dt, spF * 1.3)) h.state = 'home';
+        } else if (h.state === 'home') {
+          h.x = home.x + Math.sin(rt.clock * 0.6 + h.id) * 1.5; h.y = home.y;
+        }
+      }
+      if (Math.abs(h.x - px) > 0.01) h.face = h.x > px ? 1 : -1;
+    });
+  }
+
   /* ---------------- desafio final ---------------- */
   function challengeReady() {
     return !!(def && mat.challenge && progress() >= 1 && layersBuilt() >= mat.goalLayers && !S.challengeDone && !rt.ch);
@@ -822,6 +962,7 @@ PALIT.Game = (function () {
     updateFires(dt);
     updateSpread(dt);
     updateAuto(dt);
+    updateHelpers(dt);
     updateChallenge(dt);
   }
 
@@ -871,6 +1012,6 @@ PALIT.Game = (function () {
     damagedCells: damagedCells, blockReason: blockReason, prodRate: prodRate, sway: sway, threatsActive: threatsActive,
     layersBuilt: layersBuilt, topLayer: topLayer, limit: limit, localHeight: localHeight, globalHeight: globalHeight, progress: progress,
     get S() { return S; }, get mat() { return mat; }, get def() { return def; }, get st() { return st; }, get rt() { return rt; },
-    levels: levels, debug: debug, fx: fx, eraRecord: eraRecord
+    levels: levels, debug: debug, fx: fx, eraRecord: eraRecord, braced: function () { return braced(); }, cellPos: cellPos
   };
 })();

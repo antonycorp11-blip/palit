@@ -84,6 +84,15 @@ PALIT.STATS = {
   autoRepairMissing: { label: 'Assistente repõe peças', fmt: 'flag' },
   autoPlace:       { label: 'Braço mecânico', fmt: 'permin' },
   autoDefend:      { label: 'Defesa automática', fmt: 'permin' },
+
+  /* ---- ajudantes (bichinhos que moram no topo) ---- */
+  helpers:         { label: 'Ajudantes de defesa', fmt: 'int' },
+  helperDmg:       { label: 'Força dos ajudantes', fmt: 'pct', base: 0.25 },
+  helperAtk:       { label: 'Ritmo de ataque dos ajudantes', fmt: 'pct' },
+  helperSpeed:     { label: 'Velocidade dos ajudantes', fmt: 'pct' },
+  fixers:          { label: 'Ajudantes de reparo', fmt: 'int' },
+  fixerSpeed:      { label: 'Velocidade de descida', fmt: 'pct' },
+  fixRate:         { label: 'Rapidez do conserto', fmt: 'pct' },
   autoActiveSec:   { label: 'Atenção do assistente', fmt: 'sec0', base: 60 },
   rulerHeat:       { label: 'Mapa de integridade', fmt: 'flag' },
   statsPanel:      { label: 'Painel de produção', fmt: 'flag' }
@@ -141,6 +150,7 @@ PALIT.fmtStatDelta = function (key, v) {
     case 'placeSpeed': return 'Colocação ' + f(a * 100, a * 100 % 1 ? 1 : 0) + '% mais rápida';
     case 'repairSpeed': return 'Reparo ' + f(a * 100, 0) + '% mais rápido';
     case 'freeRepairLv': return 'Reparo grátis mais frequente';
+    case 'limitLayers': return 'Limite ' + sign + f(a) + ' camadas · tábuas blindam a base';
   }
   switch (d.fmt) {
     case 'int': return label + ' ' + sign + f(a) + (d.unit || '');

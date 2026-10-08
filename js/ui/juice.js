@@ -149,6 +149,17 @@ PALIT.Juice = (function () {
       bump('h-pieces', 'pop');
       var r = boxRect();
       if (Math.random() < 0.5) popText(r.left + r.width, r.top - 4, '+1', 'plus');
+      // o palito chega da árvore (vem de fora da tela, pela esquerda)
+      if (!P.TreeView.isOpen() && r.width && fxLayer.querySelectorAll('.prod-in').length < 4) {
+        var pin = document.createElement('i');
+        pin.className = 'prod-in';
+        var x1 = r.left + r.width / 2, y1 = r.top + r.height / 2;
+        pin.style.left = x1 + 'px'; pin.style.top = y1 + 'px';
+        pin.style.setProperty('--sx', Math.round(-x1 - 30) + 'px');
+        pin.style.setProperty('--sy', Math.round(40 + Math.random() * 60) + 'px');
+        fxLayer.appendChild(pin);
+        setTimeout(function () { pin.remove(); }, 650);
+      }
     });
     G.on('threatHit', function () { A.sfx.hit(); });
     G.on('threatDead', function (d) {

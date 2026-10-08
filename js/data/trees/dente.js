@@ -118,6 +118,9 @@ PALIT.TREES.dente = {
     { id: 'e12', b: 'rep', n: 'Tala de Palito', d: 'Peças reparadas recebem uma talinha. Ficam mais firmes.', lv: 5, c: 380, e: { spreadResist: 0.03 }, r: ['e4:5', 'e11:3'] },
     { id: 'e13', b: 'rep', n: 'Maleta de Manutenção', d: 'Com divisórias. Você etiquetou tudo.', lv: 10, c: 450, g: 1.16, e: { repairSpeed: 0.03 }, r: ['e12', 'e10'] },
     { id: 'e14', b: 'rep', n: 'OFICINA COMPLETA', d: 'Uma bancada inteira no quintal. O Seu Ademir pede emprestada toda semana.', lv: 1, c: 5200, sp: true, e: { repairSpeed: 0.15, repairFee: 0.1 }, r: ['e13', 'e11', 'e7'] },
+    { id: 'e15', b: 'rep', n: 'Joaninha Pedreira', d: 'Desce pela torre até a peça quebrada, fica pulando em cima dela e conserta.', lv: 2, c: 270, g: 2.2, e: { fixers: 1 }, r: ['e5:2'] },
+    { id: 'e16', b: 'rep', n: 'Fio Dental de Rapel', d: 'Sabor menta. A joaninha desce bem mais rápido.', lv: 5, c: 330, e: { fixerSpeed: 0.25 }, r: ['e15'] },
+    { id: 'e17', b: 'rep', n: 'Colher de Pedreiro Mini', d: 'A joaninha conserta cada vez mais rápido.', lv: 5, c: 360, e: { fixRate: 0.2 }, r: ['e15'] },
 
     /* ================= VIGILÂNCIA ================= */
     { id: 'd1', b: 'def', n: 'Dedo Indicador Treinado', d: 'Cada toque em uma ameaça causa mais dano.', lv: 5, c: 12, e: { threatPower: 0.2 }, r: ['root'] },
@@ -133,6 +136,10 @@ PALIT.TREES.dente = {
     { id: 'd11', b: 'def', n: 'Acordo com Bartolomeu', d: 'Sachê de atum todo dia. Ameaças do chão aparecem menos.', lv: 5, c: 380, e: { groundResist: 0.04 }, r: ['d8'] },
     { id: 'd12', b: 'def', n: 'Anemômetro de Copinho', d: 'Mais um segundo de aviso antes das rajadas.', lv: 1, c: 600, e: { windWarn: 1 }, r: ['d9'] },
     { id: 'd13', b: 'def', n: 'SENTINELA DO BAIRRO', d: 'Até os corvos te cumprimentam. De longe.', lv: 1, c: 4500, sp: true, e: { threatPower: 1, threatDelay: 0.1 }, r: ['d10', 'd11', 'd12'] },
+    { id: 'd14', b: 'def', n: 'Grilo de Guarda', d: 'Um grilo de quepe mora no topo. Pula nas ameaças e dá umas chutadinhas.', lv: 3, c: 210, g: 1.9, e: { helpers: 1 }, r: ['d7:3'] },
+    { id: 'd15', b: 'def', n: 'Chute de Grilo', d: 'Pernas de mola. Doem de verdade.', lv: 5, c: 330, e: { helperDmg: 0.08 }, r: ['d14'] },
+    { id: 'd16', b: 'def', n: 'Cri-Cri de Guerra', d: 'Chutes em ritmo de forró.', lv: 5, c: 360, e: { helperAtk: 0.15 }, r: ['d14'] },
+    { id: 'd17', b: 'def', n: 'Salto Duplo', d: 'Os grilos chegam às ameaças num pulo só.', lv: 5, c: 300, e: { helperSpeed: 0.2 }, r: ['d14'] },
 
     /* ================= NEGÓCIOS ================= */
     { id: 'f1', b: 'eff', n: 'Palito Reaproveitado', d: 'Chance de um posicionamento não gastar palito.', lv: 2, c: 18, e: { saveChance: [0.01, 0.02] }, r: ['root'] },

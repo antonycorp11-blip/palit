@@ -22,6 +22,7 @@ var PALIT = window.PALIT = window.PALIT || {};
     P.Desktop.init();
     P.Story.init();
     P.Panels.init();
+    P.Life.init();
     if (/[?&]debug/.test(location.search)) debugPanel();
 
     var last = performance.now(), hudT = 0, slowT = 0, saveT = 0;
@@ -31,6 +32,7 @@ var PALIT = window.PALIT = window.PALIT || {};
       if (!P.Pause.active()) { G.update(dt); P.Progress.tick(dt); }
       P.Story.tick(dt);
       P.View.frame(dt);
+      P.Life.tick(dt, P.Pause.active());
       P.Ambient.tick(dt);
       P.Juice.tick(dt);
       hudT += dt; slowT += dt; saveT += dt;

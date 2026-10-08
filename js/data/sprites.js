@@ -446,3 +446,84 @@ PALIT.SPRITES = {
   ico_flag: { pal: { r: '#ff004d', w: '#c2c3c7' }, frames: [[
     'wrrrr..', 'wrrrrrr', 'wrrrrr.', 'w......', 'w......', 'w......', 'w......']] }
 };
+
+/* ---------------- visitantes e ajudantes ---------------- */
+(function () {
+  var S = PALIT.SPRITES;
+  var head = ['...hhh...', '..hhhhh..', '..hsssk..', '..sssss..', '...sss...'];
+  var walkA = ['..ttttt..', '.ttttttt.', '.s.ttt.s.', '...ttt...', '...ppp...', '...p.p...', '..p...p..', '..p...p..', '.kk...kk.'];
+  var walkB = ['..ttttt..', '.ttttttt.', '..sttts..', '...ttt...', '...ppp...', '...p.p...', '...p.p...', '...p.p...', '..kk.kk..'];
+  var look = ['..ttttt..', 's.ttttt.s', '.sttttts.', '...ttt...', '...ppp...', '...p.p...', '...p.p...', '...p.p...', '..kk.kk..'];
+  function person(pal) {
+    return { pal: pal, fps: 6, frames: [head.concat(walkA), head.concat(walkB)] };
+  }
+  function cheer(pal) { return { pal: pal, fps: 4, frames: [head.concat(look), ['.........'].concat(head.slice(0, 4), look.slice(0, 1), ['s.ttttt.s'], look.slice(2))] }; }
+  var people = [
+    { h: '#5f3a20', s: '#ffccaa', k: '#1a1423', t: '#ff004d', p: '#1d2b53' },
+    { h: '#1a1423', s: '#e0a080', k: '#1a1423', t: '#29adff', p: '#5f574f' },
+    { h: '#ffec27', s: '#ffccaa', k: '#1a1423', t: '#00e436', p: '#ab5236' },
+    { h: '#c2c3c7', s: '#ffccaa', k: '#1a1423', t: '#83769c', p: '#5f574f' },
+    { h: '#ab5236', s: '#ab7a5a', k: '#1a1423', t: '#ffa300', p: '#1d2b53' },
+    { h: '#ff77a8', s: '#ffccaa', k: '#1a1423', t: '#fff1e8', p: '#29adff' }
+  ];
+  people.forEach(function (pal, i) { S['vis_p' + i] = person(pal); S['vis_p' + i + 'c'] = cheer(pal); });
+  var astro = { h: '#fff1e8', s: '#1d2b53', k: '#c7f0ff', t: '#fff1e8', p: '#c2c3c7' };
+  S.vis_astro = person(astro); S.vis_astroc = cheer(astro);
+  var alien = { h: '#00e436', s: '#00e436', k: '#1a1423', t: '#83769c', p: '#008751' };
+  S.vis_alien = person(alien); S.vis_alienc = cheer(alien);
+
+  S.vis_balloon = { pal: { r: '#ff004d', y: '#ffec27', w: '#fff1e8', k: '#5f574f', b: '#ab5236', d: '#7e2553', s: '#ffccaa', h: '#5f3a20' }, fps: 2, frames: [[
+    '....rrwrr....',
+    '..rrrywyrrr..',
+    '.rrryywyyrrr.',
+    'rrrryywyyrrrd',
+    'rrrryywyyrrrd',
+    'rrrryywyyrrrd',
+    '.rrryywyyrrd.',
+    '..rrrywyrrd..',
+    '...rrrwrrd...',
+    '....k...k....',
+    '....k.h.k....',
+    '....k.s.k....',
+    '....bbbbb....',
+    '....bbbbb....',
+    '.....bbb.....'], [
+    '....rrwrr....',
+    '..rrrywyrrr..',
+    '.rrryywyyrrr.',
+    'rrrryywyyrrrd',
+    'rrrryywyyrrrd',
+    'rrrryywyyrrrd',
+    '.rrryywyyrrd.',
+    '..rrrywyrrd..',
+    '...rrrwrrd...',
+    '....k...k....',
+    '....kh..k....',
+    '....ks.sk....',
+    '....bbbbb....',
+    '....bbbbb....',
+    '.....bbb.....']] };
+  S.vis_jet = { pal: { w: '#fff1e8', g: '#c2c3c7', v: '#1d2b53', c: '#c7f0ff', o: '#ffa300', y: '#ffec27', r: '#ff004d' }, fps: 10, frames: [[
+    '..www....', '.wwwww...', '.wvvcw...', '.wvvvw...', 'gg.www...', 'ggwwwww..', 'gg.www.w.', 'gg.www...', '...g.g...', '...g.g...', '.o.......', '.y.......'], [
+    '..www....', '.wwwww...', '.wvvcw...', '.wvvvw...', 'gg.www...', 'ggwwwww..', 'gg.www.w.', 'gg.www...', '...g.g...', '...g.g...', '.y.......', 'oro......']] };
+
+  /* ajudantes: [defensor, consertador] por era */
+  S.hlp_ant = { pal: { k: '#1a1423', b: '#7e2553', g: '#008751', l: '#00e436', w: '#fff1e8' }, fps: 6, frames: [[
+    '...ggg..', '..gglgg.', '...kwk..', 'bb.kkk..', 'bbbbbbk.', '.k.k.k..', 'k..k..k.'], [
+    '...ggg..', '..gglgg.', '...kwk..', 'bb.kkk..', 'bbbbbbk.', 'k.k.k...', '.k..k.k.']] };
+  S.hlp_beetle = { pal: { k: '#1a1423', o: '#ffa300', y: '#ffec27', b: '#ab5236', g: '#c2c3c7', w: '#fff1e8' }, fps: 5, frames: [[
+    '.....gg.', '..yy.gb.', '.yyyy.b.', 'kwkyy.b.', 'koooook.', 'koobook.', '.kooook.', 'k.k.k.k.'], [
+    '........', '..yy.gg.', '.yyyy.b.', 'kwkyy.b.', 'koooook.', 'koobook.', '.kooook.', '.k.k.k.k']] };
+  S.hlp_cricket = { pal: { k: '#1a1423', g: '#008751', l: '#00e436', r: '#ff004d', w: '#fff1e8' }, fps: 6, frames: [[
+    '..rrr...', '.rrrrr..', '..lwl...', '.lllll..', 'gggggggk', '.k...k..', 'k.....k.'], [
+    '..rrr...', '.rrrrr..', '..lwl...', '.lllll..', 'gggggggk', '..k.k...', '.k...k..']] };
+  S.hlp_ladybug = { pal: { k: '#1a1423', r: '#ff004d', w: '#fff1e8', y: '#ffec27', g: '#c2c3c7' }, fps: 5, frames: [[
+    '......g.', '..yyy.g.', '.kwk..g.', 'krrkrrk.', 'krkrrkk.', 'krrkrrk.', '.kkkkk..', 'k.k.k.k.'], [
+    '.....g..', '..yyy.g.', '.kwk..g.', 'krrkrrk.', 'krkrrkk.', 'krrkrrk.', '.kkkkk..', '.k.k.k.k']] };
+  S.hlp_bot = { pal: { g: '#c2c3c7', d: '#5f574f', r: '#ff004d', b: '#29adff' }, fps: 4, frames: [[
+    '...r....', '..ggg...', '.gbgbg..', '.ggggg..', 'dgdddgd.', '.g...g..', '.d...d..'], [
+    '...r....', '..ggg...', '.gbgbg..', '.ggggg..', 'dgdddgd.', '..g.g...', '..d.d...']] };
+  S.hlp_drone = { pal: { g: '#c2c3c7', d: '#5f574f', y: '#ffec27', k: '#1a1423' }, fps: 10, frames: [[
+    'ggg..ggg', '.d....d.', '.dyyyyd.', '..ykky..', '..yyyy..', '...dd...', '...g....'], [
+    '.g....g.', '.d....d.', '.dyyyyd.', '..ykky..', '..yyyy..', '...dd...', '....g...']] };
+})();

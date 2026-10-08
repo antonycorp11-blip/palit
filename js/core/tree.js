@@ -31,10 +31,13 @@ PALIT.Tree = (function () {
     return def;
   }
 
-  /* layout radial: cada ramo num ângulo; profundidade = cadeia de pré-requisitos do ramo */
+  /* layout de árvore de verdade: a raiz fica no topo do tronco e cada ramo
+     é um galho que sai do tronco (os laterais mais baixo) e se curva para
+     cima conforme cresce. Nós da mesma profundidade viram raminhos
+     alternados ao longo do galho. */
   function layout(def) {
     var nb = def.branches.length;
-    var R0 = 230, STEP = 92, LANE = 74;
+    var R0 = 290, SUB = 46, PERP = 32;
     var depth = {};
     function d(n) {
       if (depth[n.id] != null) return depth[n.id];
@@ -48,29 +51,25 @@ PALIT.Tree = (function () {
     }
     def.nodes.forEach(d);
     def.branches.forEach(function (br, bi) {
-      var ang = -Math.PI / 2 + bi * (Math.PI * 2 / nb);
-      br.angle = ang;
-      var dx = Math.cos(ang), dy = Math.sin(ang);
-      var px = -dy, py = dx;
-      var groups = {};
-      def.nodes.forEach(function (n) {
-        if (n.b !== br.id) return;
-        (groups[depth[n.id]] = groups[depth[n.id]] || []).push(n);
-      });
+      var a = (-180 + (bi + 0.5) * 180 / nb) * Math.PI / 180;
+      br.angle = a;
+      br.ox = 0; br.oy = Math.round(Math.abs(Math.cos(a)) * 150);
+      var list = def.nodes.filter(function (n) { return n.b === br.id; });
+      list.sort(function (p, q) { return depth[p.id] - depth[q.id] || def.nodes.indexOf(p) - def.nodes.indexOf(q); });
       var maxD = 0;
-      Object.keys(groups).forEach(function (k) {
-        var g = groups[k], cnt = g.length;
-        var dd = +k; maxD = Math.max(maxD, dd);
-        var rad = R0 + (dd - 1) * STEP;
-        g.forEach(function (n, i) {
-          var lane = (i - (cnt - 1) / 2) * LANE;
-          n.x = Math.round(dx * rad + px * lane);
-          n.y = Math.round(dy * rad + py * lane);
-          n.depth = dd;
-        });
+      list.forEach(function (n, i) {
+        var dd = depth[n.id]; maxD = Math.max(maxD, dd);
+        var r = R0 + i * SUB;
+        var ang = a + (-Math.PI / 2 - a) * Math.min(0.34, i * 0.024);
+        var dx = Math.cos(ang), dy = Math.sin(ang), px = -dy, py = dx;
+        var lane = (i % 2 ? PERP : -PERP) * Math.min(1, 0.4 + i * 0.15);
+        n.x = Math.round(br.ox + dx * r + px * lane);
+        n.y = Math.round(br.oy + dy * r + py * lane);
+        n.depth = dd;
+        n.along = i;
       });
-      br.labelX = Math.round(dx * (R0 - 92));
-      br.labelY = Math.round(dy * (R0 - 92));
+      br.labelX = Math.round(br.ox + Math.cos(a) * (R0 - 120));
+      br.labelY = Math.round(br.oy + Math.sin(a) * (R0 - 120));
       br.maxDepth = maxD;
     });
     def.nodes.forEach(function (n) { if (!n.b) { n.x = 0; n.y = 0; n.depth = 0; } });

@@ -93,6 +93,27 @@ PALIT.View = (function () {
         for (var x = 0; x < row.length; x++) if (row[x] !== '.') px.push([cx - 2 + x, cu + 2 - r, art.pal[row[x]]]);
       });
     }
+    if (art && art.grid) {
+      var g = art.grid, H = g.length, Wd = g[0].length, top = 1 + ((H - 1) >> 1);
+      var flip = kind === 'xr' || kind === 'zf';
+      var at = function (r, c) { var ch = g[r][flip ? Wd - 1 - c : c]; return ch === '.' ? null : art.pal[ch]; };
+      if (kind === 'xl' || kind === 'xr') {
+        for (var r = 0; r < H; r++) for (var x = 0; x < L; x++) {
+          var col = at(r, Math.min(Wd - 1, Math.floor(x * Wd / L)));
+          if (col) px.push([x, top - r, col]);
+        }
+      } else {
+        var wd = Math.max(4, H);              // espessura da diagonal (claro → sombra)
+        for (var j = 0; j < D; j++) {
+          var c0 = Math.min(Wd - 1, Math.round(j * (Wd - 1) / Math.max(1, D - 1)));
+          for (var s = 0; s < wd; s++) {
+            var col2 = at(Math.min(H - 1, Math.floor(s * H / wd)), c0);
+            if (col2) px.push([j + s, j, col2]);
+          }
+        }
+      }
+      return px;
+    }
     if (art) {
       var p = art.pal;
       if (kind === 'xl' || kind === 'xr') {
@@ -753,6 +774,8 @@ PALIT.View = (function () {
     cellScreen: function (c) { var p = cellPos(c); return { x: VW / 2 + p.x, y: focal + cam.y + p.y }; },
     toScreen: function (wx, wy) { return { x: VW / 2 + wx, y: focal + cam.y + wy }; },
     scrollBy: function (dy) { cam.follow = false; cam.jump = null; cam.vel = 0; cam.y += dy; },
-    shake: shake, get W() { return W; }, get D() { return D; }
+    shake: shake, get W() { return W; }, get D() { return D; },
+    geom: function () { return { U: U, L: L, D: D, X0: X0, VW: VW, H: H, focal: focal, camY: cam.y, LH: LH }; },
+    cellSeg: function (c) { return cellSeg(c); }, layerX: function (i) { return layerX(i); }
   };
 })();

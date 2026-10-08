@@ -174,6 +174,8 @@ PALIT.Audio = (function () {
       tone(midi(36), 1.2, { type: 'triangle', vol: 0.25 });
       noise(1, { freq: 8000, filter: 'highpass', vol: 0.06, at: 0.5 });
     },
+    helper: function () { if (ok('helper', 0.12)) { tone(1200, 0.03, { type: 'square', vol: 0.035 }); tone(900, 0.04, { type: 'square', vol: 0.03, at: 0.04 }); } },
+    fixed: function () { if (ok('fixed', 0.2)) { noise(0.04, { freq: 2200, q: 6, vol: 0.2 }); arp([84, 88, 91], 0.05, { vol: 0.06, type: 'triangle', at: 0.05 }); } },
     unlock: function () { if (ok('unlock', 0.1)) tone(2093, 0.1, { type: 'triangle', vol: 0.05, at: 0.2 }); },
     whoosh: function (up) { if (ok('whoosh', 0.1)) noise(0.25, { freq: up ? 500 : 2500, freqTo: up ? 2500 : 500, q: 1.2, vol: 0.12 }); },
     alarm: function () { if (ok('alarm', 1)) for (var i = 0; i < 3; i++) tone(500, 0.25, { to: 900, vol: 0.08, at: i * 0.3 }); },

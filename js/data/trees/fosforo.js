@@ -128,6 +128,9 @@ PALIT.TREES.fosforo = {
     { id: 'e12', b: 'rep', n: 'Remendo Duradouro', d: 'Peças reparadas sobrecarregam menos as vizinhas.', lv: 5, c: 250, e: { spreadResist: 0.03 }, r: ['e4:5', 'e11:3'] },
     { id: 'e13', b: 'rep', n: 'Kit de Reparo', d: 'Pinça, cola, linha e lupa numa latinha de bala.', lv: 10, c: 300, g: 1.16, e: { repairSpeed: 0.03 }, r: ['e12', 'e10'] },
     { id: 'e14', b: 'rep', n: 'RESTAURAÇÃO COMPLETA', d: 'Nenhum dano é definitivo.', lv: 1, c: 3500, sp: true, e: { repairSpeed: 0.15, repairFee: 0.1 }, r: ['e13', 'e11', 'e7'] },
+    { id: 'e15', b: 'rep', n: 'Besouro Carpinteiro', d: 'Desce pela torre até a peça quebrada, fica pulando em cima dela e conserta.', lv: 2, c: 180, g: 2.2, e: { fixers: 1 }, r: ['e5:2'] },
+    { id: 'e16', b: 'rep', n: 'Rapel de Linha', d: 'Um fio de linha para o besouro descer rapidinho.', lv: 5, c: 220, e: { fixerSpeed: 0.25 }, r: ['e15'] },
+    { id: 'e17', b: 'rep', n: 'Martelinho de Unha', d: 'O besouro conserta cada vez mais rápido.', lv: 5, c: 240, e: { fixRate: 0.2 }, r: ['e15'] },
 
     /* ================= DEFESA ================= */
     { id: 'd1', b: 'def', n: 'Peteleco Treinado', d: 'Cada toque em uma ameaça causa mais dano.', lv: 5, c: 8, e: { threatPower: 0.2 }, r: ['root'] },
@@ -143,6 +146,10 @@ PALIT.TREES.fosforo = {
     { id: 'd11', b: 'def', n: 'Cerca do Quintal', d: 'Formigas, lagartixas e gatos aparecem menos.', lv: 5, c: 250, e: { groundResist: 0.04 }, r: ['d8'] },
     { id: 'd12', b: 'def', n: 'Alerta Antecipado II', d: 'Mais um segundo de aviso antes das rajadas.', lv: 1, c: 400, e: { windWarn: 1 }, r: ['d9'] },
     { id: 'd13', b: 'def', n: 'GUARDIÃO DA TORRE', d: 'Nada encosta na torre sem a sua permissão.', lv: 1, c: 3000, sp: true, e: { threatPower: 1, threatDelay: 0.1 }, r: ['d10', 'd11', 'd12'] },
+    { id: 'd14', b: 'def', n: 'Formiga Sentinela', d: 'Uma formiga de capacete mora no topo. Corre até as ameaças e dá umas mordidinhas.', lv: 3, c: 140, g: 1.9, e: { helpers: 1 }, r: ['d7:3'] },
+    { id: 'd15', b: 'def', n: 'Mandíbula Afiada', d: 'As formigas aprenderam a morder com vontade.', lv: 5, c: 220, e: { helperDmg: 0.08 }, r: ['d14'] },
+    { id: 'd16', b: 'def', n: 'Ritmo de Batalha', d: 'Mordidas em sequência, sem pausa para o lanche.', lv: 5, c: 240, e: { helperAtk: 0.15 }, r: ['d14'] },
+    { id: 'd17', b: 'def', n: 'Seis Patas Ligeiras', d: 'As sentinelas chegam às ameaças muito mais rápido.', lv: 5, c: 200, e: { helperSpeed: 0.2 }, r: ['d14'] },
 
     /* ================= EFICIÊNCIA ================= */
     { id: 'f1', b: 'eff', n: 'Economizar Peça', d: 'Chance de um posicionamento não gastar fósforo.', lv: 2, c: 12, e: { saveChance: [0.01, 0.02] }, r: ['root'] },
