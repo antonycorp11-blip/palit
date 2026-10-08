@@ -650,7 +650,7 @@ PALIT.View = (function () {
   }
 
   /* ---------------- entrada ---------------- */
-  function isUI(t) { return !!t.closest('#topbar, #bottombar, #side-btns, #ruler, .toast, #tree-screen, #modal, #debug, #splash'); }
+  function isUI(t) { return !!t.closest('#topbar, #bottombar, #side-btns, #b-tree, #ruler, #era-fx, .toast, #tree-screen, #modal, #debug, #splash'); }
 
   function screenToWorld(sx, sy) {
     return { x: sx - VW / 2, y: focal + cam.y - sy };

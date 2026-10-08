@@ -29,7 +29,8 @@ PALIT.HUD = (function () {
     el.topbar.innerHTML =
       '<div class="tb-row">' + spr('ico_match') +
         '<div class="grow"><div class="mat-name" id="h-mat"></div><div class="era-tag" id="h-era" style="margin-top:4px"></div></div>' +
-        spr('ico_coin') + '<span class="money" id="h-money">0</span></div>' +
+        spr('ico_coin') + '<span class="money" id="h-money">0</span>' +
+        '<button class="pxbtn tb-menu" id="b-menu" aria-label="Menu">' + spr('ico_menu') + '</button></div>' +
       '<div class="tb-row">' +
         '<button class="box-btn" id="h-box">' + spr('ico_box') + '<span class="pieces" id="h-pieces"></span></button>' +
         '<span class="reserve" id="h-res"></span>' +
@@ -42,30 +43,36 @@ PALIT.HUD = (function () {
   }
 
   function buildBottom() {
-    el.bottombar.innerHTML =
-      '<button class="pxbtn" id="b-tree">' + spr('ico_tree') + '<span>ÁRVORE <span class="pct" id="b-tree-p"></span></span></button>' +
-      '<div id="status"></div>' +
-      '<button class="pxbtn" id="b-snd" aria-label="Som">' + spr(P.Audio.muted ? 'ico_mute' : 'ico_sound') + '</button>' +
-      '<button class="pxbtn" id="b-menu" aria-label="Menu">' + spr('ico_menu') + '</button>';
+    el.bottombar.innerHTML = '<div id="status"></div>';
+    // árvore: aba na lateral da tela (meio da altura), também abre arrastando da borda
+    var tab = document.createElement('button');
+    tab.id = 'b-tree'; tab.className = 'px'; tab.setAttribute('aria-label', 'Árvore');
+    tab.innerHTML = spr('ico_tree') + '<span class="tt">ÁRVORE</span><span class="pct" id="b-tree-p"></span><i class="chev">▶</i>';
+    $('hud').appendChild(tab);
+    tab.addEventListener('click', function () { P.TreeView.open(); });
+    bindEdgeSwipe();
     el['side-btns'].innerHTML =
-      '<button class="pxbtn gold" id="b-ch" hidden>' + spr('ico_flag') + 'DESAFIO FINAL</button>' +
-      '<button class="pxbtn gold" id="b-master" hidden>' + spr('ico_flag') + 'MATERIAL DOMINADO</button>' +
+      '<button class="pxbtn gold big-up" id="b-master" hidden>' + spr('ico_up') + 'SUBIR DE ERA</button>' +
+      '<button class="pxbtn" id="b-ch" hidden>' + spr('ico_flag') + 'DESAFIO FINAL (BÔNUS)</button>' +
       '<button class="pxbtn red" id="b-dmg" hidden>' + spr('ico_down') + 'DANO</button>' +
-      '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>' +
-      '<div class="zoom-btns"><button class="pxbtn" id="b-zin" aria-label="Aproximar">' + spr('ico_zin') + '</button><button class="pxbtn" id="b-zout" aria-label="Afastar">' + spr('ico_zout') + '</button></div>';
-    $('b-tree').addEventListener('click', function () { P.TreeView.open(); });
+      '<button class="pxbtn" id="b-top" hidden>' + spr('ico_up') + 'TOPO</button>';
     $('b-menu').addEventListener('click', function () { P.Panels.open(); });
-    $('b-snd').addEventListener('click', function () {
-      P.Audio.unlock();
-      P.Audio.setMuted(!P.Audio.muted);
-      $('b-snd').innerHTML = spr(P.Audio.muted ? 'ico_mute' : 'ico_sound');
-    });
     $('b-top').addEventListener('click', function () { V.goTop(); });
-    $('b-zin').addEventListener('click', function () { V.zoomBy(1); });
-    $('b-zout').addEventListener('click', function () { V.zoomBy(-1); });
     $('b-dmg').addEventListener('click', jumpDamage);
     $('b-ch').addEventListener('click', confirmChallenge);
     $('b-master').addEventListener('click', masteryModal);
+  }
+
+  /* arrastar da borda esquerda para a direita abre a árvore (como o "voltar" do iPhone) */
+  function bindEdgeSwipe() {
+    var st = null;
+    document.getElementById('game').addEventListener('pointerdown', function (e) {
+      st = e.clientX < 28 && !P.Pause.active() ? { x: e.clientX, y: e.clientY } : null;
+    }, true);
+    document.getElementById('game').addEventListener('pointermove', function (e) {
+      if (st && e.clientX - st.x > 70 && Math.abs(e.clientY - st.y) < 60) { st = null; P.TreeView.open(); }
+    }, true);
+    document.getElementById('game').addEventListener('pointerup', function () { st = null; }, true);
   }
 
   var dmgIdx = 0;
@@ -134,7 +141,7 @@ PALIT.HUD = (function () {
     else if (rt.ch) { s = 'SOBREVIVA À ' + G.mat.challenge.name; cls = 'warn'; }
     else if (br === 'empty') { s = 'SEM ' + G.mat.pieces.toUpperCase() + ' · AGUARDE A RECARGA'; cls = 'bad'; }
     else if (br === 'limit') { s = 'LIMITE ESTRUTURAL · MELHORE A ÁRVORE'; cls = 'warn'; }
-    else if (br === 'goal') { s = G.progress() < 1 ? 'ALTURA MÁXIMA · COMPLETE A ÁRVORE' : (S.challengeDone ? 'MATERIAL DOMINADO' : 'DESAFIO FINAL DISPONÍVEL'); cls = 'warn'; }
+    else if (br === 'goal') { s = 'ALTURA MÁXIMA DA ERA · SUBA DE ERA ▲'; cls = 'warn'; }
     else if (br === 'unstable') { s = 'ESTRUTURA INSTÁVEL · REPARE (<40%)'; cls = 'bad'; }
     else s = 'TOQUE PARA COLOCAR UM ' + G.mat.piece.toUpperCase();
     var stEl = $('status');
@@ -263,6 +270,8 @@ PALIT.HUD = (function () {
       if (s === 'lost') modal('DESAFIO FALHOU', '<div class="line c-r">A ESTRUTURA FICOU ABAIXO DE ' + G.mat.challenge.minIntegrity + '%.</div><p>Repare a torre e tente novamente. Nenhum progresso foi perdido.</p>', [['OK', null]]);
     });
     G.on('rebuild', function () { lastRuler = ''; });
+    // bateu a altura da era: oferece a subida na hora
+    G.on('layerDone', function (d) { if (d.layer + 1 === G.mat.goalLayers) setTimeout(function () { P.Story.whenIdle(masteryModal); }, 1200); });
   }
 
   /* ---------------- modais ---------------- */
@@ -295,24 +304,27 @@ PALIT.HUD = (function () {
     if (!G.masteryReady()) return;
     var m = G.mat, next = P.MATERIALS[m.era];
     var hasTree = next && next.tree && P.TREES[next.tree];
+    var pct = Math.floor(G.progress() * 100);
     var body =
-      '<div class="line c-g">100% DA ÁRVORE CONCLUÍDA</div>' +
-      '<div class="line c-g">ALTURA MÁXIMA DA ERA ATINGIDA</div>' +
-      '<div class="line c-g">DESAFIO FINAL CONCLUÍDO</div><div class="sep"></div>' +
+      '<div class="line c-g">✓ ALTURA MÁXIMA DA ERA: ' + P.fmtHeight(G.localHeight()) + '</div>' +
+      '<div class="line ' + (pct >= 100 ? 'c-g">✓' : 'c-l">·') + ' ÁRVORE ' + pct + '% (OPCIONAL)</div>' +
+      '<div class="line ' + (G.S.challengeDone ? 'c-g">✓' : 'c-l">·') + ' DESAFIO FINAL (OPCIONAL)</div><div class="sep"></div>' +
       '<div class="line c-l">MATERIAL DOMINADO:</div><div class="big">' + m.name.toUpperCase() + '</div><div class="sep"></div>';
     if (!next) {
       modal('FIM DA REALIDADE', body + '<p>Não há mais nada para construir. Tudo começou com um palito de fósforo.</p>');
       return;
     }
-    body += '<div class="line c-l">NOVO MATERIAL DESCOBERTO:</div><div class="big c-y">' + next.name.toUpperCase() + '</div>' +
+    body += '<div class="line c-l">PRÓXIMO MATERIAL:</div><div class="big c-y">' + next.name.toUpperCase() + '</div>' +
       '<p>' + next.traits.join(' · ') + '</p><p class="c-r">Novos problemas: ' + next.problems.join(' · ') + '</p>';
     if (!hasTree) {
-      body += '<div class="sep"></div><p class="c-o">A árvore de ' + next.name + ' chega na próxima atualização. Seu domínio está registrado — continue cuidando da torre!</p>';
-      modal('MATERIAL DOMINADO', body);
+      body += '<div class="sep"></div><p class="c-o">A era de ' + next.name + ' chega na próxima atualização. Seu domínio está registrado — continue cuidando da torre!</p>';
+      modal('ALTURA MÁXIMA!', body);
       return;
     }
-    body += '<div class="sep"></div><p>A torre atual fica registrada no histórico. Uma nova torre começa no checkpoint a ' + P.fmtHeight(G.globalHeight()) + '. O dinheiro desta era vira fundação.</p>';
-    modal('MATERIAL DOMINADO', body, [['RECONSTRUIR', function () { G.rebuild(); P.save(); }, 'gold'], ['DEPOIS', null]]);
+    body += '<div class="sep"></div><p>A torre atual fica no histórico. Uma nova torre começa no checkpoint a ' + P.fmtHeight(G.globalHeight()) + '. O dinheiro desta era vira fundação.</p>';
+    var btns = [['SUBIR DE ERA ▲', function () { P.EraFX.play(function () { G.rebuild(); P.save(); }); }, 'gold'], ['CONTINUAR AQUI', null]];
+    if (G.challengeReady()) btns.splice(1, 0, ['DESAFIO FINAL', confirmChallenge]);
+    modal('ALTURA MÁXIMA!', body, btns);
   }
 
   function openMenu() {
@@ -351,5 +363,5 @@ PALIT.HUD = (function () {
     return h + 'h ' + String(m).padStart(2, '0') + 'min';
   }
 
-  return { init: init, update: update, toast: toast, modal: modal, close: close };
+  return { init: init, update: update, toast: toast, modal: modal, close: close, masteryModal: masteryModal };
 })();

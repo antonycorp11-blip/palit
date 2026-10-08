@@ -160,6 +160,21 @@ PALIT.Story = (function () {
     el.bubT = setTimeout(function () { el.bub.hidden = true; }, 6500);
   }
 
+  /* balão rápido de um personagem (sem pausar o jogo) */
+  function bubble(who, text) {
+    var ch = P.CHARACTERS[who];
+    if (!ch) return;
+    el.bub.querySelector('.sp').className = 'sp sp-' + ch.sprite;
+    el.bub.querySelector('b').textContent = ch.name;
+    el.bub.querySelector('b').style.color = ch.color;
+    el.bub.querySelector('p').textContent = text;
+    el.bub.hidden = false;
+    el.bub.classList.remove('in'); void el.bub.offsetWidth; el.bub.classList.add('in');
+    for (var k = 0; k < 4; k++) setTimeout(function () { P.Audio.sfx.blip(ch.pitch); }, k * 70);
+    clearTimeout(el.bubT);
+    el.bubT = setTimeout(function () { el.bub.hidden = true; }, 7000);
+  }
+
   function tick(dt) {
     // digitação
     if (cur && cur.typing) {
@@ -183,7 +198,7 @@ PALIT.Story = (function () {
     }
   }
 
-  return { init: init, start: start, tick: tick, whenIdle: whenIdle, advance: advance, active: function () { return !!cur; } };
+  return { init: init, start: start, tick: tick, whenIdle: whenIdle, advance: advance, bubble: bubble, active: function () { return !!cur; } };
 })();
 
 /* pausa compartilhada (história, escolhas) */

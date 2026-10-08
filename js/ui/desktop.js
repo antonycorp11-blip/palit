@@ -141,7 +141,7 @@ PALIT.Desktop = (function () {
         if (V.nearTop()) G.tryPlace(false); else P.HUD.toast('VOLTE AO TOPO (HOME)', 'warn', true);
       }
       else if (k === 'KeyT') P.TreeView.open();
-      else if (k === 'KeyM') $('b-snd').click();
+      else if (k === 'KeyM') { P.Audio.unlock(); P.Audio.setMuted(!P.Audio.muted); P.HUD.toast(P.Audio.muted ? 'SOM DESLIGADO' : 'SOM LIGADO', 'info', true); }
       else if (k === 'KeyD') { var b = $('b-dmg'); if (b && !b.hidden) b.click(); }
       else if (k === 'Home') V.goTop();
       else if (k === 'Equal' || k === 'NumpadAdd') V.zoomBy(1);

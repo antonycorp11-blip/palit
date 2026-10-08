@@ -13,6 +13,7 @@ PALIT.Life = (function () {
   var helpers = {};        // id -> {el, rope, kind}
   var visitors = [];
   var walkT = 6, flyT = 20, seq = 1;
+  var bornT = performance.now(), arrivals = {};
 
   var HELPER_SPR = {
     fosforo: ['hlp_ant', 'hlp_beetle'],
@@ -49,7 +50,15 @@ PALIT.Life = (function () {
       V.sparks(p.x - g.VW / 2, p.y - g.focal - g.camY, '#00e436', 6);
     });
     G.on('helperNew', function (h) {
-      P.HUD.toast((h.kind === 'def' ? 'NOVO DEFENSOR: ' : 'NOVO CONSERTADOR: ') + helperName(h.kind).toUpperCase(), 'good');
+      // no carregamento do save os ajudantes já moram lá; só a contratação é anunciada
+      if (performance.now() - bornT < 1500) return;
+      arrivals[h.id] = performance.now();
+      V.goTop();
+      P.HUD.toast((h.kind === 'def' ? 'NOVO DEFENSOR: ' : 'NOVO CONSERTADOR: ') + helperName(h.kind).toUpperCase() + '!', 'good', false, { big: true, life: 4 });
+      if (P.Audio.sfx.achievement) P.Audio.sfx.achievement();
+      if (P.Story.bubble) P.Story.bubble('ademir', h.kind === 'def'
+        ? 'Contratei um(a) ' + helperName('def') + '! Mora no topo e corre atrás das ameaças. Você ainda bate mais forte.'
+        : 'Chegou o(a) ' + helperName('fix') + '! Desce pela torre até as peças quebradas e conserta pra você.');
     });
     G.on('bought', function () { braceKey = ''; });
   }
@@ -122,7 +131,8 @@ PALIT.Life = (function () {
       if (!o) {
         var e = document.createElement('div');
         e.className = 'hlp ' + h.kind;
-        e.innerHTML = P.SpriteCSS.html(sprOf(h.kind)) + '<b class="hlp-mark"></b>';
+        e.innerHTML = '<i class="hlp-glow"></i>' + P.SpriteCSS.html(sprOf(h.kind)) + '<b class="hlp-mark"></b><i class="hlp-sparks"></i>' +
+          '<span class="hlp-tag t-px">' + (h.kind === 'def' ? '⚔ ' : '✚ ') + helperName(h.kind).split(' ')[0].toUpperCase() + '</span>';
         el.life.appendChild(e);
         o = helpers[h.id] = { el: e, kind: h.kind, rope: null, spr: sprOf(h.kind) };
         if (h.kind === 'fix') { o.rope = document.createElement('i'); o.rope.className = 'hlp-rope'; o.rope.hidden = true; el.life.insertBefore(o.rope, el.life.firstChild); }
@@ -138,7 +148,8 @@ PALIT.Life = (function () {
       if (o.k !== key) {
         o.k = key;
         o.el.style.transform = 'translate(' + (x - sz.w * U / 2) + 'px,' + (y - sz.h * U) + 'px)';
-        o.el.className = 'hlp ' + h.kind + ' st-' + h.state + (h.face < 0 ? ' flip' : '') + (h.wait ? ' wait' : '');
+        var arr = arrivals[h.id] && performance.now() - arrivals[h.id] < 6000;
+        o.el.className = 'hlp ' + h.kind + ' st-' + h.state + (h.face < 0 ? ' flip' : '') + (h.wait ? ' wait' : '') + (arr ? ' arrive' : '');
       }
       if (o.rope) {
         var down = (h.state === 'go' || h.state === 'fix' || h.state === 'back') && -y < topY - 10 * U;

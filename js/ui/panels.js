@@ -134,7 +134,7 @@ PALIT.Panels = (function () {
       }).join('') + '</div>';
     } else if (tab === 'opcoes') {
       var A = P.Audio;
-      html = toggle('music', 'MÚSICA', A.musicOn) + toggle('sfx', 'EFEITOS SONOROS', A.sfxOn) + toggle('vibe', 'VIBRAÇÃO (ANDROID)', P.Haptics.on) +
+      html = toggle('mute', 'SOM', !A.muted) + toggle('music', 'MÚSICA', A.musicOn) + toggle('sfx', 'EFEITOS SONOROS', A.sfxOn) + toggle('vibe', 'VIBRAÇÃO (ANDROID)', P.Haptics.on) +
         '<div class="sep"></div><p class="c-l">O progresso fica salvo neste aparelho.</p><button class="pxbtn red" id="op-wipe">APAGAR TODO O PROGRESSO</button>';
     }
     b.innerHTML = html;
@@ -144,6 +144,7 @@ PALIT.Panels = (function () {
     b.querySelectorAll('[data-opt]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var k = btn.dataset.opt, A = P.Audio;
+        if (k === 'mute') { A.unlock(); A.setMuted(!A.muted); }
         if (k === 'music') A.setMusic(!A.musicOn);
         if (k === 'sfx') A.setSfx(!A.sfxOn);
         if (k === 'vibe') { P.Haptics.set(!P.Haptics.on); P.Haptics.buzz(30); }

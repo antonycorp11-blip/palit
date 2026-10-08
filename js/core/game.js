@@ -806,7 +806,7 @@ PALIT.Game = (function () {
       while (have[k] < want[k]) {
         var n = have[k]++;
         var h = { id: rt.helperSeq++, kind: k, state: 'home', t: 0, hx: (k === 'def' ? -0.7 + n * 0.45 : 0.75 - n * 0.4), target: null, cell: null, face: 1 };
-        var hp = homeOf(h); h.x = hp.x; h.y = hp.y + 30;
+        var hp = homeOf(h); h.x = hp.x; h.y = hp.y + 70;
         H.push(h); emit('helperNew', h);
       }
     });
@@ -888,7 +888,7 @@ PALIT.Game = (function () {
 
   /* ---------------- desafio final ---------------- */
   function challengeReady() {
-    return !!(def && mat.challenge && progress() >= 1 && layersBuilt() >= mat.goalLayers && !S.challengeDone && !rt.ch);
+    return !!(def && mat.challenge && layersBuilt() >= mat.goalLayers && !S.challengeDone && !rt.ch);
   }
 
   function startChallenge() {
@@ -916,7 +916,8 @@ PALIT.Game = (function () {
   }
 
   function masteryReady() {
-    return !!(def && progress() >= 1 && layersBuilt() >= mat.goalLayers && S.challengeDone);
+    // bateu a altura da era, pode subir (árvore e desafio final são opcionais)
+    return !!(def && layersBuilt() >= mat.goalLayers && !rt.ch);
   }
 
   function rebuild() {

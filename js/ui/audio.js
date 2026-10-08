@@ -80,7 +80,7 @@ PALIT.Audio = (function () {
   }
 
   function arp(notes, step, o) {
-    notes.forEach(function (n, i) { tone(midi(n), (o && o.len) || step * 1.6, Object.assign({}, o, { at: i * step })); });
+    notes.forEach(function (n, i) { tone(midi(n), (o && o.len) || step * 1.6, Object.assign({}, o, { at: ((o && o.at) || 0) + i * step })); });
   }
 
   var S = {
@@ -179,6 +179,14 @@ PALIT.Audio = (function () {
     unlock: function () { if (ok('unlock', 0.1)) tone(2093, 0.1, { type: 'triangle', vol: 0.05, at: 0.2 }); },
     whoosh: function (up) { if (ok('whoosh', 0.1)) noise(0.25, { freq: up ? 500 : 2500, freqTo: up ? 2500 : 500, q: 1.2, vol: 0.12 }); },
     alarm: function () { if (ok('alarm', 1)) for (var i = 0; i < 3; i++) tone(500, 0.25, { to: 900, vol: 0.08, at: i * 0.3 }); },
+    rumble: function () { if (!ok('rumble', 1)) return; noise(2.2, { freq: 120, freqTo: 1600, q: 1.5, vol: 0.35, filter: 'lowpass' }); tone(55, 2.2, { to: 220, type: 'sawtooth', vol: 0.08 }); },
+    shatter: function () { if (!ok('shatter', 0.3)) return; noise(0.5, { freq: 3000, q: 1, vol: 0.4 }); arp([96, 91, 88, 84, 79], 0.04, { vol: 0.07, type: 'square' }); },
+    eraOpen: function () {
+      if (!ok('eraOpen', 1)) return;
+      arp([60, 64, 67, 72, 76, 79, 84, 88, 91, 96], 0.07, { vol: 0.1, type: 'square' });
+      arp([72, 76, 79, 84], 0.28, { vol: 0.09, type: 'triangle', at: 0.8, len: 0.5 });
+      tone(midi(36), 2.4, { type: 'triangle', vol: 0.22, at: 0.7 });
+    },
     win: function () { if (ok('win', 1)) { arp([60, 64, 67, 72, 67, 72, 76, 79, 84], 0.11, { vol: 0.1 }); tone(midi(48), 1.4, { type: 'triangle', vol: 0.2 }); } },
     lose: function () { if (ok('lose', 1)) arp([67, 63, 60, 55], 0.18, { vol: 0.09, len: 0.3 }); },
     /* encaixe perfeito: sino que sobe com a sequência */
