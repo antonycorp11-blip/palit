@@ -85,8 +85,29 @@ var PALIT = window.PALIT = window.PALIT || {};
   }
 
   /* PWA: service worker (offline) + bloqueios de gestos do iOS */
+  /* versão publicada (aparece no canto da tela inicial e em MENU → OPÇÕES) */
+  P.BUILD = 'v15';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () { /* sem SW */ }); });
+    var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
+    // quando uma versão nova assume, recarrega uma vez (salvando antes)
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!hadCtrl || reloaded) return;
+      reloaded = true;
+      try { P.save && P.save(); } catch (e) { /* segue */ }
+      location.reload();
+    });
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(function (reg) {
+        reg.update();
+        if (reg.waiting) reg.waiting.postMessage('skipWaiting');
+        reg.addEventListener('updatefound', function () {
+          var nw = reg.installing;
+          if (nw) nw.addEventListener('statechange', function () { if (nw.state === 'installed' && navigator.serviceWorker.controller) nw.postMessage('skipWaiting'); });
+        });
+        // procura atualização sempre que o app volta para a frente
+        document.addEventListener('visibilitychange', function () { if (!document.hidden) reg.update(); });
+      }).catch(function () { /* sem SW */ });
+    });
   }
   ['gesturestart', 'gesturechange', 'dblclick'].forEach(function (ev) {
     document.addEventListener(ev, function (e) { e.preventDefault(); }, { passive: false });

@@ -1116,3 +1116,4 @@ html.themed #topbar::after, html.themed #dialog::after, html.themed #boss-bar::a
 html.themed #topbar::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: var(--u); pointer-events: none; background: color-mix(in srgb, var(--accent) 45%, transparent); }
 html.themed .toast { box-shadow: 0 0 0 var(--u) var(--edge), inset var(--u) 0 0 0 var(--accent); }
 html.themed #ruler::before { background: var(--panel); box-shadow: 0 0 0 2px var(--accent); }
+.build-tag { position: absolute; right: 6px; bottom: 3px; font-family: var(--font-px); font-size: 7px; color: var(--lgray); opacity: .55; pointer-events: none; }

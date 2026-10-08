@@ -135,7 +135,7 @@ PALIT.Panels = (function () {
     } else if (tab === 'opcoes') {
       var A = P.Audio;
       html = toggle('mute', 'SOM', !A.muted) + toggle('music', 'MÚSICA', A.musicOn) + toggle('sfx', 'EFEITOS SONOROS', A.sfxOn) + toggle('vibe', 'VIBRAÇÃO (ANDROID)', P.Haptics.on) +
-        '<div class="sep"></div><p class="c-l">O progresso fica salvo neste aparelho.</p><button class="pxbtn red" id="op-wipe">APAGAR TODO O PROGRESSO</button>';
+        '<div class="sep"></div><p class="c-l">VERSÃO DO JOGO: <b class="c-y">' + (P.BUILD || '?') + '</b></p><p class="c-l">O progresso fica salvo neste aparelho.</p><button class="pxbtn red" id="op-wipe">APAGAR TODO O PROGRESSO</button>';
     }
     b.innerHTML = html;
     b.querySelectorAll('[data-claim]').forEach(function (btn) {

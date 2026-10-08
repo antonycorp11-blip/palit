@@ -1,8 +1,8 @@
 /* Service worker — deixa o jogo funcionando offline depois de instalado.
-   Estratégia: pré-cache do app + "stale-while-revalidate" (abre na hora pelo
-   cache e baixa a versão nova em segundo plano para a próxima abertura).
-   Ao publicar mudanças grandes, aumente VERSION. */
-var VERSION = 'palit-v14';
+   Estratégia: REDE PRIMEIRO. Com internet, sempre baixa a versão publicada
+   (ignorando o cache HTTP); sem internet, usa a cópia guardada.
+   Ao publicar mudanças, aumente VERSION (e PALIT.BUILD em js/main.js). */
+var VERSION = 'palit-v15';
 var ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',
@@ -16,7 +16,11 @@ var ASSETS = [
 ];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(VERSION).then(function (c) { return c.addAll(ASSETS); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(caches.open(VERSION).then(function (c) {
+    return Promise.all(ASSETS.map(function (u) {
+      return fetch(new Request(u, { cache: 'reload' })).then(function (r) { if (r.ok) return c.put(u, r); }).catch(function () {});
+    }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 
 self.addEventListener('activate', function (e) {
@@ -25,16 +29,19 @@ self.addEventListener('activate', function (e) {
   }).then(function () { return self.clients.claim(); }));
 });
 
+self.addEventListener('message', function (e) { if (e.data === 'skipWaiting') self.skipWaiting(); });
+
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
   e.respondWith(caches.open(VERSION).then(function (cache) {
-    return cache.match(req, { ignoreSearch: true }).then(function (hit) {
-      var net = fetch(req).then(function (res) {
-        if (res && res.ok) cache.put(req, res.clone());
-        return res;
-      }).catch(function () { return hit || (req.mode === 'navigate' ? cache.match('index.html') : undefined); });
-      return hit || net;
+    return fetch(req, { cache: 'no-store' }).then(function (res) {
+      if (res && res.ok) cache.put(req, res.clone());
+      return res;
+    }).catch(function () {
+      return cache.match(req, { ignoreSearch: true }).then(function (hit) {
+        return hit || (req.mode === 'navigate' ? cache.match('index.html') : undefined);
+      });
     });
   }));
 });

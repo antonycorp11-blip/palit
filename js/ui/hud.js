@@ -38,7 +38,7 @@ PALIT.HUD = (function () {
         '<div class="alts"><div class="alt"><span>ALT. GLOBAL</span><b id="h-glob"></b></div><div class="alt"><span>TORRE</span><b id="h-loc" class="c-g"></b></div></div>' +
       '</div>' +
       '<div class="integ" id="h-integ"><span>ESTRUTURA</span><div class="bar"><i id="h-int"></i></div><b id="h-int-t"></b></div>' +
-      '<div class="chips" id="h-chips"></div>';
+      '<div class="chips" id="h-chips"></div><span class="build-tag">' + (P.BUILD || '') + '</span>';
     $('h-box').addEventListener('click', function () { G.unjam(); });
   }
 
