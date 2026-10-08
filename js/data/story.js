@@ -25,13 +25,13 @@ PALIT.CHARACTERS = {
 
 /* pistas do mistério — aparecem no ARQUIVO DO MISTÉRIO (menu) */
 PALIT.CLUES = [
-  { id: 'regra4',     title: 'A Regra dos 4 Metros',  text: 'Vó Zuleica jura que, desde a época dela, ninguém nunca passou de 4 metros com palitos de fósforo. "Ninguém. NINGUÉM."' },
-  { id: 'art4',       title: 'Artigo 4 do INPALI',    text: '"Nenhuma torre de fósforos ultrapassará quatro metros." O inspetor não está autorizado a explicar o porquê.' },
-  { id: 'pombos40',   title: 'Os Pombos Observam',    text: 'Segundo Seu Ademir, os pombos começam a olhar fixamente para qualquer torre que passe de 40 centímetros.' },
-  { id: 'tonico',     title: 'O Caso Tonico',         text: 'Numa noite de lua cheia, Tonico tentou passar dos 4 metros. Sumiu por três dias. Voltou falando de "um palito que flutua".' },
+  { id: 'regra4',     title: 'A Regra dos 2 Metros',  text: 'Vó Zuleica jura que, desde a época dela, ninguém nunca passou de 2 metros com palitos de fósforo. "Ninguém. NINGUÉM."' },
+  { id: 'art4',       title: 'Artigo 4 do INPALI',    text: '"Nenhuma torre de fósforos ultrapassará dois metros." O inspetor não está autorizado a explicar o porquê.' },
+  { id: 'pombos40',   title: 'Os Pombos Observam',    text: 'Segundo Seu Ademir, os pombos começam a olhar fixamente para qualquer torre que passe de 20 centímetros.' },
+  { id: 'tonico',     title: 'O Caso Tonico',         text: 'Numa noite de lua cheia, Tonico tentou passar dos 2 metros. Sumiu por três dias. Voltou falando de "um palito que flutua".' },
   { id: 'teoria',     title: 'A Teoria do Ademir',    text: 'Envolve pombos, a Receita Federal e um palito de dente muito antigo. Ainda não fecha. "Mas vai fechar."' },
-  { id: 'tictic',     title: 'O Tic-Tic',             text: 'Depois dos 2 metros, Tonico começou a ouvir um "tic-tic-tic" vindo de cima. Você também está ouvindo?' },
-  { id: 'relatorio87', title: 'Relatório de 1987',    text: 'Alguém passou dos 4 metros em 1987. O relatório foi lacrado. A única palavra legível: "DENTE".' },
+  { id: 'tictic',     title: 'O Tic-Tic',             text: 'Depois de 1 metro, Tonico começou a ouvir um "tic-tic-tic" vindo de cima. Você também está ouvindo?' },
+  { id: 'relatorio87', title: 'Relatório de 1987',    text: 'Alguém passou dos 2 metros em 1987. O relatório foi lacrado. A única palavra legível: "DENTE".' },
   { id: 'plataforma', title: 'A Plataforma',          text: 'Gervásio afirma que existe uma plataforma lá em cima. Construída por alguém. Antes de todos nós.' },
   { id: 'voz',        title: 'A Voz do Topo',         text: '"Quem empilha... chega. Quem chega... troca." A voz vem de cima. Ninguém mais parece ouvir.' },
   { id: 'bilhete',    title: 'O Bilhete de A.',       text: '"Se você chegou aqui com fósforos, já não precisa deles. Os dentes te esperam. — A."' },
@@ -46,7 +46,7 @@ PALIT.STORY = [
     ['ademir', 'Sou o Ademir, seu vizinho. Isso na minha cabeça é um chapéu. NÃO é uma caixa de fósforos. Não pergunte.'],
     ['ademir', 'Vai construir uma torre? Com FÓSFOROS? Hehehe... clássico.'],
     ['ademir', 'Toque na tela para colocar um palito. Um de cada vez. Paciência é a cola da alma.'],
-    ['ademir', 'Ah, e uma coisinha: não passe de 4 metros.'],
+    ['ademir', 'Ah, e uma coisinha: não passe de 2 metros.'],
     ['ademir', '...'],
     ['ademir', 'Brincadeira! ...Ou não. Tchau!']
   ] },
@@ -57,8 +57,8 @@ PALIT.STORY = [
   { id: 'vo1', era: 'fosforo', when: { layer: 8 }, clue: 'regra4', lines: [
     ['vo', 'Menino, o que é isso? Uma escadinha pra formiga?'],
     ['ademir', 'É uma TORRE, Dona Zuleica.'],
-    ['vo', 'Na minha época a gente empilhava fósforo até 2 metros e ainda dava tempo de fazer bolo de fubá.'],
-    ['vo', 'Mas ninguém passava de 4 metros. Ninguém.'],
+    ['vo', 'Na minha época a gente empilhava fósforo até 1 metro e ainda dava tempo de fazer bolo de fubá.'],
+    ['vo', 'Mas ninguém passava de 2 metros. Ninguém.'],
     ['vo', 'NINGUÉM.']
   ] },
   { id: 'threat1', era: 'fosforo', when: { on: 'threat' }, lines: [
@@ -73,7 +73,7 @@ PALIT.STORY = [
     ['ademir', 'Opa, juntou umas moedinhas! Abre a ÁRVORE ali embaixo.'],
     ['ademir', 'Eu chamo de "árvore" porque "planilha de melhorias" não vende jogo.']
   ] },
-  { id: 'luca1', era: 'fosforo', when: { layer: 30 }, lines: [
+  { id: 'luca1', era: 'fosforo', when: { layer: 20 }, lines: [
     ['luca', 'Moço, por que você tá empilhando palito?'],
     ['luca', 'Minha mãe disse que é porque você não tem televisão.'],
     ['luca', 'Posso chutar minha bola aqui perto? Prometo que não miro.'],
@@ -88,19 +88,19 @@ PALIT.STORY = [
     ['ademir', 'Melhore a árvore (Construção, Resistência, Qualidade) e ele aguenta subir mais.'],
     ['ademir', 'Todo material tem um limite. Até eu. Meu limite é três cafés.']
   ] },
-  { id: 'insp1', era: 'fosforo', when: { layer: 70 }, clue: 'art4', lines: [
+  { id: 'insp1', era: 'fosforo', when: { layer: 40 }, clue: 'art4', lines: [
     ['inspetor', 'Bom dia. Inspetor Valdemar, do INPALI. Instituto Nacional de Padronização de Palitos.'],
     ['inspetor', 'Recebemos denúncia de construção vertical com material inflamável sem alvará.'],
     ['inspetor', 'Pode continuar. Por enquanto. Mas lembre-se do Artigo 4.'],
-    ['inspetor', '"Nenhuma torre de fósforos ultrapassará quatro metros."'],
+    ['inspetor', '"Nenhuma torre de fósforos ultrapassará dois metros."'],
     ['inspetor', 'Por quê? ...Não estou autorizado a dizer. Bom dia.']
   ] },
-  { id: 'm100', era: 'fosforo', when: { layer: 100 }, clue: 'pombos40', lines: [
-    ['ademir', 'CEM CAMADAS! Isso é 40 centímetros de pura teimosia!'],
-    ['ademir', 'Repara: os pombos estão olhando. Eles SEMPRE olham quando passa dos 40.'],
+  { id: 'm100', era: 'fosforo', when: { layer: 50 }, clue: 'pombos40', lines: [
+    ['ademir', 'CINQUENTA CAMADAS! Isso é 20 centímetros de pura teimosia!'],
+    ['ademir', 'Repara: os pombos estão olhando. Eles SEMPRE olham quando passa dos 20.'],
     ['ademir', 'Ninguém sabe por quê. Eu tenho uma teoria. Ainda não posso contar.']
   ] },
-  { id: 'pombo1', era: 'fosforo', when: { layer: 150 }, lines: [
+  { id: 'pombo1', era: 'fosforo', when: { layer: 80 }, lines: [
     ['pombo', 'Pruu.'],
     ['ademir', 'Ele disse "cuidado lá em cima".'],
     ['pombo', 'Pruu pruu.'],
@@ -110,11 +110,11 @@ PALIT.STORY = [
   ] },
   { id: 'night1', era: 'fosforo', when: { on: 'night' }, clue: 'tonico', lines: [
     ['vo', 'Ainda construindo? De noite? Seus palitos vão pegar sereno.'],
-    ['vo', 'Quando eu era moça, o Tonico tentou passar dos 4 metros numa noite de lua cheia.'],
+    ['vo', 'Quando eu era moça, o Tonico tentou passar dos 2 metros numa noite de lua cheia.'],
     ['vo', 'Sumiu por três dias. Voltou falando de um "palito que flutua".'],
     ['vo', 'Depois abriu uma lojinha de churrasco. Nunca mais tocou no assunto. Vai um chazinho?']
   ] },
-  { id: 'lens1', era: 'fosforo', when: { layer: 190 }, lines: [
+  { id: 'lens1', era: 'fosforo', when: { layer: 100 }, lines: [
     ['luca', 'Moço! Ganhei uma LUPA! Dá pra ver formiga GIGANTE!'],
     ['luca', 'E dá pra acender coisa com o sol.'],
     ['luca', 'Que coisa? Nada. Nenhuma coisa. Tchau!']
@@ -124,67 +124,67 @@ PALIT.STORY = [
     ['ademir', 'Por isso eu uso um chapéu à prova de fogo. Que NÃO é uma caixa de fósforos.'],
     ['ademir', 'Na árvore tem um tal de "Cabeça Aparada". Fica a dica.']
   ] },
-  { id: 'insp2', era: 'fosforo', when: { layer: 250 }, lines: [
-    ['inspetor', 'Inspetor Valdemar, de novo. Um metro. Impressionante.'],
+  { id: 'insp2', era: 'fosforo', when: { layer: 125 }, lines: [
+    ['inspetor', 'Inspetor Valdemar, de novo. Meio metro. Impressionante.'],
     ['inspetor', 'Ilegal em três estados, mas impressionante.'],
-    ['inspetor', 'O INPALI recomenda FORTEMENTE que você pare em 3,99 metros.'],
+    ['inspetor', 'O INPALI recomenda FORTEMENTE que você pare em 1,99 metro.'],
     ['inspetor', 'Não é uma ameaça. É uma recomendação. Uma recomendação muito, muito forte.']
   ] },
-  { id: 'teoria', era: 'fosforo', when: { layer: 320 }, clue: 'teoria', lines: [
-    ['ademir', 'Sabe por que ninguém passa dos 4 metros com fósforo?'],
+  { id: 'teoria', era: 'fosforo', when: { layer: 170 }, clue: 'teoria', lines: [
+    ['ademir', 'Sabe por que ninguém passa dos 2 metros com fósforo?'],
     ['ademir', 'Eu tenho uma teoria. Envolve pombos, a Receita Federal e um palito de dente muito antigo.'],
     ['ademir', 'Ainda não fecha. Mas vai fechar.'],
     ['ademir', 'Esquece a parte da Receita. Isso é outro assunto. Pessoal.']
   ] },
-  { id: 'radio1', era: 'fosforo', when: { layer: 400 }, lines: [
+  { id: 'radio1', era: 'fosforo', when: { layer: 200 }, lines: [
     ['radio', 'Bom dia, ouvintes! Aqui é a Rádio Torre FM, a ÚNICA rádio que fala de torres de palito!'],
-    ['radio', 'Um morador do bairro já passa de 1,6 metro! Especialistas chamam de "uma bobagem perigosa".'],
+    ['radio', 'Um morador do bairro já passa de 80 centímetros! Especialistas chamam de "uma bobagem perigosa".'],
     ['radio', 'Outros especialistas chamam de "uma bobagem incrível". Os especialistas brigaram ao vivo.'],
     ['radio', 'E agora, o sucesso "Fósforo do Meu Coração", com Os Palitinhos!']
   ] },
-  { id: 'vo2', era: 'fosforo', when: { layer: 500 }, clue: 'tictic', lines: [
-    ['vo', 'Dois metros! O Tonico chegou nos dois metros também.'],
+  { id: 'vo2', era: 'fosforo', when: { layer: 250 }, clue: 'tictic', lines: [
+    ['vo', 'Um metro! O Tonico chegou em um metro também.'],
     ['vo', 'Depois disso ele começou a ouvir um "tic-tic-tic" vindo lá de cima.'],
     ['vo', 'Escuta...'],
     ['voz', '...tic... tic...'],
     ['vo', 'Tá ouvindo? Não? Melhor assim. Vou fazer um bolo.']
   ] },
-  { id: 'voz1', era: 'fosforo', when: { layer: 600 }, lines: [
+  { id: 'voz1', era: 'fosforo', when: { layer: 310 }, lines: [
     ['voz', '...tic... tic... tic...'],
     ['ademir', 'Ouviu isso?'],
     ['ademir', 'Não? Eu também não. Vamos fingir que não ouvimos. Combinado?'],
     ['ademir', '...combinado.']
   ] },
-  { id: 'insp3', era: 'fosforo', when: { layer: 700 }, clue: 'relatorio87', lines: [
+  { id: 'insp3', era: 'fosforo', when: { layer: 360 }, clue: 'relatorio87', lines: [
     ['inspetor', 'Escute. Extraoficialmente.'],
-    ['inspetor', 'O Artigo 4 existe por um motivo. Em 1987, alguém passou dos 4 metros.'],
+    ['inspetor', 'O Artigo 4 existe por um motivo. Em 1987, alguém passou dos 2 metros.'],
     ['inspetor', 'O relatório foi lacrado. A única palavra legível era: "DENTE".'],
     ['inspetor', 'Eu não te disse nada. Este bigode nunca esteve aqui. Bom dia.']
   ] },
-  { id: 'pombo2', era: 'fosforo', when: { layer: 800 }, clue: 'plataforma', lines: [
+  { id: 'pombo2', era: 'fosforo', when: { layer: 410 }, clue: 'plataforma', lines: [
     ['pombo', 'Pruu. Pruu pruu. Pruuuu.'],
     ['ademir', 'Ele disse que lá em cima existe uma PLATAFORMA. Construída por alguém. Antes de nós.'],
     ['ademir', 'Gervásio nunca mentiu para mim.'],
     ['ademir', '...exceto sobre o farelo. Ele sempre diz que não comeu o farelo.']
   ] },
-  { id: 'luca2', era: 'fosforo', when: { layer: 880 }, lines: [
+  { id: 'luca2', era: 'fosforo', when: { layer: 450 }, lines: [
     ['luca', 'Moço... dá pra ver o meu prédio daí?'],
     ['luca', 'Minha mãe disse que agora você é famoso. E que é pra eu parar de chutar bola na sua torre.'],
     ['luca', 'Desculpa pelas outras vezes. E pela lupa. E pelo gato. O gato não foi eu, mas desculpa também.']
   ] },
-  { id: 'voz2', era: 'fosforo', when: { layer: 950 }, clue: 'voz', lines: [
+  { id: 'voz2', era: 'fosforo', when: { layer: 480 }, clue: 'voz', lines: [
     ['voz', 'Quem empilha... chega.'],
     ['voz', 'Quem chega... troca.'],
     ['ademir', 'Essa voz vem do TOPO. Eu sabia! Quer dizer... eu não sabia. Mas agora sei.']
   ] },
-  { id: 'insp4', era: 'fosforo', when: { layer: 990 }, lines: [
+  { id: 'insp4', era: 'fosforo', when: { layer: 495 }, lines: [
     ['inspetor', 'PARE!'],
     ['inspetor', '...'],
     ['inspetor', 'Quer dizer, continue. Eu também quero saber o que tem lá em cima.'],
     ['inspetor', 'Mas se perguntarem, eu disse "pare".']
   ] },
-  { id: 'top', era: 'fosforo', when: { layer: 1000 }, lines: [
-    ['ademir', 'QUATRO METROS! Você chegou no limite que NINGUÉM passa!'],
+  { id: 'top', era: 'fosforo', when: { layer: 500 }, lines: [
+    ['ademir', 'DOIS METROS! Você chegou no limite que NINGUÉM passa!'],
     ['voz', 'Finalmente. Um empilhador de verdade.'],
     ['voz', 'O fósforo chega até aqui. Nenhum fósforo vai além. Não por lei. Por natureza.'],
     ['voz', 'Domine tudo o que o fósforo tem a ensinar. Então enfrente a VENTANIA.'],
@@ -213,7 +213,7 @@ PALIT.STORY = [
   { id: 'dente_intro', era: 'dente', when: { start: true }, clue: 'arquiteto', lines: [
     ['ademir', 'Palitos de DENTE! Mais rígidos, sem cabeça, sem fogo. O sonho de todo empilhador!'],
     ['vo', 'E escorregam. As pontinhas escorregam. Cuidado, que eu já vi isso acabar em choro.'],
-    ['inspetor', 'Chegou ao checkpoint dos 4 metros. Inacreditável. O Arquiteto existia mesmo.'],
+    ['inspetor', 'Chegou ao checkpoint dos 2 metros. Inacreditável. O Arquiteto existia mesmo.'],
     ['inspetor', 'Ele construía sempre recomeçando do ponto onde o material anterior parou. Uma plataforma de cada vez.'],
     ['ademir', 'Então o tic-tic... era alguém empilhando lá em cima esse tempo todo?'],
     ['voz', '...tic... tic...']
@@ -238,7 +238,7 @@ PALIT.STORY = [
     ['inspetor', 'Estou redigindo uma agora. Artigo 1: "Cuidado". Só isso por enquanto.']
   ] },
   { id: 'dente_radio', era: 'dente', when: { layer: 350 }, lines: [
-    ['radio', 'Rádio Torre FM, edição extraordinária! A torre do bairro passou dos 7 metros!'],
+    ['radio', 'Rádio Torre FM, edição extraordinária! A torre do bairro passou dos 5 metros!'],
     ['radio', 'Já foi vista da padaria, do posto e de um avião que pediu para não ser identificado.'],
     ['radio', 'Ouvintes relatam um "tic-tic" no céu. Nossos técnicos dizem que é o relógio da igreja. A igreja não tem relógio.']
   ] },

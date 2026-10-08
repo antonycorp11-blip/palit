@@ -45,6 +45,8 @@ PALIT.Story = (function () {
     P.STORY.forEach(function (b) {
       var past = P.materialById(b.era) && P.materialById(b.era).era < G.mat.era;
       if (seen(b.id)) return;
+      // a cena do topo da era nunca é pulada: ela aparece ao abrir o jogo
+      if (!past && b.when.layer != null && b.when.layer >= G.mat.goalLayers) return;
       if (past || (b.era === G.mat.id && b.when.layer != null && b.when.layer <= L && L > 0)) markSeen(b, true);
     });
 
@@ -61,7 +63,10 @@ PALIT.Story = (function () {
   }
 
   /* chamado quando o jogo começa de fato (após a tela inicial) */
-  function start() { trigger(function (w) { return w.start; }); }
+  function start() {
+    var L = G.layersBuilt();
+    trigger(function (w) { return w.start || (w.layer != null && w.layer >= G.mat.goalLayers && L >= w.layer); });
+  }
 
   function checkLimit() {
     var L = G.layersBuilt();

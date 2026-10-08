@@ -35,8 +35,8 @@ var PALIT = window.PALIT = window.PALIT || {};
   }
 
   PALIT.MATERIALS = [
-    M(1, 'fosforo', 'Palito de Fósforo', 'fósforo', 'fósforos', 4, {
-      costScale: 0.6, base: { capacity: 10, rechargeSec: 5, placeSec: 0.9, repairSec: 2 },
+    M(1, 'fosforo', 'Palito de Fósforo', 'fósforo', 'fósforos', 2, {
+      goalLayers: 500, milestoneEvery: 50, passiveRate: 0.006, costScale: 0.35, base: { capacity: 10, rechargeSec: 5, placeSec: 0.9, repairSec: 2 },
       look: { len: 34, body: '#e4bb73', light: '#f6d69d', shade: '#a4743f', head: '#c4261a', headDark: '#6a0e0c', headLen: 3 },
       traits: ['Frágil', 'Pequeno', 'Leve', 'Recarga razoavelmente rápida'],
       problems: ['Vento', 'Umidade', 'Pássaros', 'Peças que se soltam', 'Cabeças inflamáveis'],

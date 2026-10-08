@@ -46,6 +46,9 @@ PALIT.Game = (function () {
     S = save || P.State.fresh();
     rt = freshRuntime();
     setMaterial();
+    // a era ficou mais curta: torres acima da nova altura máxima são aparadas no topo
+    var maxCells = mat.goalLayers * ppl();
+    if (S.cursor > maxCells) { S.cursor = maxCells; S.cells.length = maxCells; }
     rebuildDamageIndex(true);
     eraRecord();
   }
