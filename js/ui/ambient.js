@@ -206,22 +206,30 @@ PALIT.Ambient = (function () {
       el.sky.style.background = 'linear-gradient(180deg,' + stops.join(',') + ')';
     }
     night = ph.night;
-    el.stars.style.opacity = Math.max(Math.min(1, sc.stars || 0), night);
-    el.game.style.setProperty('--night', night.toFixed(2));
-    el.game.classList.toggle('is-night', night > 0.5);
+    var nk = night.toFixed(2) + '|' + Math.max(Math.min(1, sc.stars || 0), night);
+    if (nk !== el.game._nk) {   // só mexe no estilo quando muda (evita repintar o cenário)
+      el.game._nk = nk;
+      var so = Math.max(Math.min(1, sc.stars || 0), night);
+      el.stars.style.opacity = so;
+      el.stars.hidden = so <= 0;   // invisíveis: para as 70 animações de piscar
+      el.game.style.setProperty('--night', night.toFixed(2));
+      el.game.classList.toggle('is-night', night > 0.5);
+      el.game.classList.toggle('nf', night > 0.004);   // filtros de noite só quando há noite
+    }
     // sol e lua em arco (em degraus)
-    var hu = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--u'), 10) || 3;
     function arc(e, p, show) {
-      e.hidden = !show;
+      if (e.hidden !== !show) e.hidden = !show;
       if (!show) return;
       var x = 6 + p * 80, y = 34 - Math.sin(p * Math.PI) * 24;
-      e.style.left = x + '%';
+      var k = x.toFixed(1) + '|' + y.toFixed(1) + '|' + (camBase * 0.01 | 0);
+      if (e._k === k) return;
+      e._k = k;
+      e.style.left = x.toFixed(1) + '%';
       e.style.top = 'calc(' + y.toFixed(1) + '% - ' + (camBase * 0.01 | 0) + 'px)';
     }
     var t = ph.t;
     arc(el.sun, Math.min(1, t / 0.56), !!sc.sun && t < 0.57);
     arc(el.moon, Math.max(0, Math.min(1, (t - 0.55) / 0.4)), !!sc.day && t >= 0.55 && t < 0.96);
-    void hu;
   }
 
   /* ---------------- vida ao fundo ---------------- */

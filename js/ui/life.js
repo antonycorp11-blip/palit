@@ -153,11 +153,13 @@ PALIT.Life = (function () {
       }
       if (o.rope) {
         var down = (h.state === 'go' || h.state === 'fix' || h.state === 'back') && -y < topY - 10 * U;
-        o.rope.hidden = !down;
-        if (down) {
+        if (o.rope.hidden !== !down) o.rope.hidden = !down;
+        var rk = down ? x + ',' + topY + ',' + y : '';
+        if (down && o.rk !== rk) {
           o.rope.style.transform = 'translate(' + x + 'px,' + (-topY) + 'px)';
           o.rope.style.height = Math.max(0, topY + y - sz.h * U) + 'px';
         }
+        o.rk = rk;
       }
     });
     Object.keys(helpers).forEach(function (id) {
@@ -270,7 +272,8 @@ PALIT.Life = (function () {
       }
       var bob = v.kind === 'fly' ? Math.round(Math.sin(v.t * 1.3) * 2) : 0;
       var sz = P.SpriteCSS.size(v.spr);
-      v.el.style.transform = 'translate(' + (Math.round(v.x) * U - sz.w * U / 2) + 'px,' + (-(Math.round(v.y) + bob) * U - sz.h * U) + 'px)';
+      var tf = 'translate(' + (Math.round(v.x) * U - sz.w * U / 2) + 'px,' + (-(Math.round(v.y) + bob) * U - sz.h * U) + 'px)';
+      if (v.tf !== tf) { v.tf = tf; v.el.style.transform = tf; }   // só escreve quando anda um pixel
       if (Math.abs(v.x) > edge) { v.el.remove(); visitors.splice(i, 1); }
     }
   }

@@ -26,9 +26,13 @@ PALIT.View = (function () {
     G = P.Game; C = G.CELL;
     ['game', 'world', 'tower', 'ents', 'fx', 'ground', 'sky', 'stars', 'far', 'mid', 'near', 'clouds', 'sun', 'weather', 'flash', 'arrows'].forEach(function (k) { el[k] = $(k); });
     measure();
+    var rsz = 0;   // agrupa a rajada de resizes (arrastar a janela) num só recálculo
     window.addEventListener('resize', function () {
-      measure(); el.tower.innerHTML = ''; layers = {}; allDirty = true; buildGround(); lastParKey = '';
-      if (P.Desktop) P.Desktop.apply();
+      clearTimeout(rsz);
+      rsz = setTimeout(function () {
+        measure(); el.tower.innerHTML = ''; layers = {}; allDirty = true; buildGround(); lastParKey = '';
+        if (P.Desktop) P.Desktop.apply();
+      }, 120);
     });
     buildScenery();
     setupMaterial();
@@ -65,7 +69,7 @@ PALIT.View = (function () {
        ponto (x, z, h) → tela (x + z/2, h + z/2)
      Camadas pares: palitos ao longo de X (frente e fundo).
      Camadas ímpares: palitos ao longo de Z (esquerda e direita),
-     desenhados em diagonal 1:1. Cada palito é um sprite box-shadow
+     desenhados em diagonal 1:1. Cada palito é um sprite (imagem)
      gerado por material.                                            */
   function geo() {
     if (!G.mat) return;
@@ -158,9 +162,9 @@ PALIT.View = (function () {
       px.forEach(function (p) { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minU = Math.min(minU, p[1]); maxU = Math.max(maxU, p[1]); });
       var w = maxX - minX + 1, h = maxU - minU + 1;
       SPR[v[1]] = { minX: minX, minU: minU, w: w, h: h };
-      var sh = px.map(function (p) { return ((p[0] - minX + 1) * U) + 'px ' + ((maxU - p[1] + 1) * U) + 'px 0 0 ' + p[2]; }).join(',');
+      var img = P.SpriteCSS.bake(w, h, px.map(function (p) { return [p[0] - minX, maxU - p[1], p[2]]; }), U);
       out.push('.' + v[1] + '{width:' + w * U + 'px;height:' + h * U + 'px}');
-      out.push('.' + v[1] + '::before{box-shadow:' + sh + '}');
+      out.push('.' + v[1] + '::before{background-image:url(' + img + ');background-size:100% 100%}');
     });
     var e = document.getElementById('stick-css') || document.createElement('style');
     e.id = 'stick-css';
@@ -394,7 +398,8 @@ PALIT.View = (function () {
     }
     cam.y = Math.max(camMin(), Math.min(maxY, cam.y));
     if (!cam.follow && !cam.drag && cam.jump == null && Math.abs(cam.y - targetCam()) < LH * 3) cam.follow = true;
-    el.world.style.transform = 'translate3d(0,' + Math.round(focal + cam.y) + 'px,0)';
+    var wy = Math.round(focal + cam.y);
+    if (wy !== cam.wy) { cam.wy = wy; el.world.style.transform = 'translate3d(0,' + wy + 'px,0)'; }
   }
 
   function nearTop() { return Math.abs(cam.y - targetCam()) < H * 0.3; }
@@ -507,9 +512,13 @@ PALIT.View = (function () {
       var bsz = P.SpriteCSS.size(b.def.sprite);
       var bx = Math.round(b.x) * U + (b.state === 'perch' ? layerX(b.layer) : 0), by = -Math.round(b.y) * U;
       var bface = b.state === 'perch' ? -b.side : (b.tx >= b.x ? 1 : -1);
-      be.style.transform = 'translate(' + (bx + 22) + 'px,' + (by + 22) + 'px)';
-      be.style.setProperty('--bw', bsz.w * U + 'px'); be.style.setProperty('--bh', bsz.h * U + 'px');
-      be.className = 'th boss st-' + b.state + (bface < 0 ? ' flip' : '');
+      var bkey = bx + ',' + by + ',' + U + b.state + bface;
+      if (be._k !== bkey) {
+        be._k = bkey;
+        be.style.transform = 'translate(' + (bx + 22) + 'px,' + (by + 22) + 'px)';
+        be.style.setProperty('--bw', bsz.w * U + 'px'); be.style.setProperty('--bh', bsz.h * U + 'px');
+        be.className = 'th boss st-' + b.state + (bface < 0 ? ' flip' : '');
+      }
     }
     Object.keys(ents).forEach(function (id) { if (!seen[id]) { ents[id].remove(); delete ents[id]; } });
     // setas de ameaças fora da tela (Sentinela)
@@ -521,8 +530,8 @@ PALIT.View = (function () {
         if (sy < 120) html += '<span class="arr" style="left:' + (VW / 2 + t.x * U) + 'px;top:130px">▲</span>';
         else if (sy > H - 90) html += '<span class="arr" style="left:' + (VW / 2 + t.x * U) + 'px;top:' + (H - 100) + 'px">▼</span>';
       });
-      el.arrows.innerHTML = html;
-    } else if (el.arrows.innerHTML) el.arrows.innerHTML = '';
+      if (el.arrows._h !== html) { el.arrows._h = html; el.arrows.innerHTML = html; }
+    } else if (el.arrows._h) { el.arrows._h = ''; el.arrows.innerHTML = ''; }
   }
 
   /* ---------------- efeitos ---------------- */
@@ -600,8 +609,12 @@ PALIT.View = (function () {
         }
       }
     }
-    el.weather.classList.toggle('storm', r.storm > 0 || !!r.ch);
-    el.weather.classList.toggle('heat', r.heat > 0);
+    var wk = (r.storm > 0 || !!r.ch) + '|' + (r.heat > 0);
+    if (wk !== el.weather._k) {
+      el.weather._k = wk;
+      el.weather.classList.toggle('storm', r.storm > 0 || !!r.ch);
+      el.weather.classList.toggle('heat', r.heat > 0);
+    }
   }
 
   function shake(px) {

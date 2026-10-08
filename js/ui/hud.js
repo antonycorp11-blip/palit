@@ -86,31 +86,38 @@ PALIT.HUD = (function () {
   }
 
   /* ---------------- atualização (10 Hz) ---------------- */
+  /* escrevem no DOM só quando o valor muda (evita relayout/repintura do HUD) */
+  function txt(e, v) { if (e && e._t !== v) { e._t = v; e.textContent = v; } }
+  function htm(e, v) { if (e && e._h !== v) { e._h = v; e.innerHTML = v; } }
+  function wid(e, v) { if (e && e._w !== v) { e._w = v; e.style.width = v; } }
+  function hid(e, v) { if (e && e.hidden !== v) e.hidden = v; }
+
   function update() {
     var S = G.S, st = G.st, m = G.mat, rt = G.rt;
-    $('h-mat').textContent = m.name.toUpperCase();
-    $('h-era').textContent = 'ERA ' + String(m.era).padStart(2, '0') + ' · CAMADA ' + P.fmtNum(G.layersBuilt()) + ' / ' + P.fmtNum(m.goalLayers);
-    $('h-money').textContent = '$' + P.fmtMoney(P.Juice.money());
-    $('h-pieces').innerHTML = Math.floor(S.pieces) + '<small>/' + st.capacity + '</small>';
+    txt($('h-mat'), m.name.toUpperCase());
+    txt($('h-era'), 'ERA ' + String(m.era).padStart(2, '0') + ' · CAMADA ' + P.fmtNum(G.layersBuilt()) + ' / ' + P.fmtNum(m.goalLayers));
+    txt($('h-money'), '$' + P.fmtMoney(P.Juice.money()));
+    htm($('h-pieces'), Math.floor(S.pieces) + '<small>/' + st.capacity + '</small>');
     $('h-box').classList.toggle('jam', rt.jam);
-    $('h-res').textContent = st.reserveCap > 0 ? '+' + S.reserve + '/' + st.reserveCap : '';
+    txt($('h-res'), st.reserveCap > 0 ? '+' + S.reserve + '/' + st.reserveCap : '');
     var rate = G.prodRate();
     var full = S.pieces >= st.capacity && S.reserve >= st.reserveCap;
-    $('h-timer').style.width = (full ? 100 : Math.min(100, S.prodP * 100)) + '%';
+    wid($('h-timer'), (full ? 100 : Math.min(100, S.prodP * 100)) + '%');
     var tt;
     if (rt.jam) tt = 'EMPERROU! TOQUE';
     else if (full) tt = 'CAIXA CHEIA';
     else if (rate <= 0) tt = 'PAUSADA';
     else tt = P.fmtNum((1 - S.prodP) / rate, 1) + 's' + (S.pieces >= st.capacity ? ' → RES.' : '');
-    $('h-timer-t').textContent = tt;
-    $('h-glob').textContent = P.fmtHeight(G.globalHeight());
-    $('h-loc').textContent = P.fmtHeight(G.localHeight());
+    txt($('h-timer-t'), tt);
+    txt($('h-glob'), P.fmtHeight(G.globalHeight()));
+    txt($('h-loc'), P.fmtHeight(G.localHeight()));
     var integ = rt.integrity;
     var ib = $('h-int');
-    ib.style.width = integ + '%';
-    ib.style.setProperty('--c', integ > 70 ? 'var(--lime)' : integ > 40 ? 'var(--yellow)' : 'var(--red)');
-    $('h-int-t').textContent = Math.round(integ) + '%';
-    $('b-tree-p').textContent = G.def ? Math.floor(G.progress() * 100) + '%' : '—';
+    wid(ib, integ + '%');
+    var ic = (integ > 70 ? 'var(--lime)' : integ > 40 ? 'var(--yellow)' : 'var(--red)');
+    if (ib._c !== ic) { ib._c = ic; ib.style.setProperty('--c', ic); }
+    txt($('h-int-t'), Math.round(integ) + '%');
+    txt($('b-tree-p'), G.def ? Math.floor(G.progress() * 100) + '%' : '—');
     $('b-tree').classList.toggle('has', canAffordAny());
 
     // chips de estado
@@ -148,10 +155,10 @@ PALIT.HUD = (function () {
     var stEl = $('status');
     if (stEl._v !== s) { stEl._v = s; stEl.textContent = s; stEl.className = cls; }
 
-    $('b-top').hidden = V.nearTop();
-    $('b-dmg').hidden = !(st.jumpToDamage && G.damagedCells(true).length);
-    $('b-ch').hidden = !G.challengeReady();
-    $('b-master').hidden = !G.masteryReady();
+    hid($('b-top'), V.nearTop());
+    hid($('b-dmg'), !(st.jumpToDamage && G.damagedCells(true).length));
+    hid($('b-ch'), !G.challengeReady());
+    hid($('b-master'), !G.masteryReady());
 
     // indicador de vento
     var wi = el['wind-ind'];
@@ -159,17 +166,17 @@ PALIT.HUD = (function () {
     if (pend || rt.wind.gust) {
       var dir = (pend || rt.wind.gust).dir;
       var arrows = dir > 0 ? '►►►' : '◄◄◄';
-      var txt = pend ? 'VENTO ' + arrows + ' ' + P.fmtNum(Math.max(0, pend.t), 1) + 's' : 'RAJADA ' + arrows;
-      wi.hidden = false; wi.className = 'px' + (pend ? '' : ' now');
-      if (wi._v !== txt) { wi._v = txt; wi.innerHTML = spr('ico_wind') + txt; }
-    } else wi.hidden = true;
+      var wtx = pend ? 'VENTO ' + arrows + ' ' + P.fmtNum(Math.max(0, pend.t), 1) + 's' : 'RAJADA ' + arrows;
+      hid(wi, false); var wc = 'px' + (pend ? '' : ' now'); if (wi.className !== wc) wi.className = wc;
+      if (wi._v !== wtx) { wi._v = wtx; wi.innerHTML = spr('ico_wind') + wtx; }
+    } else hid(wi, true);
 
     // desafio
     var ci = el['ch-ind'];
     if (rt.ch) {
-      ci.hidden = false; ci.className = 'px';
-      ci.innerHTML = G.mat.challenge.name + '<br>' + Math.ceil(rt.ch.t) + 's · MÍN ' + G.mat.challenge.minIntegrity + '%';
-    } else ci.hidden = true;
+      hid(ci, false); if (ci.className !== 'px') ci.className = 'px';
+      htm(ci, G.mat.challenge.name + '<br>' + Math.ceil(rt.ch.t) + 's · MÍN ' + G.mat.challenge.minIntegrity + '%');
+    } else hid(ci, true);
 
     updateBossBar();
     updateRuler();
@@ -178,11 +185,11 @@ PALIT.HUD = (function () {
   function updateBossBar() {
     var b = G.rt.boss, bb = $('boss-bar');
     if (!bb) { bb = document.createElement('div'); bb.id = 'boss-bar'; bb.className = 'px'; bb.hidden = true; bb.innerHTML = '<b class="t-px"></b><div class="bar"><i></i></div><span class="t-px"></span>'; $('hud').appendChild(bb); }
-    if (!b) { bb.hidden = true; return; }
-    bb.hidden = false;
-    bb.querySelector('b').textContent = '☠ ' + b.def.name;
-    bb.querySelector('.bar i').style.width = (b.hp / b.maxHp * 100) + '%';
-    bb.querySelector('span').textContent = Math.ceil(b.hp) + ' / ' + b.maxHp + (b.state === 'dead' ? ' · DERROTADO!' : '');
+    if (!b) { hid(bb, true); return; }
+    hid(bb, false);
+    txt(bb.querySelector('b'), '☠ ' + b.def.name);
+    wid(bb.querySelector('.bar i'), (b.hp / b.maxHp * 100) + '%');
+    txt(bb.querySelector('span'), Math.ceil(b.hp) + ' / ' + b.maxHp + (b.state === 'dead' ? ' · DERROTADO!' : ''));
     bb.classList.toggle('dead', b.state === 'dead');
   }
 

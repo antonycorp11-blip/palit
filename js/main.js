@@ -55,6 +55,7 @@ var PALIT = window.PALIT = window.PALIT || {};
       P.Life.tick(dt, P.Pause.active());
       P.Ambient.tick(dt);
       P.Juice.tick(dt);
+      P.Gfx.frame();
       hudT += dt; slowT += dt; saveT += dt;
       if (hudT > 0.1) { hudT = 0; P.HUD.update(); P.TreeView.tick(); P.Desktop.update(); P.Panels.update(); }
       if (slowT > 1) { slowT = 0; P.TreeView.slowTick(); }
@@ -104,7 +105,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
   /* PWA: service worker (offline) + bloqueios de gestos do iOS */
   /* versão publicada (aparece no canto da tela inicial e em MENU → OPÇÕES) */
-  P.BUILD = 'v18';
+  P.BUILD = 'v19';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
     // quando uma versão nova assume, recarrega uma vez (salvando antes)

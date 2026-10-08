@@ -135,6 +135,8 @@ PALIT.Panels = (function () {
     } else if (tab === 'opcoes') {
       var A = P.Audio;
       html = toggle('mute', 'SOM', !A.muted) + toggle('music', 'MÚSICA', A.musicOn) + toggle('sfx', 'EFEITOS SONOROS', A.sfxOn) + toggle('vibe', 'VIBRAÇÃO (ANDROID)', P.Haptics.on) +
+        '<div class="kv opt"><span>GRÁFICOS</span><button class="pxbtn' + (P.Gfx.lite() ? '' : ' green') + '" data-opt="gfx">' + gfxLabel() + '</button></div>' +
+        '<p class="c-l">AUTO usa qualidade total e liga o modo leve sozinho se o jogo ficar lento. LEVE deixa a noite e os brilhos mais simples para rodar em qualquer PC.</p>' +
         '<div class="sep"></div><p class="c-l">VERSÃO DO JOGO: <b class="c-y">' + (P.BUILD || '?') + '</b></p><p class="c-l">' + (P.Cloud.active() ? 'O progresso fica salvo na sua conta ATHG: continue de qualquer aparelho.' : 'O progresso fica salvo neste aparelho.') + '</p><button class="pxbtn red" id="op-wipe">APAGAR TODO O PROGRESSO</button>';
     }
     b.innerHTML = html;
@@ -148,6 +150,7 @@ PALIT.Panels = (function () {
         if (k === 'music') A.setMusic(!A.musicOn);
         if (k === 'sfx') A.setSfx(!A.sfxOn);
         if (k === 'vibe') { P.Haptics.set(!P.Haptics.on); P.Haptics.buzz(30); }
+        if (k === 'gfx') P.Gfx.set({ auto: 'full', full: 'lite', lite: 'auto' }[P.Gfx.mode]);
         render();
       });
     });
@@ -158,6 +161,7 @@ PALIT.Panels = (function () {
     });
   }
 
+  function gfxLabel() { var G = P.Gfx; return G.mode === 'auto' ? 'AUTO' + (G.autoLite ? ' (LEVE)' : '') : G.mode === 'full' ? 'TOTAL' : 'LEVE'; }
   function kv(a, b) { return '<div class="kv"><span>' + a + '</span><b>' + b + '</b></div>'; }
   function toggle(k, label, on) { return '<div class="kv opt"><span>' + label + '</span><button class="pxbtn' + (on ? ' green' : '') + '" data-opt="' + k + '">' + (on ? 'LIGADO' : 'DESLIGADO') + '</button></div>'; }
 

@@ -99,9 +99,13 @@ PALIT.STATS = {
 };
 
 /* ---------- formatação ---------- */
+/* um Intl.NumberFormat por nº de casas: criar um a cada chamada (toLocaleString
+   com opções) é caro e o HUD formata números 10x por segundo */
+PALIT._nf = {};
 PALIT.fmtNum = function (n, dec) {
   dec = dec || 0;
-  return Number(n).toLocaleString('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  var f = PALIT._nf[dec] || (PALIT._nf[dec] = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: dec, maximumFractionDigits: dec }));
+  return f.format(Number(n));
 };
 
 PALIT.fmtMoney = function (n) {

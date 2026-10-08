@@ -2,7 +2,7 @@
    Estratégia: REDE PRIMEIRO. Com internet, sempre baixa a versão publicada
    (ignorando o cache HTTP); sem internet, usa a cópia guardada.
    Ao publicar mudanças, aumente VERSION (e PALIT.BUILD em js/main.js). */
-var VERSION = 'palit-v18';
+var VERSION = 'palit-v19';
 var ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',
@@ -11,7 +11,7 @@ var ASSETS = [
   'js/data/stats.js', 'js/data/materials.js', 'js/data/trees/fosforo.js', 'js/data/threats.js', 'js/data/events.js',
   'js/data/scenes.js', 'js/data/sprites.js', 'js/data/sticks.js', 'js/data/treelooks.js', 'js/data/bosses.js', 'js/data/story.js', 'js/data/progression.js', 'js/data/trees/dente.js',
   'js/core/econ.js', 'js/core/cloud.js', 'js/core/tree.js', 'js/core/state.js', 'js/core/game.js', 'js/core/progress.js',
-  'js/ui/audio.js', 'js/ui/spritecss.js', 'js/ui/view.js', 'js/ui/hud.js', 'js/ui/treeview.js', 'js/ui/juice.js', 'js/ui/theme.js', 'js/ui/life.js', 'js/ui/erafx.js', 'js/ui/ambient.js', 'js/ui/desktop.js', 'js/ui/story.js', 'js/ui/panels.js',
+  'js/ui/audio.js', 'js/ui/gfx.js', 'js/ui/spritecss.js', 'js/ui/view.js', 'js/ui/hud.js', 'js/ui/treeview.js', 'js/ui/juice.js', 'js/ui/theme.js', 'js/ui/life.js', 'js/ui/erafx.js', 'js/ui/ambient.js', 'js/ui/desktop.js', 'js/ui/story.js', 'js/ui/panels.js',
   'js/main.js'
 ];
 

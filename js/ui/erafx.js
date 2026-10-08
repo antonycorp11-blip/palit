@@ -9,7 +9,7 @@ PALIT.EraFX = (function () {
   var P = PALIT;
   var busy = false;
 
-  /* palito grande em pixel art (box-shadow) a partir da arte do material */
+  /* palito grande em pixel art (imagem) a partir da arte do material */
   function stickArt(mat) {
     var art = P.STICKS && P.STICKS[mat.id], rows = [], pal = {};
     if (art && art.grid) { rows = art.grid; pal = art.pal; }
@@ -29,12 +29,13 @@ PALIT.EraFX = (function () {
       var w = lk.len; rows = [Array(w + 1).join('a'), Array(w + 1).join('b'), Array(w + 1).join('c')];
     }
     var Z = Math.max(4, Math.min(9, Math.floor(Math.min(window.innerWidth * 0.8, 520) / rows[0].length)));
-    var sh = [];
+    var px = [];
     rows.forEach(function (row, y) {
-      for (var x = 0; x < row.length; x++) if (row[x] !== '.' && pal[row[x]]) sh.push((x * Z) + 'px ' + (y * Z) + 'px 0 0 ' + pal[row[x]]);
+      for (var x = 0; x < row.length; x++) if (row[x] !== '.' && pal[row[x]]) px.push([x, y, pal[row[x]]]);
     });
     var w2 = rows[0].length * Z, h2 = rows.length * Z;
-    return '<div class="ef-stick" style="width:' + w2 + 'px;height:' + h2 + 'px"><i style="width:' + Z + 'px;height:' + Z + 'px;box-shadow:' + sh.join(',') + '"></i></div>';
+    var img = P.SpriteCSS.bake(rows[0].length, rows.length, px, Z);
+    return '<div class="ef-stick" style="width:' + w2 + 'px;height:' + h2 + 'px"><i style="width:100%;height:100%;background:url(' + img + ') 0 0/100% 100% no-repeat;image-rendering:pixelated"></i></div>';
   }
 
   function colorsOf(mat) {
