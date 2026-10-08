@@ -30,7 +30,14 @@ PALIT.Story = (function () {
     el.name = el.box.querySelector('.dg-name');
     el.text = el.box.querySelector('.dg-text');
     el.box.addEventListener('pointerdown', function (e) { e.stopPropagation(); if (e.target.closest('.dg-skip')) return; advance(); });
-    el.box.querySelector('.dg-skip').addEventListener('click', function (e) { e.stopPropagation(); finish(); });
+    // pular exige confirmação: toques rápidos de quem está "clicando" não pulam a cena
+    var skipT = 0, skipB = el.box.querySelector('.dg-skip');
+    skipB.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (performance.now() - skipT < 2500) { skipB.textContent = 'PULAR'; finish(); return; }
+      skipT = performance.now(); skipB.textContent = 'PULAR? TOQUE DE NOVO';
+      setTimeout(function () { skipB.textContent = 'PULAR'; }, 2500);
+    });
 
     el.bub = document.createElement('div');
     el.bub.id = 'bubble';
@@ -57,6 +64,8 @@ PALIT.Story = (function () {
     });
     G.on('damage', function (d) { trigger(function (w) { return w.on === 'damage' || (d.kind === 'fire' && w.on === 'fire'); }); });
     G.on('blocked', function (r) { if (r === 'limit') trigger(function (w) { return w.on === 'limit'; }); });
+    G.on('bossSpawn', function (b) { trigger(function (w) { return w.on === 'boss_' + b.def.id; }); });
+    G.on('bossDead', function (d) { trigger(function (w) { return w.on === 'bossdown_' + d.b.def.id; }); });
     G.on('treeComplete', function () { trigger(function (w) { return w.on === 'tree100'; }); });
     G.on('challenge', function (s) { trigger(function (w) { return w.on === (s === 'start' ? 'challenge' : s === 'won' ? 'won' : '_'); }); });
     G.on('rebuild', function () { setTimeout(start, 1600); });
@@ -84,13 +93,26 @@ PALIT.Story = (function () {
     return !!document.getElementById('splash') || !$('modal').hidden || (P.TreeView && P.TreeView.isOpen());
   }
 
+  /* a cena acontece na BASE: o jogo para, a câmera desce até o chão,
+     os personagens aparecem ao pé da torre e só então a conversa começa.
+     No fim, o jogador sobe de volta manualmente. */
   function show(b) {
-    cur = { beat: b, i: -1 };
+    cur = { beat: b, i: -1, travel: true };
     P.Pause.set('story', true);
-    el.box.hidden = false;
-    el.box.classList.remove('in'); void el.box.offsetWidth; el.box.classList.add('in');
-    P.Audio.sfx.page();
-    next();
+    var low = G.layersBuilt() < 12 || b.when.start;
+    P.View.goLayer(0);
+    var who = [];
+    b.lines.forEach(function (l) { if (who.indexOf(l[0]) < 0) who.push(l[0]); });
+    if (P.Life.cast) P.Life.cast(who);
+    if (!low) P.HUD.toast('CHAMADO NA BASE!', 'info', false, { icon: 'ico_down', life: 1.6 });
+    setTimeout(function () {
+      if (!cur || cur.beat !== b) return;
+      cur.travel = false;
+      el.box.hidden = false;
+      el.box.classList.remove('in'); void el.box.offsetWidth; el.box.classList.add('in');
+      P.Audio.sfx.page();
+      next();
+    }, low ? 350 : 1500);
   }
 
   function next() {
@@ -105,14 +127,18 @@ PALIT.Story = (function () {
     cur.full = line[1];
     cur.shown = 0;
     cur.typing = true;
+    cur.lineAt = performance.now();
+    if (P.Life.speak) P.Life.speak(line[0]);
     cur.pitch = ch.pitch;
     el.text.textContent = '';
     el.box.classList.toggle('mystery', line[0] === 'voz');
   }
 
   function advance() {
-    if (!cur) return;
-    if (cur.typing) { cur.shown = cur.full.length; el.text.textContent = cur.full; cur.typing = false; return; }
+    if (!cur || cur.travel) return;
+    var now = performance.now();
+    if (now - cur.lineAt < 300) return;        // toques em rajada não atropelam as falas
+    if (cur.typing) { cur.shown = cur.full.length; el.text.textContent = cur.full; cur.typing = false; cur.lineAt = now; return; }
     P.Audio.sfx.page();
     next();
   }
@@ -134,6 +160,8 @@ PALIT.Story = (function () {
     cur = null;
     el.box.hidden = true;
     P.Pause.set('story', false);
+    if (P.Life.uncast) P.Life.uncast();
+    if (!queue.length && G.layersBuilt() > 12) P.HUD.toast('SUBA DE VOLTA AO TOPO ▲', 'info', false, { icon: 'ico_up', life: 3, onClick: function () { P.View.goTop(); } });
     P.save();
     if (!queue.length) { var f = idleFns.splice(0); f.forEach(function (fn) { fn(); }); }
   }
@@ -184,10 +212,15 @@ PALIT.Story = (function () {
         cur.shown++;
         el.text.textContent = cur.full.slice(0, cur.shown);
         if (cur.shown % 2 === 0 && /\S/.test(cur.full[cur.shown - 1] || '')) P.Audio.sfx.blip(cur.pitch);
-        if (cur.shown >= cur.full.length) cur.typing = false;
+        if (cur.shown >= cur.full.length) { cur.typing = false; cur.lineAt = performance.now(); }
       }
     }
-    if (!cur && queue.length && !blocked()) show(queue.shift());
+    if (!cur && queue.length && !blocked()) {
+      // durante a luta com o chefão, só a cena do próprio chefão interrompe
+      var fight = G.rt.boss && G.rt.boss.state !== 'dead';
+      var qi = fight ? queue.findIndex(function (q) { return q.when.on && q.when.on.indexOf('boss') === 0; }) : 0;
+      if (qi >= 0) show(queue.splice(qi, 1)[0]);
+    }
     // noite / dinheiro
     if (P.Ambient && P.Ambient.night > 0.5 && G.layersBuilt() > 20) trigger(function (w) { return w.on === 'night'; });
     if (G.def && !(G.levels().root) && G.S.money >= 3 && G.S.stats.placed > 4) trigger(function (w) { return w.on === 'money'; });

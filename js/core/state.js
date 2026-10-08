@@ -35,6 +35,7 @@ PALIT.State = {
       clues: [],
       records: {},
       flags: {},
+      bosses: {},
       lastSeen: Date.now()
     };
   },

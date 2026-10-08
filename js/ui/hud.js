@@ -139,6 +139,7 @@ PALIT.HUD = (function () {
     var br = G.blockReason();
     if (!V.nearTop()) { s = 'VISITANDO CAMADA ' + Math.max(1, Math.round(V.viewLayers()[0] + (V.viewLayers()[1] - V.viewLayers()[0]) / 2)); }
     else if (rt.ch) { s = 'SOBREVIVA À ' + G.mat.challenge.name; cls = 'warn'; }
+    else if (br === 'boss') { s = 'CHEFÃO NA TORRE! TOQUE NELE!'; cls = 'bad'; }
     else if (br === 'empty') { s = 'SEM ' + G.mat.pieces.toUpperCase() + ' · AGUARDE A RECARGA'; cls = 'bad'; }
     else if (br === 'limit') { s = 'LIMITE ESTRUTURAL · MELHORE A ÁRVORE'; cls = 'warn'; }
     else if (br === 'goal') { s = 'ALTURA MÁXIMA DA ERA · SUBA DE ERA ▲'; cls = 'warn'; }
@@ -170,7 +171,19 @@ PALIT.HUD = (function () {
       ci.innerHTML = G.mat.challenge.name + '<br>' + Math.ceil(rt.ch.t) + 's · MÍN ' + G.mat.challenge.minIntegrity + '%';
     } else ci.hidden = true;
 
+    updateBossBar();
     updateRuler();
+  }
+
+  function updateBossBar() {
+    var b = G.rt.boss, bb = $('boss-bar');
+    if (!bb) { bb = document.createElement('div'); bb.id = 'boss-bar'; bb.className = 'px'; bb.hidden = true; bb.innerHTML = '<b class="t-px"></b><div class="bar"><i></i></div><span class="t-px"></span>'; $('hud').appendChild(bb); }
+    if (!b) { bb.hidden = true; return; }
+    bb.hidden = false;
+    bb.querySelector('b').textContent = '☠ ' + b.def.name;
+    bb.querySelector('.bar i').style.width = (b.hp / b.maxHp * 100) + '%';
+    bb.querySelector('span').textContent = Math.ceil(b.hp) + ' / ' + b.maxHp + (b.state === 'dead' ? ' · DERROTADO!' : '');
+    bb.classList.toggle('dead', b.state === 'dead');
   }
 
   function canAffordAny() {
@@ -190,7 +203,7 @@ PALIT.HUD = (function () {
     var vl = V.viewLayers();
     var built = G.layersBuilt(), lim = G.limit();
     var dmg = st.rulerMarkers ? G.damagedCells(true) : [];
-    var key = [built, lim, Math.round(vl[0]), Math.round(vl[1]), dmg.length, dmg[0], st.rulerHeat, G.rt.dmgCount.miss + G.rt.dmgCount.crack].join('|');
+    var key = [built, lim, Math.round(vl[0]), Math.round(vl[1]), dmg.length, dmg[0], st.rulerHeat, G.rt.dmgCount.miss + G.rt.dmgCount.crack, JSON.stringify(G.S.bosses || {})].join('|');
     if (key === lastRuler) return;
     lastRuler = key;
     function pct(l) { return Math.max(0, Math.min(100, l / goal * 100)); }
@@ -207,6 +220,10 @@ PALIT.HUD = (function () {
       }
     }
     dmg.forEach(function (c) { h += '<i class="dmg" style="bottom:' + pct(Math.floor(c / m.piecesPerLayer)) + '%"></i>'; });
+    G.bossList().forEach(function (bd) {
+      var done = G.S.bosses && G.S.bosses[bd.id];
+      h += '<span class="boss-mk' + (done ? ' done' : '') + '" style="bottom:' + pct(bd.layer) + '%" title="' + bd.name + '">' + (done ? '✓' : '☠') + '</span>';
+    });
     var v0 = pct(Math.max(0, vl[0])), v1 = pct(Math.max(0, vl[1]));
     h += '<i class="view" style="bottom:' + v0 + '%;height:' + Math.max(1, v1 - v0) + '%"></i>';
     h += '<span class="lbl" style="bottom:calc(100% - 4px)">' + P.fmtHeight(m.goalM * (1 + st.pieceSize)) + '</span>';
@@ -246,6 +263,7 @@ PALIT.HUD = (function () {
       toast(t.text, t.kind, t.small, opts);
     });
     G.on('damage', function (d) {
+      if (d.src === 'boss') return;          // o chefão tem a própria barra
       var what = d.kind === 'fire' ? 'FOGO' : d.kind === 'miss' ? 'PEÇA CAIU' : 'DANO';
       toast(what + ' — CAMADA ' + (d.layer + 1), 'bad', false, {
         icon: 'ico_warn',
@@ -255,7 +273,7 @@ PALIT.HUD = (function () {
     G.on('blocked', function (r) {
       var msg = {
         empty: 'SEM ' + G.mat.pieces.toUpperCase() + '!', emptyRepair: G.rt.jam ? 'CAIXA EMPERRADA — TOQUE 3x' : 'SEM PEÇAS E SEM DINHEIRO PARA O REPARO', money: 'DINHEIRO INSUFICIENTE',
-        limit: 'LIMITE ESTRUTURAL — MELHORE A ÁRVORE', unstable: 'ESTRUTURA INSTÁVEL — REPARE A TORRE', goal: 'ALTURA MÁXIMA DA ERA',
+        limit: 'LIMITE ESTRUTURAL — MELHORE A ÁRVORE', boss: 'DERROTE O CHEFÃO PARA CONTINUAR!', unstable: 'ESTRUTURA INSTÁVEL — REPARE A TORRE', goal: 'ALTURA MÁXIMA DA ERA',
         chIntegrity: 'INTEGRIDADE MÍNIMA DE ' + (G.mat.challenge ? G.mat.challenge.startIntegrity : 0) + '% PARA INICIAR'
       }[r] || r;
       toast(msg, 'warn', true);

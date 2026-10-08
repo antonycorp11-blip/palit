@@ -35,6 +35,7 @@ PALIT.Game = (function () {
       lastInput: 0,
       autoPlaceT: 0, autoRepairT: 0, autoDefendT: 0,
       helpers: [], helperSeq: 1,
+      boss: null, bossCheckT: 3,
       ch: null,
       integrity: 100, dmgCount: { crack: 0, miss: 0, fire: 0 },
       viewW: 100
@@ -181,6 +182,7 @@ PALIT.Game = (function () {
 
   /* ---------------- colocação ---------------- */
   function blockReason() {
+    if (rt.boss && rt.boss.state !== 'dead') return 'boss';
     if (layersBuilt() >= limit() && S.cursor % ppl() === 0) return layersBuilt() >= mat.goalLayers ? 'goal' : 'limit';
     if (rt.integrity < 40) return 'unstable';
     if (S.pieces < 1 && !(st.reserveBuild && S.reserve >= 1)) return 'empty';
@@ -750,7 +752,8 @@ PALIT.Game = (function () {
       if (rt.autoDefendT >= 60 / st.autoDefend) {
         rt.autoDefendT = 0;
         var live = rt.threats.filter(function (t) { return t.state === 'attack' || t.state === 'approach' || t.state === 'windup'; });
-        if (live.length) { hitThreat(live[rint(0, live.length - 1)].id, 1); emit('auto', 'defend'); }
+        if (rt.boss && rt.boss.state !== 'dead') { hitBoss(1); emit('auto', 'defend'); }
+        else if (live.length) { hitThreat(live[rint(0, live.length - 1)].id, 1); emit('auto', 'defend'); }
       }
     }
   }
@@ -760,6 +763,7 @@ PALIT.Game = (function () {
      continua sendo o principal). 'fix': descem até peças danificadas,
      marcam o lugar e consertam (pagando a taxa normal de reparo). */
   function liveThreat(id) {
+    if (id === 'boss') return rt.boss && rt.boss.state !== 'dead' ? rt.boss : null;
     for (var i = 0; i < rt.threats.length; i++) {
       var t = rt.threats[i];
       if (t.id === id) return (t.state === 'approach' || t.state === 'attack' || t.state === 'windup') ? t : null;
@@ -822,7 +826,9 @@ PALIT.Game = (function () {
         if (h.target && !t) { h.target = null; h.state = 'back'; }
         if (h.state === 'home' || h.state === 'back') {
           var best = null, bc = 99;
+          if (rt.boss && rt.boss.state !== 'dead') { best = rt.boss; bc = -1; }   // chefão tem prioridade
           rt.threats.forEach(function (o) {
+            if (bc < 0) return;
             if (o.def.kind === 'faller' || !liveThreat(o.id)) return;
             var c = targeted[o.id] || 0;
             if (c < bc) { bc = c; best = o; }
@@ -834,7 +840,7 @@ PALIT.Game = (function () {
           if (moveTo(h, dt, spD)) { h.state = 'fight'; h.t = 0; }
         } else if (h.state === 'fight' && t) {
           h.x = t.x - t.side * 3; h.y = t.y;
-          if (h.t >= atkInt) { h.t = 0; emit('helperHit', { h: h, t: t }); hitThreat(t.id, dmg); }
+          if (h.t >= atkInt) { h.t = 0; emit('helperHit', { h: h, t: t }); if (t === rt.boss) hitBoss(dmg); else hitThreat(t.id, dmg); }
         } else if (h.state === 'back') {
           h.tx = home.x; h.ty = home.y;
           if (moveTo(h, dt, spD)) h.state = 'home';
@@ -886,6 +892,83 @@ PALIT.Game = (function () {
     });
   }
 
+  /* ---------------- chefões ----------------
+     Em alturas fixas (PALIT.BOSSES), um chefão sobe na torre, quebra
+     palitos e bloqueia a construção até ser derrotado. */
+  function bossList() { return (P.BOSSES && P.BOSSES[mat.id]) || []; }
+  function pendingBoss() {
+    S.bosses = S.bosses || {};
+    var L = layersBuilt(), l = bossList();
+    for (var i = 0; i < l.length; i++) if (L >= l[i].layer && !S.bosses[l[i].id]) return l[i];
+    return null;
+  }
+  function perchY(layer) { return layer * LHU + geo().D / 2 + 2; }
+  function bossLayer() {
+    var top = layersBuilt();
+    return Math.max(braced(), top - 1 - rint(0, Math.min(40, Math.max(0, top - 1 - braced()))));
+  }
+  function startBoss(d) {
+    var g = geo(), side = Math.random() < 0.5 ? -1 : 1, layer = bossLayer();
+    rt.boss = { id: 'boss', def: d, hp: d.hp, maxHp: d.hp, side: side, state: 'enter', t: 0, layer: layer,
+      x: side * (rt.viewW / 2 + 30), y: perchY(layer) + 40, tx: side * (g.halfW + 2), ty: perchY(layer),
+      smashT: d.smash + 2, jumpT: d.jump };
+    emit('bossSpawn', rt.boss);
+  }
+  function bossSmash(n) {
+    var b = rt.boss, hit = 0;
+    for (var i = 0; i < n; i++) if (damage(pickCell(b.layer - 3, b.layer + 3, 1), Math.random() < 0.55 ? 'drop' : 'crack', 'boss')) hit++;
+    emit('bossSmash', { b: b, hits: hit });
+  }
+  function updateBoss(dt) {
+    if (!rt.boss) {
+      rt.bossCheckT -= dt;
+      if (rt.bossCheckT <= 0 && !rt.ch) { rt.bossCheckT = 2; var d = pendingBoss(); if (d) startBoss(d); }
+      return;
+    }
+    var b = rt.boss, d = b.def, g = geo();
+    b.t += dt;
+    if (b.state === 'enter') {
+      if (moveTo(b, dt, 34)) { b.state = 'perch'; bossSmash(d.land); }
+    } else if (b.state === 'perch') {
+      b.x = b.tx; b.y = b.ty;
+      b.smashT -= dt; b.jumpT -= dt;
+      if (b.smashT <= 0) { b.smashT = d.smash * (0.8 + Math.random() * 0.4); bossSmash(d.hits); }
+      if (b.jumpT <= 0) {
+        b.jumpT = d.jump * (0.8 + Math.random() * 0.4);
+        b.layer = bossLayer();
+        if (Math.random() < 0.5) b.side = -b.side;
+        b.fx = b.x; b.fy = b.y; b.tx = b.side * (g.halfW + 2); b.ty = perchY(b.layer);
+        b.state = 'jump'; b.t = 0;
+        emit('bossJump', b);
+      }
+    } else if (b.state === 'jump') {
+      var k = Math.min(1, b.t / 1.1);
+      b.x = b.fx + (b.tx - b.fx) * k;
+      b.y = b.fy + (b.ty - b.fy) * k + Math.sin(k * Math.PI) * 28;
+      if (k >= 1) { b.state = 'perch'; b.smashT = d.smash; bossSmash(d.land); }
+    } else if (b.state === 'dead') {
+      b.y -= dt * 30;
+      if (b.t > 1.6) rt.boss = null;
+    }
+  }
+  function hitBoss(power) {
+    var b = rt.boss;
+    if (!b || b.state === 'dead') return false;
+    if (power == null) rt.lastInput = rt.clock;
+    b.hp -= power != null ? power : st.threatPower;
+    emit('bossHit', b);
+    if (b.hp <= 0) {
+      b.hp = 0; b.state = 'dead'; b.t = 0;
+      var m = b.def.reward * (1 + st.threatReward);
+      addMoney(m);
+      S.bosses[b.def.id] = 1;
+      S.stats.defeated++;
+      S.stats.bosses = (S.stats.bosses || 0) + 1;
+      emit('bossDead', { b: b, money: m });
+    }
+    return true;
+  }
+
   /* ---------------- desafio final ---------------- */
   function challengeReady() {
     return !!(def && mat.challenge && layersBuilt() >= mat.goalLayers && !S.challengeDone && !rt.ch);
@@ -917,7 +1000,7 @@ PALIT.Game = (function () {
 
   function masteryReady() {
     // bateu a altura da era, pode subir (árvore e desafio final são opcionais)
-    return !!(def && layersBuilt() >= mat.goalLayers && !rt.ch);
+    return !!(def && layersBuilt() >= mat.goalLayers && !rt.ch && !rt.boss && !pendingBoss());
   }
 
   function rebuild() {
@@ -980,6 +1063,7 @@ PALIT.Game = (function () {
     updateSpread(dt);
     updateAuto(dt);
     updateHelpers(dt);
+    updateBoss(dt);
     updateChallenge(dt);
   }
 
@@ -1017,7 +1101,8 @@ PALIT.Game = (function () {
     maxTree: function () { def.nodes.forEach(function (n) { levels()[n.id] = n.lv; }); recalc(); emit('bought', {}); },
     event: function (id) { runEvent(P.EVENTS.filter(function (e) { return e.id === id; })[0]); },
     threat: function (k, n) { spawnThreat(k, n || 1); },
-    gust: function (s) { gust(s || 1); }
+    gust: function (s) { gust(s || 1); },
+    boss: function (i) { var l = bossList(); if (l[i || 0]) { S.bosses[l[i || 0].id] = 0; startBoss(l[i || 0]); } }
   };
 
   return {
@@ -1029,6 +1114,6 @@ PALIT.Game = (function () {
     damagedCells: damagedCells, blockReason: blockReason, prodRate: prodRate, sway: sway, threatsActive: threatsActive,
     layersBuilt: layersBuilt, topLayer: topLayer, limit: limit, localHeight: localHeight, globalHeight: globalHeight, progress: progress,
     get S() { return S; }, get mat() { return mat; }, get def() { return def; }, get st() { return st; }, get rt() { return rt; },
-    levels: levels, debug: debug, fx: fx, eraRecord: eraRecord, braced: function () { return braced(); }, cellPos: cellPos
+    levels: levels, debug: debug, fx: fx, eraRecord: eraRecord, hitBoss: function () { return hitBoss(); }, bossList: bossList, braced: function () { return braced(); }, cellPos: cellPos
   };
 })();

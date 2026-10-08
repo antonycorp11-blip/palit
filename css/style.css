@@ -52,10 +52,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   position: relative;
   background: var(--panel);
   box-shadow:
-    0 calc(var(--u) * -1) 0 0 var(--ink),
-    0 var(--u) 0 0 var(--ink),
-    calc(var(--u) * -1) 0 0 0 var(--ink),
-    var(--u) 0 0 0 var(--ink),
+    0 calc(var(--u) * -1) 0 0 var(--edge, var(--ink)),
+    0 var(--u) 0 0 var(--edge, var(--ink)),
+    calc(var(--u) * -1) 0 0 0 var(--edge, var(--ink)),
+    var(--u) 0 0 0 var(--edge, var(--ink)),
     inset var(--u) var(--u) 0 0 rgba(255, 255, 255, .10),
     inset calc(var(--u) * -1) calc(var(--u) * -1) 0 0 rgba(0, 0, 0, .35);
 }
@@ -65,8 +65,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: var(--panel2);
   font-family: var(--font-px); font-size: 11px; letter-spacing: 0; text-transform: uppercase;
   box-shadow:
-    0 calc(var(--u) * -1) 0 0 var(--ink), 0 var(--u) 0 0 var(--ink),
-    calc(var(--u) * -1) 0 0 0 var(--ink), var(--u) 0 0 0 var(--ink),
+    0 calc(var(--u) * -1) 0 0 var(--edge, var(--ink)), 0 var(--u) 0 0 var(--edge, var(--ink)),
+    calc(var(--u) * -1) 0 0 0 var(--edge, var(--ink)), var(--u) 0 0 0 var(--edge, var(--ink)),
     inset var(--u) var(--u) 0 0 rgba(255, 255, 255, .18),
     inset calc(var(--u) * -1) calc(var(--u) * -1) 0 0 rgba(0, 0, 0, .45);
 }
@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .bar { position: relative; height: calc(var(--u) * 2); background: var(--ink); overflow: hidden; }
 .bar > i {
   position: absolute; left: 0; top: 0; bottom: 0; width: 0;
-  background: repeating-linear-gradient(90deg, var(--c, var(--lime)) 0 calc(var(--u) * 2), transparent calc(var(--u) * 2) calc(var(--u) * 3));
+  background: repeating-linear-gradient(90deg, var(--c, var(--bar, var(--lime))) 0 calc(var(--u) * 2), transparent calc(var(--u) * 2) calc(var(--u) * 3));
 }
 
 /* =========================================================
@@ -274,7 +274,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 #ruler { position: absolute; right: calc(16px + env(safe-area-inset-right)); top: calc(34% + env(safe-area-inset-top)); bottom: 25%; width: calc(var(--u) * 4); background: var(--ink); cursor: pointer; }
 #ruler::before { content: ''; position: absolute; inset: calc(var(--u) * -1); z-index: -1; background: var(--panel); }
-#ruler .fill { position: absolute; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, var(--lime) 0 calc(var(--u) * 1), #008751 var(--u) calc(var(--u) * 2)); }
+#ruler .fill { position: absolute; left: 0; right: 0; bottom: 0; background: repeating-linear-gradient(0deg, var(--bar, var(--lime)) 0 calc(var(--u) * 1), var(--bar2, #008751) var(--u) calc(var(--u) * 2)); }
 #ruler .limit { position: absolute; left: calc(var(--u) * -2); right: calc(var(--u) * -2); height: var(--u); background: var(--orange); }
 #ruler .tick { position: absolute; right: 100%; width: calc(var(--u) * 2); height: 2px; background: var(--lav); }
 #ruler .view { position: absolute; left: calc(var(--u) * -1); right: calc(var(--u) * -1); border: 2px solid var(--white); min-height: 4px; }
@@ -1023,3 +1023,96 @@ html.desk #era-fx .ef-title { font-size: 34px; } html.desk #era-fx .ef-kicker { 
 html.land #topbar .tb-menu { position: absolute; right: 6px; top: 6px; padding: 4px 5px; margin: 0; }
 html.land #topbar .tb-row:first-child { padding-right: 34px; }
 html.land #b-tree { top: 190px; bottom: auto; }
+
+/* =========================================================
+   TEMAS POR ERA (texturas dos painéis)
+   ========================================================= */
+html.themed #topbar .mat-name, html.themed #tree-head h2 { color: var(--accent); }
+html.themed .pxbtn:not(.gold):not(.red):not(.green) { color: var(--white); }
+html.themed #b-tree .tt { color: var(--accent); }
+html.themed #b-tree { background: var(--panel2); }
+html.themed .chip { box-shadow: 0 0 0 2px var(--edge); }
+/* madeira: veios */
+html.th-wood .px, html.th-cane .px { background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.035) 0 3px, transparent 3px 9px, rgba(0,0,0,.08) 9px 11px, transparent 11px 17px); }
+html.th-cane .px { background-image: repeating-linear-gradient(90deg, transparent 0 46px, rgba(0,0,0,.22) 46px 49px, rgba(255,255,255,.08) 49px 51px); }
+/* metal: escovado + rebites */
+html.th-metal .px { background-image:
+  radial-gradient(circle at 7px 7px, rgba(255,255,255,.5) 0 2px, transparent 2.5px),
+  radial-gradient(circle at calc(100% - 7px) 7px, rgba(255,255,255,.5) 0 2px, transparent 2.5px),
+  radial-gradient(circle at 7px calc(100% - 7px), rgba(255,255,255,.35) 0 2px, transparent 2.5px),
+  radial-gradient(circle at calc(100% - 7px) calc(100% - 7px), rgba(255,255,255,.35) 0 2px, transparent 2.5px),
+  repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 4px); }
+/* pedra: blocos */
+html.th-stone .px { background-image: repeating-linear-gradient(0deg, transparent 0 14px, rgba(0,0,0,.18) 14px 16px), repeating-linear-gradient(90deg, transparent 0 30px, rgba(0,0,0,.12) 30px 32px); }
+/* vidro/cristal: reflexo diagonal */
+html.th-glass .px { background-image: linear-gradient(115deg, rgba(255,255,255,.12) 0 18%, transparent 18% 32%, rgba(255,255,255,.07) 32% 36%, transparent 36%); }
+html.th-glass .px, html.th-glass .pxbtn { box-shadow:
+  0 calc(var(--u) * -1) 0 0 var(--accent2), 0 var(--u) 0 0 var(--edge), calc(var(--u) * -1) 0 0 0 var(--edge), var(--u) 0 0 0 var(--edge),
+  inset var(--u) var(--u) 0 0 rgba(255,255,255,.18), inset calc(var(--u) * -1) calc(var(--u) * -1) 0 0 rgba(0,0,0,.35); }
+/* cósmico: brilho que percorre e estrelas */
+html.th-cosmic .px { background-image:
+  radial-gradient(circle at 20% 30%, rgba(255,255,255,.5) 0 1px, transparent 1.5px),
+  radial-gradient(circle at 70% 70%, rgba(255,255,255,.4) 0 1px, transparent 1.5px),
+  radial-gradient(circle at 85% 20%, rgba(255,255,255,.35) 0 1px, transparent 1.5px),
+  linear-gradient(100deg, transparent 0 40%, rgba(255,255,255,.08) 50%, transparent 60%);
+  background-size: 37px 29px, 53px 41px, 61px 47px, 300% 100%; animation: cosmicshine 6s linear infinite; }
+@keyframes cosmicshine { to { background-position: 0 0, 0 0, 0 0, -300% 0; } }
+html.th-cosmic #topbar, html.th-cosmic #b-tree { filter: drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 60%, transparent)); }
+
+/* ---------------- elenco na base ---------------- */
+.npc { position: absolute; left: 0; top: 0; animation: npcin .6s steps(6) both; }
+.npc .sp { transform: scale(1.8); transform-origin: 50% 100%; }
+.npc.kid .sp { transform: scale(1.4); }
+.npc.voice .sp { transform: scale(2.4); animation: npcvoice 1.4s steps(4) infinite; filter: drop-shadow(0 0 8px #ffec27); }
+.npc-name { position: absolute; left: 50%; bottom: calc(100% + 30px); transform: translateX(-50%); font-size: 7px; white-space: nowrap; background: rgba(26,20,35,.85); padding: 2px 4px; opacity: .7; }
+.npc.talking .npc-name { opacity: 1; box-shadow: 0 0 0 2px currentColor; }
+.npc.talking .sp { animation: npctalk .35s steps(2) infinite; filter: drop-shadow(0 0 4px #fff1e8); }
+.npc .npc-talk { display: none; position: absolute; left: 50%; bottom: calc(100% + 14px); width: 18px; height: 10px; margin-left: -4px; background: #fff1e8;
+  box-shadow: 0 0 0 2px #1a1423; }
+.npc .npc-talk::after { content: ''; position: absolute; left: 3px; bottom: -5px; width: 4px; height: 4px; background: #fff1e8; }
+.npc.talking .npc-talk { display: block; animation: blink .6s steps(1) infinite; }
+.npc.leave { animation: npcout .7s steps(6) forwards; }
+@keyframes npcin { from { opacity: 0; margin-left: -60px; } to { opacity: 1; margin-left: 0; } }
+@keyframes npcout { to { opacity: 0; margin-left: -60px; } }
+@keyframes npctalk { 50% { margin-top: -6px; } }
+@keyframes npcvoice { 50% { opacity: .5; } }
+
+/* ---------------- chefões ---------------- */
+.th.boss { z-index: 12; min-width: 0; min-height: 0; margin: 0; width: 0; height: 0; }
+.th.boss .boss-in { position: absolute; left: 0; top: 0; width: calc(var(--bw) * var(--bs)); height: calc(var(--bh) * var(--bs));
+  transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.th.boss .boss-in .sp { transform: scale(var(--bs)); filter: drop-shadow(0 0 2px #ff004d) drop-shadow(0 0 8px rgba(255,0,77,.7)); }
+.th.boss.flip .boss-in .sp { transform: scale(calc(var(--bs) * -1), var(--bs)); }
+.th.boss .boss-aura { position: absolute; left: 0; top: 0; width: 160px; height: 160px; margin: -80px 0 0 -80px; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,0,77,.35), transparent 65%); animation: hglow 1s ease-in-out infinite; }
+.th.boss.hit .boss-in { animation: bosshit .18s steps(2); }
+@keyframes bosshit { 50% { filter: brightness(3); margin-left: 4px; } }
+.th.boss.st-perch .boss-in { animation: bossbreath 1.2s steps(2) infinite; }
+@keyframes bossbreath { 50% { margin-top: -4px; } }
+.th.boss.st-dead { opacity: .5; transition: opacity 1.4s; }
+.th.boss.st-dead .boss-in .sp { filter: grayscale(1) brightness(1.6); }
+#boss-bar { position: absolute; left: 50%; top: calc(150px + env(safe-area-inset-top)); transform: translateX(-50%); width: min(92vw, 420px); z-index: 7;
+  padding: 8px 10px; display: grid; gap: 5px; background: #2a0a14; animation: bossbar .5s steps(4); }
+#boss-bar b { color: var(--red); font-size: 9px; text-shadow: 2px 2px 0 var(--ink); }
+#boss-bar .bar { height: calc(var(--u) * 3); }
+#boss-bar .bar i { --c: var(--red); transition: width .2s steps(3); }
+#boss-bar span { font-size: 8px; color: var(--peach); text-align: right; }
+#boss-bar.dead b { color: var(--lime); }
+@keyframes bossbar { from { transform: translate(-50%, -40px); opacity: 0; } }
+html.desk #boss-bar { top: 24px; }
+html.land #boss-bar { top: 8px; width: 300px; }
+#ruler .boss-mk { position: absolute; left: -22px; transform: translateY(50%); font-size: 12px; line-height: 1; color: var(--red); text-shadow: 1px 1px 0 var(--ink), -1px -1px 0 var(--ink); animation: blink 1s steps(1) infinite; pointer-events: none; }
+#ruler .boss-mk.done { color: var(--lime); animation: none; }
+.banner.boss b { color: var(--red); font-size: 28px; text-shadow: 3px 3px 0 var(--ink); animation: bossban .3s steps(2) 4; }
+@keyframes bossban { 50% { transform: scale(1.15); } }
+
+/* diálogos no alto da tela: a base (onde o elenco conversa) fica à vista */
+#dialog { top: calc(150px + env(safe-area-inset-top)); bottom: auto; }
+html.desk #dialog { top: 24px; bottom: auto; }
+html.land #dialog { top: 8px; bottom: auto; }
+/* temas mais marcantes */
+html.themed #topbar::after, html.themed #dialog::after, html.themed #boss-bar::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: var(--u); pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 calc(var(--u) * 3), var(--accent2) calc(var(--u) * 3) calc(var(--u) * 6)); }
+html.themed #topbar::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: var(--u); pointer-events: none; background: color-mix(in srgb, var(--accent) 45%, transparent); }
+html.themed .toast { box-shadow: 0 0 0 var(--u) var(--edge), inset var(--u) 0 0 0 var(--accent); }
+html.themed #ruler::before { background: var(--panel); box-shadow: 0 0 0 2px var(--accent); }

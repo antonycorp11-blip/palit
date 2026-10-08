@@ -23,6 +23,8 @@ var PALIT = window.PALIT = window.PALIT || {};
     P.Story.init();
     P.Panels.init();
     P.Life.init();
+    P.Theme.apply(G.mat);
+    G.on('rebuild', function () { P.Theme.apply(G.mat); });
     if (/[?&]debug/.test(location.search)) debugPanel();
 
     var last = performance.now(), hudT = 0, slowT = 0, saveT = 0;

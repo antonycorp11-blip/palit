@@ -491,6 +491,26 @@ PALIT.View = (function () {
         hp.firstChild.style.width = Math.max(0, t.hp / t.maxHp * 100) + '%';
       }
     });
+    // chefão
+    var b = G.rt.boss;
+    if (b) {
+      seen.boss = 1;
+      var be = ents.boss;
+      if (!be) {
+        be = document.createElement('div');
+        be.className = 'th boss';
+        be.dataset.boss = '1';
+        be.innerHTML = '<div class="boss-in" style="--bs:' + b.def.scale + ';filter:' + (b.def.tint || 'none') + '">' + P.SpriteCSS.html(b.def.sprite) + '</div><i class="boss-aura"></i>';
+        el.ents.appendChild(be);
+        ents.boss = be;
+      }
+      var bsz = P.SpriteCSS.size(b.def.sprite);
+      var bx = Math.round(b.x) * U + (b.state === 'perch' ? layerX(b.layer) : 0), by = -Math.round(b.y) * U;
+      var bface = b.state === 'perch' ? -b.side : (b.tx >= b.x ? 1 : -1);
+      be.style.transform = 'translate(' + (bx + 22) + 'px,' + (by + 22) + 'px)';
+      be.style.setProperty('--bw', bsz.w * U + 'px'); be.style.setProperty('--bh', bsz.h * U + 'px');
+      be.className = 'th boss st-' + b.state + (bface < 0 ? ' flip' : '');
+    }
     Object.keys(ents).forEach(function (id) { if (!seen[id]) { ents[id].remove(); delete ents[id]; } });
     // setas de ameaças fora da tela (Sentinela)
     if (G.st.threatWarn) {
@@ -642,6 +662,16 @@ PALIT.View = (function () {
       floatText(Math.round(d.t.x) * U, -Math.round(d.t.y) * U - 16, '+$' + P.fmtMoney(Math.max(1, d.money)), 'good');
       sparks(Math.round(d.t.x) * U, -Math.round(d.t.y) * U, '#ffec27', 8);
     });
+    G.on('bossHit', function (b) {
+      sparks(Math.round(b.x) * U, -Math.round(b.y) * U, '#fff1e8', 4);
+      var be = ents.boss; if (be) { be.classList.remove('hit'); void be.offsetWidth; be.classList.add('hit'); }
+    });
+    G.on('bossSmash', function (d) { shake(d.hits ? 3 : 1); sparks(Math.round(d.b.x) * U, -Math.round(d.b.y) * U, '#ffa300', 10); });
+    G.on('bossDead', function (d) {
+      floatText(Math.round(d.b.x) * U, -Math.round(d.b.y) * U - 30, '+$' + P.fmtMoney(d.money), 'good');
+      sparks(Math.round(d.b.x) * U, -Math.round(d.b.y) * U, '#ffec27', 24);
+      shake(4);
+    });
     G.on('impact', function (t) { sparks(Math.round(t.x) * U, -Math.round(t.y) * U, '#ff004d', 8); });
     G.on('gust', function (g) { windLines(g.dir); });
     G.on('placeStart', function (p) { dirty[Math.floor(p.cell / G.mat.piecesPerLayer)] = 1; });
@@ -702,9 +732,9 @@ PALIT.View = (function () {
     g.addEventListener('pointerdown', function (e) {
       if (isUI(e.target)) return;
       e.preventDefault();
-      if (P.Pause.active()) { if (P.Story.active()) P.Story.advance(); return; }
+      if (P.Pause.active()) return;     // diálogos só avançam tocando na caixa de diálogo
       var th = e.target.closest('.th');
-      if (th) { G.hitThreat(+th.dataset.id); return; }
+      if (th) { if (th.dataset.boss) G.hitBoss(); else G.hitThreat(+th.dataset.id); return; }
       ptrs[e.pointerId] = { x: e.clientX, y: e.clientY, y0: e.clientY, cam0: cam.y, t: performance.now(), moved: false, lastY: e.clientY, lastT: performance.now(), v: 0 };
       var ids = Object.keys(ptrs);
       if (ids.length === 2) {   // pinça: zoom na torre

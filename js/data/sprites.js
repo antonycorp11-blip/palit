@@ -472,6 +472,11 @@ PALIT.SPRITES = {
   var alien = { h: '#00e436', s: '#00e436', k: '#1a1423', t: '#83769c', p: '#008751' };
   S.vis_alien = person(alien); S.vis_alienc = cheer(alien);
 
+  /* personagens da história (aparecem na base durante as conversas) */
+  S.npc_ademir = cheer({ h: '#ff004d', s: '#ffccaa', k: '#1a1423', t: '#ffec27', p: '#5f3a20' });
+  S.npc_vo = cheer({ h: '#c2c3c7', s: '#ffccaa', k: '#5f574f', t: '#83769c', p: '#ff77a8' });
+  S.npc_luca = cheer({ h: '#5f3a20', s: '#ffccaa', k: '#1a1423', t: '#29adff', p: '#ffa300' });
+  S.npc_inspetor = cheer({ h: '#29233a', s: '#e0a080', k: '#1a1423', t: '#5f574f', p: '#29233a' });
   S.vis_balloon = { pal: { r: '#ff004d', y: '#ffec27', w: '#fff1e8', k: '#5f574f', b: '#ab5236', d: '#7e2553', s: '#ffccaa', h: '#5f3a20' }, fps: 2, frames: [[
     '....rrwrr....',
     '..rrrywyrrr..',

@@ -275,6 +275,41 @@ PALIT.Life = (function () {
     }
   }
 
+  /* ---------------- elenco da história na base ---------------- */
+  var CAST = { ademir: 'npc_ademir', vo: 'npc_vo', luca: 'npc_luca', inspetor: 'npc_inspetor', pombo: 'pigeon', gato: 'cat', radio: 'pt_radio', bilhete: 'pt_bilhete', voz: 'pt_voz' };
+  var castEls = {};
+  function cast(who) {
+    uncast(true);
+    var g = V.geom(), U = g.U, halfW = (g.L + g.D) / 2;
+    var n = 0;
+    who.forEach(function (w) {
+      var spr = CAST[w];
+      if (!spr || !P.SPRITES[spr]) return;
+      var ch = P.CHARACTERS[w] || {};
+      var e = document.createElement('div');
+      e.className = 'npc' + (w === 'voz' ? ' voice' : '') + (w === 'luca' ? ' kid' : '');
+      var sz = P.SpriteCSS.size(spr);
+      var x, y = 0;
+      if (w === 'voz') { x = 0; y = 34; }
+      else { x = -(halfW + 10 + n * 15); n++; }
+      if (n > 3 && w !== 'voz') x = halfW + 12 + (n - 4) * 15;
+      e.style.transform = 'translate(' + (x * U - sz.w * U / 2) + 'px,' + (-y * U - sz.h * U) + 'px)';
+      e.innerHTML = '<span class="npc-name t-px" style="color:' + (ch.color || '#fff1e8') + '">' + (ch.name || '').split(' ')[0] + '</span>' + P.SpriteCSS.html(spr) + '<b class="npc-talk"></b>';
+      el.life.appendChild(e);
+      castEls[w] = e;
+    });
+  }
+  function speak(w) {
+    Object.keys(castEls).forEach(function (k) { castEls[k].classList.toggle('talking', k === w); });
+  }
+  function uncast(now) {
+    Object.keys(castEls).forEach(function (k) {
+      var e = castEls[k];
+      if (now) e.remove(); else { e.classList.add('leave'); setTimeout(function () { e.remove(); }, 700); }
+    });
+    castEls = {};
+  }
+
   function tick(dt, paused) {
     if (!G || !V) return;
     updateBrace();
@@ -282,5 +317,5 @@ PALIT.Life = (function () {
     updateVisitors(dt, paused);
   }
 
-  return { init: init, tick: tick, helperName: helperName, spawn: function (k) { if (k === 'fly') spawnFlyer(); else spawnWalker(); } };
+  return { init: init, tick: tick, helperName: helperName, cast: cast, speak: speak, uncast: function () { uncast(false); }, spawn: function (k) { if (k === 'fly') spawnFlyer(); else spawnWalker(); } };
 })();

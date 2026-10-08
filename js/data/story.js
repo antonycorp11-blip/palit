@@ -31,6 +31,7 @@ PALIT.CLUES = [
   { id: 'tonico',     title: 'O Caso Tonico',         text: 'Numa noite de lua cheia, Tonico tentou passar dos 2 metros. Sumiu por três dias. Voltou falando de "um palito que flutua".' },
   { id: 'teoria',     title: 'A Teoria do Ademir',    text: 'Envolve pombos, a Receita Federal e um palito de dente muito antigo. Ainda não fecha. "Mas vai fechar."' },
   { id: 'tictic',     title: 'O Tic-Tic',             text: 'Depois de 1 metro, Tonico começou a ouvir um "tic-tic-tic" vindo de cima. Você também está ouvindo?' },
+  { id: 'corvo',       title: 'O Corvo-Rei',          text: 'O guardião da altura proibida trabalhava para a Voz. Quem guarda as alturas... e por quê?' },
   { id: 'relatorio87', title: 'Relatório de 1987',    text: 'Alguém passou dos 2 metros em 1987. O relatório foi lacrado. A única palavra legível: "DENTE".' },
   { id: 'plataforma', title: 'A Plataforma',          text: 'Gervásio afirma que existe uma plataforma lá em cima. Construída por alguém. Antes de todos nós.' },
   { id: 'voz',        title: 'A Voz do Topo',         text: '"Quem empilha... chega. Quem chega... troca." A voz vem de cima. Ninguém mais parece ouvir.' },
@@ -209,6 +210,32 @@ PALIT.STORY = [
     ['pombo', 'Pruu.']
   ] },
 
+  /* ---------------- chefões da era 1 ---------------- */
+  { id: 'boss_bartolomeu', era: 'fosforo', when: { on: 'boss_bartolomeu' }, lines: [
+    ['ademir', 'Ô-ou. Tá ouvindo esse ronronar? Parece um trator.'],
+    ['gato', 'Mrrrrrau.'],
+    ['vo', 'É o Bartolomeu! Ele comeu a ração de três vizinhos e agora acha que a torre é um arranhador!'],
+    ['ademir', 'Ele vai pular de andar em andar derrubando fósforo! Sobe lá e toca nele até ele desistir!'],
+    ['ademir', 'Enquanto ele estiver lá em cima, nada de construir. E quanto mais ajudante você tiver, melhor.']
+  ] },
+  { id: 'bossdown_bartolomeu', era: 'fosforo', when: { on: 'bossdown_bartolomeu' }, lines: [
+    ['gato', 'Mrau... (ofendido)'],
+    ['vo', 'Ele foi dormir em cima da geladeira. Vitória nossa!'],
+    ['voz', '...tic. Ele não subiu sozinho. Alguém chamou.']
+  ] },
+  { id: 'boss_corvorei', era: 'fosforo', when: { on: 'boss_corvorei' }, lines: [
+    ['inspetor', 'ALERTA DO INPALI! Um Corvo-Rei foi avistado a 1,7 metro!'],
+    ['ademir', 'Corvo-Rei? Isso existe?'],
+    ['inspetor', 'Ele guarda a altura proibida. Quebra tudo que passa dos limites. Está no Artigo 4, parágrafo único.'],
+    ['pombo', 'Pruu! (os pombos estão com medo)'],
+    ['ademir', 'Chama os bichinhos! Formigas, besouros, todo mundo pra cima!']
+  ] },
+  { id: 'bossdown_corvorei', era: 'fosforo', when: { on: 'bossdown_corvorei' }, clue: 'corvo', lines: [
+    ['inspetor', 'Inacreditável. Ninguém derrota o Corvo-Rei. Vou ter que preencher um formulário.'],
+    ['voz', 'Ele trabalhava para mim. Agora você está pronto para os 2 metros.'],
+    ['ademir', 'TRABALHAVA PRA QUEM?!']
+  ] },
+
   /* ================= ERA 02 — PALITO DE DENTE ================= */
   { id: 'dente_intro', era: 'dente', when: { start: true }, clue: 'arquiteto', lines: [
     ['ademir', 'Palitos de DENTE! Mais rígidos, sem cabeça, sem fogo. O sonho de todo empilhador!'],
@@ -217,6 +244,35 @@ PALIT.STORY = [
     ['inspetor', 'Ele construía sempre recomeçando do ponto onde o material anterior parou. Uma plataforma de cada vez.'],
     ['ademir', 'Então o tic-tic... era alguém empilhando lá em cima esse tempo todo?'],
     ['voz', '...tic... tic...']
+  ] },
+  { id: 'boss_domcascudo', era: 'dente', when: { on: 'boss_domcascudo' }, lines: [
+    ['pombo', 'PRUUUU!'],
+    ['ademir', 'É o Dom Cascudo! O chefão dos Pombos Cascudos! O Gervásio diz que ele não é da família. Não oficialmente.'],
+    ['ademir', 'Ele vai bicar os palitos de dente um por um. Sobe e espanta ele!']
+  ] },
+  { id: 'bossdown_domcascudo', era: 'dente', when: { on: 'bossdown_domcascudo' }, lines: [
+    ['pombo', 'Pruu. (o Gervásio agora é o chefe da família)'],
+    ['ademir', 'Promoção no meio do expediente. Parabéns, Gervásio.']
+  ] },
+  { id: 'boss_megadrone', era: 'dente', when: { on: 'boss_megadrone' }, lines: [
+    ['luca', 'MOÇO! Eu montei um drone com o motor do liquidificador da minha mãe!'],
+    ['luca', 'Ele... meio que não obedece mais.'],
+    ['ademir', 'LUQUINHAS! Ele está serrando a torre!'],
+    ['luca', 'Toca nele! Ele desliga se apanhar bastante! Eu acho!']
+  ] },
+  { id: 'bossdown_megadrone', era: 'dente', when: { on: 'bossdown_megadrone' }, lines: [
+    ['luca', 'Desligou! Minha mãe ainda não sabe do liquidificador.'],
+    ['vo', 'Sabe sim. Ela está vindo.']
+  ] },
+  { id: 'boss_gaivota', era: 'dente', when: { on: 'boss_gaivota' }, lines: [
+    ['radio', 'Rádio Torre FM! Uma GAIVOTA GIGANTE foi vista sobre os telhados! Ninguém sabe de onde veio, não tem mar aqui!'],
+    ['voz', 'Ela vem do alto. De onde eu estou.'],
+    ['ademir', 'Então vamos mandar ela de volta! Todo mundo pra cima!']
+  ] },
+  { id: 'bossdown_gaivota', era: 'dente', when: { on: 'bossdown_gaivota' }, lines: [
+    ['voz', 'Impressionante. Os dentes estão quase dominados.'],
+    ['ademir', 'Um dia você vai descer aqui e tomar um café com a gente, viu?'],
+    ['voz', '...tic.']
   ] },
   { id: 'dente_pombos', era: 'dente', when: { on: 'pigeon' }, lines: [
     ['pombo', 'Pruu! PRUU!'],

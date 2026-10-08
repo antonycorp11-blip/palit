@@ -162,6 +162,21 @@ PALIT.Juice = (function () {
       }
     });
     G.on('threatHit', function () { A.sfx.hit(); });
+    G.on('bossSpawn', function (b) {
+      A.sfx.alarm();
+      banner('CHEFÃO!', b.def.name, 'boss');
+      if (P.Haptics) P.Haptics.buzz([80, 60, 80, 60, 160]);
+    });
+    G.on('bossHit', function () { A.sfx.hit(); if (P.Haptics) P.Haptics.buzz(8); });
+    G.on('bossSmash', function (d) { A.sfx.crack(); if (d.hits) { A.sfx.fall(); if (P.Haptics) P.Haptics.buzz(40); } });
+    G.on('bossJump', function () { A.sfx.whoosh(true); });
+    G.on('bossDead', function (d) {
+      A.sfx.win();
+      banner('CHEFÃO DERROTADO!', '+$' + P.fmtMoney(d.money), 'gold');
+      confetti(60); V.shake(4);
+      var s = V.toScreen(Math.round(d.b.x) * V.U, -Math.round(d.b.y) * V.U);
+      coinFly(s.x, s.y, 14, 60);
+    });
     G.on('threatDead', function (d) {
       A.sfx.kill();
       var s = V.toScreen(Math.round(d.t.x) * V.U, -Math.round(d.t.y) * V.U);
