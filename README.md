@@ -80,3 +80,13 @@ tools/
 2. Em `materials.js`, definir `tree: '<id>'`, `challenge` e a lista `threats` da era.
 3. Novos atributos → `stats.js`; novas ameaças/eventos → `threats.js` / `events.js`.
 4. Incluir o script no `index.html` e rodar `node tools/validate.js` e `node tools/sim.js`.
+
+## ATHG — trava da plataforma
+
+O Palit só roda dentro da ATHG (https://athg.antonycorp11.workers.dev/play/palit). **Não remova:**
+
+- o `<script>` no topo do `index.html`: aberto fora de um iframe (link direto), redireciona para o player da ATHG (localhost/rede local continuam livres para testes);
+- o `_headers` (`frame-ancestors`): só a ATHG pode exibir o jogo em iframe.
+
+Publicação na Cloudflare: `npx wrangler deploy` (config em `wrangler.jsonc`; o que não vai para o ar fica em `.assetsignore`).
+

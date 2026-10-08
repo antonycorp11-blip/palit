@@ -1,0 +1,9 @@
+// Cloudflare (Workers com assets estáticos): site estático, sem build — publica a raiz.
+// Os cabeçalhos (frame-ancestors da ATHG) vêm de _headers; o que não vai para o ar fica em .assetsignore.
+{
+  "name": "palit",
+  "compatibility_date": "2026-09-24",
+  "assets": {
+    "directory": "."
+  }
+}

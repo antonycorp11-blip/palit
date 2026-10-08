@@ -1,0 +1,11 @@
+.git
+.vercelignore
+vercel.json
+wrangler.jsonc
+README.md
+docs
+tools
+.DS_Store
+.wrangler
+.gitignore
+.assetsignore

@@ -86,7 +86,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
   /* PWA: service worker (offline) + bloqueios de gestos do iOS */
   /* versão publicada (aparece no canto da tela inicial e em MENU → OPÇÕES) */
-  P.BUILD = 'v15';
+  P.BUILD = 'v16';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
     // quando uma versão nova assume, recarrega uma vez (salvando antes)
