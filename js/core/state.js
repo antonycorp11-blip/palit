@@ -1,5 +1,6 @@
 /* =========================================================
-   ESTADO PERSISTENTE — save/load em localStorage.
+   ESTADO PERSISTENTE — save/load em localStorage
+   (dentro da ATHG, também na conta do jogador: ver cloud.js).
    ========================================================= */
 var PALIT = window.PALIT = window.PALIT || {};
 
@@ -43,8 +44,13 @@ PALIT.State = {
   load: function () {
     try {
       var raw = localStorage.getItem(this.KEY);
-      if (!raw) return null;
-      var d = JSON.parse(raw);
+      return raw ? this.unpack(JSON.parse(raw)) : null;
+    } catch (e) { return null; }
+  },
+
+  /* objeto salvo (local ou nuvem da ATHG) → estado do jogo; null se inválido */
+  unpack: function (d) {
+    try {
       if (!d || d.v !== 1) return null;
       d.cells = typeof d.cells === 'string' ? d.cells.split('').map(Number) : (d.cells || []);
       var f = this.fresh();
@@ -54,12 +60,19 @@ PALIT.State = {
     } catch (e) { return null; }
   },
 
+  /* estado do jogo → objeto para salvar (o mesmo vai para o aparelho e para a nuvem) */
+  pack: function (S) {
+    S.lastSeen = Date.now();
+    var o = Object.assign({}, S);
+    // peças em colocação (5) voltam a vazio
+    o.cells = S.cells.map(function (c) { return c === 5 ? 1 : c; }).join('');
+    return o;
+  },
+
   save: function (S) {
+    var o = this.pack(S);
+    PALIT.Cloud.save(o);
     try {
-      S.lastSeen = Date.now();
-      var o = Object.assign({}, S);
-      // peças em colocação (5) voltam a vazio
-      o.cells = S.cells.map(function (c) { return c === 5 ? 1 : c; }).join('');
       localStorage.setItem(this.KEY, JSON.stringify(o));
       return true;
     } catch (e) { return false; }

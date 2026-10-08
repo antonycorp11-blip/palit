@@ -9,10 +9,28 @@ var PALIT = window.PALIT = window.PALIT || {};
   var wiping = false;
 
   P.save = function () { if (!wiping) P.State.save(G.S); };
-  P.wipe = function () { wiping = true; P.State.wipe(); location.reload(); };
+  P.wipe = function () {
+    wiping = true; P.State.wipe();
+    P.Cloud.wipe().then(function () { location.reload(); });
+  };
+  // salva e envia para a conta na hora (sair, trocar de aba, subir de era)
+  function saveNow() { P.save(); P.Cloud.flush(); }
 
-  function start() {
-    G.init(P.State.load());
+  /* dentro da ATHG: vale o save mais recente entre o da conta e o deste aparelho */
+  function boot() {
+    P.Cloud.ready();
+    if (P.Cloud.active()) window.ATHG.on('pause', saveNow);   // portal pausou (saindo do jogo, aba escondida)
+    var local = P.State.load();
+    if (!P.Cloud.active()) return start(local);
+    P.Cloud.load().then(function (raw) {
+      var cloud = P.State.unpack(raw);
+      start(cloud && (!local || (cloud.lastSeen || 0) > (local.lastSeen || 0)) ? cloud : local);
+    });
+  }
+
+  function start(save) {
+    P.Cloud.started();
+    G.init(save);
     P.Progress.init();
     P.View.init();
     P.HUD.init();
@@ -47,12 +65,12 @@ var PALIT = window.PALIT = window.PALIT || {};
     requestAnimationFrame(loop);
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) P.save();
+      if (document.hidden) saveNow();
       else last = performance.now(); // sem ganhos offline: o tempo fora não conta
     });
-    window.addEventListener('pagehide', P.save);
+    window.addEventListener('pagehide', saveNow);
     G.on('bought', P.save);
-    G.on('rebuild', P.save);
+    G.on('rebuild', saveNow);
 
     var sp = document.getElementById('splash');
     var first = G.S.stats.placed === 0 && G.S.matIndex === 0;
@@ -86,7 +104,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
   /* PWA: service worker (offline) + bloqueios de gestos do iOS */
   /* versão publicada (aparece no canto da tela inicial e em MENU → OPÇÕES) */
-  P.BUILD = 'v17';
+  P.BUILD = 'v18';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
     // quando uma versão nova assume, recarrega uma vez (salvando antes)
@@ -124,6 +142,6 @@ var PALIT = window.PALIT = window.PALIT || {};
     if (tip && ios && !standalone && window.top === window.self) tip.hidden = false;
   });
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
-  else start();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
