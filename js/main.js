@@ -86,7 +86,7 @@ var PALIT = window.PALIT = window.PALIT || {};
 
   /* PWA: service worker (offline) + bloqueios de gestos do iOS */
   /* versão publicada (aparece no canto da tela inicial e em MENU → OPÇÕES) */
-  P.BUILD = 'v16';
+  P.BUILD = 'v17';
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     var hadCtrl = !!navigator.serviceWorker.controller, reloaded = false;
     // quando uma versão nova assume, recarrega uma vez (salvando antes)
@@ -120,7 +120,8 @@ var PALIT = window.PALIT = window.PALIT || {};
   document.addEventListener('DOMContentLoaded', function () {
     var ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     var tip = document.getElementById('ios-tip');
-    if (tip && ios && !standalone) tip.hidden = false;
+    // dentro da ATHG (iframe) a dica não vale: o app instalado abriria fora da plataforma
+    if (tip && ios && !standalone && window.top === window.self) tip.hidden = false;
   });
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
