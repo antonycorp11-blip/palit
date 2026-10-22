@@ -794,7 +794,8 @@ PALIT.Game = (function () {
     var best = -1, bs = -1e9;
     for (var c = S.cursor - 1; c >= 0; c--) {
       var v = S.cells[c];
-      if ((v !== CRACK && v !== MISS && v !== FIRE) || !rt.known[c] || taken[c]) continue;
+      // o consertador procura dano na torre inteira, mesmo fora do alcance de detecção
+      if ((v !== CRACK && v !== MISS && v !== FIRE) || taken[c]) continue;
       if (rt.repairing && rt.repairing.cell === c) continue;
       var sc = (v === FIRE ? 1000 : v === CRACK ? 200 : 100) - Math.abs(cellPos(c).y - h.y) / 30;
       if (sc > bs) { bs = sc; best = c; }
@@ -854,7 +855,11 @@ PALIT.Game = (function () {
         if ((h.state === 'home' || h.state === 'back') && h.t > 0.4) {
           h.t = 0;
           var c2 = fixTarget(h);
-          if (c2 >= 0) { h.cell = c2; h.state = 'go'; emit('fixerGo', { h: h, cell: c2 }); }
+          if (c2 >= 0) {
+            h.cell = c2; h.state = 'go';
+            rt.known[c2] = 1;   // dano escondido achado pelo ajudante passa a aparecer na régua e no atalho
+            emit('fixerGo', { h: h, cell: c2 });
+          }
         }
         if (h.state === 'go') {
           var cp = cellPos(h.cell);

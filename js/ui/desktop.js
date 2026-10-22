@@ -1,15 +1,13 @@
 /* =========================================================
-   DESKTOP — layout de tela grande, atalhos de teclado,
-   painel de próximas melhorias, registro de eventos e
-   dicas ao passar o mouse na árvore.
+   DESKTOP — layout de tela grande, atalhos de teclado e
+   dicas ao passar o mouse na árvore. Sem painel lateral:
+   a torre fica com a tela toda (missões no indicador).
    ========================================================= */
 var PALIT = window.PALIT = window.PALIT || {};
 
 PALIT.Desktop = (function () {
   var P = PALIT, G, V;
   var el = {};
-  var log = [];
-  var upKey = '';
   var hover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   function $(id) { return document.getElementById(id); }
@@ -19,21 +17,6 @@ PALIT.Desktop = (function () {
 
   function init() {
     G = P.Game; V = P.View;
-    var panel = document.createElement('aside');
-    panel.id = 'deskpanel';
-    panel.className = 'px';
-    panel.innerHTML =
-      '<h3>' + P.SpriteCSS.html('ico_star') + 'MISSÕES</h3><div id="dp-mis"></div>' +
-      '<h3>' + P.SpriteCSS.html('ico_tree') + 'PRÓXIMAS MELHORIAS</h3><div id="dp-up"></div>' +
-      '<h3>' + P.SpriteCSS.html('ico_flag') + 'REGISTRO</h3><div id="dp-log"></div>' +
-      '<div class="keys">' +
-        '<span><kbd>ESPAÇO</kbd> colocar</span><span><kbd>T</kbd> árvore</span><span><kbd>ESC</kbd> fechar</span>' +
-        '<span><kbd>↑</kbd><kbd>↓</kbd> rolar</span><span><kbd>HOME</kbd> topo</span><span><kbd>D</kbd> dano</span>' +
-        '<span><kbd>+</kbd><kbd>−</kbd> zoom</span><span><kbd>M</kbd> som</span><span><kbd>ENTER</kbd> comprar (árvore)</span>' +
-      '</div>';
-    $('hud').appendChild(panel);
-    el.panel = panel; el.up = $('dp-up'); el.log = $('dp-log');
-
     el.tip = document.createElement('div');
     el.tip.id = 'tip';
     el.tip.className = 'px';
@@ -43,70 +26,11 @@ PALIT.Desktop = (function () {
     apply();
     window.addEventListener('resize', apply);
     bindKeys();
-    bindLog();
     bindTips();
-    $('dp-mis').addEventListener('click', function (e) { var b = e.target.closest('[data-claim]'); if (b) P.Progress.claim(+b.dataset.claim); });
-    el.up.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-buy]');
-      if (b) { e.stopPropagation(); if (!G.buy(b.dataset.buy, false)) P.Audio.sfx.blocked(); else { P.Audio.sfx.buy(G.levels()[b.dataset.buy] || 1, false); upKey = ''; } return; }
-      var r = e.target.closest('[data-node]');
-      if (r) P.TreeView.focus(r.dataset.node);
-    });
   }
 
   function apply() {
-    var d = isDesk();
-    document.documentElement.classList.toggle('desk', d);
-    el.panel.hidden = !d;
-  }
-
-  /* ---------------- painel: próximas melhorias ---------------- */
-  function update() {
-    if (!isDesk() || !G.def) return;
-    var def = G.def, lv = G.levels(), money = G.S.money;
-    var list = def.nodes.filter(function (n) {
-      var l = lv[n.id] || 0;
-      return l < n.lv && P.Tree.reqsMet(def, n, lv);
-    }).map(function (n) { return { n: n, c: P.Tree.cost(def, G.mat, n, lv[n.id] || 0) }; })
-      .sort(function (a, b) { return a.c - b.c; }).slice(0, 5);
-    var key = list.map(function (x) { return x.n.id + (lv[x.n.id] || 0) + (money >= x.c ? 'y' : 'n'); }).join();
-    if (key === upKey) return;
-    upKey = key;
-    var brs = {};
-    def.branches.forEach(function (b) { brs[b.id] = b; });
-    if (!list.length) { el.up.innerHTML = '<p class="c-g">ÁRVORE COMPLETA!</p>'; return; }
-    el.up.innerHTML = list.map(function (x) {
-      var n = x.n, b = brs[n.b], ok = money >= x.c;
-      return '<div class="dp-row' + (ok ? ' ok' : '') + '" data-node="' + n.id + '" style="--bc:' + (b ? b.color : '#ffa300') + '">' +
-        P.SpriteCSS.html(b ? 'ico_' + b.icon : 'ico_match') +
-        '<div class="dp-txt"><b>' + n.n + '</b><span>' + P.Tree.effectLines(n)[0] + ' · NV ' + (lv[n.id] || 0) + '/' + n.lv + '</span></div>' +
-        '<button class="pxbtn' + (ok ? ' gold' : '') + '" data-buy="' + n.id + '">$' + P.fmtMoney(x.c) + '</button></div>';
-    }).join('');
-  }
-
-  /* ---------------- registro de eventos ---------------- */
-  function add(text, cls) {
-    var d = new Date();
-    log.unshift({ t: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'), text: text, cls: cls || '' });
-    if (log.length > 40) log.pop();
-    if (!isDesk()) return;
-    var row = document.createElement('div');
-    row.className = 'dp-log ' + (cls || '');
-    row.innerHTML = '<i>' + log[0].t + '</i>' + text;
-    el.log.insertBefore(row, el.log.firstChild);
-    while (el.log.children.length > 14) el.log.lastChild.remove();
-  }
-
-  function bindLog() {
-    add('Bem-vindo à ' + G.mat.name.toUpperCase() + '.', 'info');
-    G.on('event', function (d) { add(d.e.name + (d.extra ? ' ' + d.extra : ''), d.e.good ? 'good' : 'info'); });
-    G.on('milestone', function (d) { add('MARCO ' + d.layer + ' camadas · +$' + P.fmtMoney(d.money), 'gold'); });
-    G.on('damage', function (d) { add((d.kind === 'fire' ? 'Fogo' : d.kind === 'miss' ? 'Peça caiu' : 'Dano') + ' na camada ' + (d.layer + 1), 'bad'); });
-    G.on('threatDead', function (d) { add(d.t.def.name + ' expulso(a) · +$' + P.fmtMoney(Math.max(1, d.money)), 'good'); });
-    G.on('bought', function (d) { if (d && d.id) { var n = G.def.byId[d.id]; add('Comprado: ' + n.n + ' (nv ' + (G.levels()[d.id] || 0) + ')', 'gold'); } });
-    G.on('gust', function (g) { if (g.str >= 1.1) add('Rajada forte de vento', 'info'); });
-    G.on('challenge', function (s) { add(s === 'start' ? 'Desafio final iniciado!' : s === 'won' ? 'DESAFIO FINAL VENCIDO!' : 'Desafio final falhou', s === 'lost' ? 'bad' : 'gold'); });
-    G.on('rebuild', function () { add('Nova era: ' + G.mat.name.toUpperCase(), 'gold'); });
+    document.documentElement.classList.toggle('desk', isDesk());
   }
 
   /* ---------------- teclado ---------------- */
@@ -176,5 +100,5 @@ PALIT.Desktop = (function () {
     G.on('bought', function () { el.tip.hidden = true; });
   }
 
-  return { init: init, update: update, isDesk: isDesk, log: add, apply: function () { if (el.panel) apply(); } };
+  return { init: init, isDesk: isDesk, apply: function () { if (G) apply(); } };
 })();

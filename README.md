@@ -22,8 +22,8 @@ Notas:
 
 ## Versão desktop
 
-Em telas com 1000px de largura ou mais, o jogo muda para o layout de PC: status à esquerda, painel à direita com
-**próximas melhorias** (compra direta) e **registro de eventos**, e árvore em duas colunas com dicas ao passar o mouse.
+Em telas com 1000px de largura ou mais, o jogo muda para o layout de PC: status à esquerda, torre com a tela toda,
+missões num indicador pequeno (clique para abrir a lista ou receber) e árvore em duas colunas com dicas ao passar o mouse.
 Atalhos: `Espaço`/`Enter` colocar · `T` árvore · `Esc` fechar · `↑ ↓ PgUp PgDn` rolar · `Home` topo · `D` próximo dano ·
 `M` som · na árvore: `Enter` comprar (`Shift+Enter` máximo), setas para mover, `+`/`−` zoom.
 No Chrome/Edge do PC dá para instalar como app pelo ícone de instalar na barra de endereço.

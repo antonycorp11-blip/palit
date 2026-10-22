@@ -1,6 +1,6 @@
 /* =========================================================
    PAINÉIS — menu com abas, eventos com escolha e
-   indicador de missões (celular) / seção de missões (PC).
+   indicador discreto de missões (celular e PC).
    ========================================================= */
 var PALIT = window.PALIT = window.PALIT || {};
 
@@ -17,7 +17,7 @@ PALIT.Panels = (function () {
 
   function init() {
     G = P.Game;
-    // indicador de missão (celular)
+    // indicador de missão: discreto, toque abre a lista ou recebe a recompensa
     el.pill = document.createElement('button');
     el.pill.id = 'mission-pill';
     el.pill.className = 'px';
@@ -30,10 +30,10 @@ PALIT.Panels = (function () {
     G.on('choice', function (d) { choice(d.id); });
   }
 
-  /* ---------------- missões: indicador e seção desktop ---------------- */
+  /* ---------------- missões: indicador ---------------- */
   function update() {
     var ms = S().missions || [];
-    var key = ms.map(function (m) { return m.type + Math.floor(m.prog) + m.done; }).join() + (P.Desktop && P.Desktop.isDesk());
+    var key = ms.map(function (m) { return m.type + Math.floor(m.prog) + m.done; }).join();
     if (key === misKey) return;
     misKey = key;
     var done = ms.filter(function (m) { return m.done; }).length;
@@ -44,8 +44,6 @@ PALIT.Panels = (function () {
     el.pill.innerHTML = done > 0
       ? spr('ico_star') + '<span><b>MISSÃO COMPLETA!</b><em>TOQUE PARA RECEBER</em></span>'
       : spr('ico_flag') + '<span><b>' + first.text + '</b><i class="bar"><i style="width:' + Math.min(100, first.prog / first.target * 100) + '%;--c:var(--yellow)"></i></i></span>';
-    var dp = $('dp-mis');
-    if (dp) dp.innerHTML = missionRows(true);
   }
 
   function missionRows(compact) {

@@ -2,7 +2,7 @@
    Estratégia: REDE PRIMEIRO. Com internet, sempre baixa a versão publicada
    (ignorando o cache HTTP); sem internet, usa a cópia guardada.
    Ao publicar mudanças, aumente VERSION (e PALIT.BUILD em js/main.js). */
-var VERSION = 'palit-v19';
+var VERSION = 'palit-v20';
 var ASSETS = [
   './', 'index.html', 'manifest.webmanifest',
   'css/fonts.css', 'css/style.css',
